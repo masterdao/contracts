@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.6.2/ethers.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"
+        integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@2.7.2/dist/Chart.bundle.min.js"
+        integrity="sha256-XF29CBwU1MWLaGEnsELogU6Y6rcc5nCkhhx89nFMIDQ=" crossorigin="anonymous"></script>
+
+<script src="erc20Abi.js"></script>
+<script src ="contract.js"></script>
+<script src="multisig.js" + now()></script>
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div>
+    <button onclick="onTest()">get contract</button>
+</div>
+<button onclick="getstatus()">获取列表信息</button>
+<br><br>
+DAO 余额：<span style="color: red;" class="dao-balance">--.--</span><br>
+管理员地址：<span style="color: red;" class="owner-addr">--.--</span><br>
+<div  style="color:red; border-radius: 2%;  border: 2px solid burlywood;">
+用户操作：<hr>
+</body>
+</html>

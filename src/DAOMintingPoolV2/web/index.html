@@ -1,0 +1,90 @@
+<head>
+    <!-- Meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Cryptocash is Professional Creative Template"/>
+</head>
+<script src="https://cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"
+        integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@2.7.2/dist/Chart.bundle.min.js"
+        integrity="sha256-XF29CBwU1MWLaGEnsELogU6Y6rcc5nCkhhx89nFMIDQ=" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.min.js"
+        integrity="sha256-ecWZ3XYM7AwWIaGvSdmipJ2l1F4bN9RXW6zgpeAiZYI=" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+ 
+<script src="erc20Abi_1.js"></script>
+<script src="ISMPool_1.js?ueel" + random()></script>
+<script src="contract_2.js?urle232wew2eell="+ random() ></script>
+<html>
+    <body>
+        <button onclick="getstatus()">获取列表信息</button>
+        <br><br>
+        DAO 余额：<span style="color: red;" class="dao-balance">--.--</span><br>
+        
+        <div  style="color:red; border-radius: 2%;  border: 2px solid burlywood;">
+        操作流程：<hr>
+        1、添加矿池类型；<br>
+        2、添加矿池：<br>
+        3、授权 DAO 给合约：<br>    
+        4、增加奖金到资金池：<br>   
+        5、Depost：<br>
+        6、查看奖金:<br>
+        7、withdraw:<br>  
+        <span style="color: red;" class="showpoollist">--.--</span>
+        <hr>
+        我的抵押详情：<br>
+        <span style="color: red;" class="miner-list">--.--</span>
+        <br>
+        <span style="color: red;" class="show-bouns">--.--</span>
+        <br>
+        </div>
+        <br>
+        <br>
+        <div  style="color:red; border-radius: 2%;  border: 2px solid burlywood;">
+        管理员操作：<br><br>
+        <hr>
+        设定操作员：<input type="text" id="set-Policy" size=60><br><br>
+        <button onclick="setMonetaryPolicy()">设定操作员</button>
+        <hr>
+        添加矿池类型：<br>
+        时间：<input type="text" id="set-poolLength" value = "604800" size=60>（1周=86400 * 7 = 604800 ）<br><br>
+        权重：<input type="text" id="set-weight" value = "5" size=60>（0.5% =  5 ；2% = 20 ；13% = 130 ...）<br><br>
+        <button onclick="addmintingPoolType()">添加矿池类型</button>
+        <hr> 
+        矿池类型列表：<br>
+        <span style="color: red;" class="show-poolTypeinfo">--.--</span>
+        <hr>
+        添加矿池：<br>
+        token地址：<input type="text" id="set-lpToken" value = "0xDDd4A9D50a43B426F59F371B79975fE0e86e7D68" size=60><br><br>
+        倍数：<input type="text" id="set-multiple" value = "1" size=60>（1,10...）<br><br>
+        类型：<input type="text" id="set-poolTypeId" value = "0" size=60>（0，1...）<br><br>
+        <button onclick="addmintingPool()">添加矿池</button><br><br>
+        <span style="color: red;" class="show-poolinfo">--.--</span>
+        <hr>
+        增加奖金到资金池<br>
+        授权 DAO 给合约 <br><br>
+        <button onclick="approveBonusToken()">授权</button> &nbsp;&nbsp; 
+        <span class="bonus-isApprove" style="color:red">--.--</span><br>
+        <hr>
+        <!--
+        产品地址：<input type="text" id="product-address" size=60 value="0x2feAa4DEc384212Bda2622c80c1E653D91354c15">
+        <button onclick="getexpirationTimestamps()">获取产品，到期时间</button><input type="checkbox" id="CLAIM" onclick="onclaim()" >CLAIM<input onclick="onunclaim()" type="checkbox" id="UNCLAIM" > UNCLAIM <br>
+        -->
+        矿池名称：<input type="text" id="create-lptoken-name" size=60 value="DAO_ETH_ONE_WEEK_05">（Name）<br>
+        奖金地址：<input type="text" id="create-lptoken-token" size=60 value="0xDDd4A9D50a43B426F59F371B79975fE0e86e7D68">（DAO,奖金币）<br>
+        奖金数量：<input type="text" id="create-bonus-amount" size=60 value="100000"><br>
+        到期时间：<input type="text" id="last-time" size=60 value="1656518400">(默认：2022-06-30 00:00:00)<br><br>
+        <button onclick="addBonusToken()">给所有增加奖金</button><br><br>
+
+        <hr>
+        添加奖金到资金池： 
+        <span style="color: red;" class="minting-pool-list">--.--</span>
+        <br>
+         
+        <br>
+        </div>
+    </body>
+</html>
+ 
