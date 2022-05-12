@@ -154,7 +154,15 @@ contract idoCoinContract is  Ownable {
         require( coinAddress != address(0) );           
         return idoCoin[coinAddress];
     }
- 
+    //获取注册费
+    function getregisterAmount() public view returns(uint256){
+        return registerAmount;
+    }
+    //设定注册费
+    function setregisterAmount(uint256 _registerAmount) public onlyOwner returns(uint256){
+        registerAmount = _registerAmount
+        return _registerAmount
+    }
     /**
     新建IDO上币资料
      */
@@ -163,7 +171,9 @@ contract idoCoinContract is  Ownable {
         require(idoCoinHead.idoAmount > 0);
         address coinAddress = idoCoinHead.coinAddress;
         require(idoCoin[coinAddress].idoCoinHead.coinAddress == address(0));  
-        require(msg.value >=  registerAmount );         //收取至少一个ETH                 
+        //require(msg.value >=  registerAmount );         //收取至少一个ETH   
+        require(DAOToken.balanceOf(msg.sender) >= registerAmount);       //收取一定数量DAO    
+         
         idoCoinInfo memory newidoCoinInfo = idoCoinInfo({
             idoCoinHead:            idoCoinHead,
             timestamp:              block.timestamp,
@@ -189,7 +199,10 @@ contract idoCoinContract is  Ownable {
         COIN =  IERC20(idoCoinHead.coinAddress) ;
         COIN.safeTransferFrom(msg.sender, address(this), amount);
         
+        DAOToken.safeTransferFrom(msg.sender, address(this),registerAmount);
+
         registeFee = registeFee.add(msg.value);
+
         emit CreateIeoCoin(msg.sender,idoCoinHead.coinAddress,block.timestamp,amount);      
         return true;
     }
@@ -273,7 +286,12 @@ contract idoCoinContract is  Ownable {
         usercoin[msg.sender][coinAddress].makeCoinAmount =  makeCoinAmount;
         //提取购买币
         COIN = IERC20(idoCoin[coinAddress].idoCoinHead.coinAddress);   
-        COIN.safeTransfer(msg.sender,makeCoinAmount );       
+        COIN.safeTransfer(msg.sender,makeCoinAmount );
+
+        
+        //统计卖掉的币
+        idoCoin[coinAddress].idoAmountComplete = makeCoinAmount.add(idoCoin[coinAddress].idoAmountComplete);   
+
         //退款支付币
         if( winningRate.div(1e10) != 1 ){
             //address payable sender = address(uint160(msg.sender));
@@ -284,6 +302,9 @@ contract idoCoinContract is  Ownable {
             }
             usercoin[msg.sender][coinAddress].takeCoinAmount = usercoin[msg.sender][coinAddress].takeCoinAmount.sub(takeBalance);
         }
+        //统计获取的钱
+        idoCoin[coinAddress].collectAmount = usercoin[msg.sender][coinAddress].takeCoinAmount.add(idoCoin[coinAddress].collectAmount);
+
         emit Withdraw(msg.sender,COIN, makeCoinAmount,coinAddress,takeBalance );
         return true;
     }
@@ -328,6 +349,9 @@ contract idoCoinContract is  Ownable {
         
         COIN = IERC20(idoCoin[coinAddress].idoCoinHead.coinAddress); 
         COIN.safeTransfer(msg.sender, balance); 
+
+        DAOToken.safeTransfer(msg.sender, registerAmount );  //返还注册费
+
         emit TakeOut(msg.sender,idoCoin[coinAddress].collectAmount,idoCoin[coinAddress].idoCoinHead.collectType);
         return true;
     } 
