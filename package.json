@@ -1,0 +1,60 @@
+{
+  "name": "sor_demo",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "liang xiong <liangxiong@okg.com>",
+  "license": "MIT",
+  "scripts": {
+    "fix": "yarn prettier:fix && run-s lint:*",
+    "prettier:fix": "yarn prettier --write \"**/*.{js,json,md,sol,ts}\"",
+    "prettier:check": "yarn prettier --check --config ./.prettierrc.yaml \"**/*.{js,json,md,sol,ts}\"",
+    "lint:ts": "yarn eslint --config ./.eslintrc.json --ignore-path ./.eslintignore --ext .js,.ts . --fix",
+    "lint:sol": "yarn solhint --config ./.solhint.json --max-warnings 0 \"contracts/**/*.sol\" --fix"
+  },
+  "engines": {
+    "node": ">=10"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^4.5.0",
+    "bignumber.js": "^9.0.2",
+    "dotenv": "^10.0.0",
+    "eslint-config-airbnb-typescript": "^16.1.0",
+    "eslint-plugin-functional": "^4.0.2",
+    "ethereum-types": "^3.5.0",
+    "ethers": "^5.1.4",
+    "tslib": "^1.14.1",
+    "winston": "^3.6.0"
+  },
+  "devDependencies": {
+    "@nomiclabs/hardhat-ethers": "^2.0.5",
+    "@nomiclabs/hardhat-etherscan": "^3.0.1",
+    "@nomiclabs/hardhat-waffle": "^2.0.2",
+    "@typechain/ethers-v5": "^9.0.0",
+    "@typechain/hardhat": "^4.0.0",
+    "@types/chai": "^4.3.1",
+    "@types/mocha": "^9.1.1",
+    "@types/node": "^15.0.2",
+    "@typescript-eslint/eslint-plugin": "^5.8.1",
+    "@typescript-eslint/parser": "^5.8.1",
+    "chai": "^4.3.6",
+    "eslint": "^8.5.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-plugin-eslint-comments": "^3.2.0",
+    "eslint-plugin-import": "^2.25.3",
+    "ethereum-waffle": "^3.4.4",
+    "hardhat": "^2.8.4",
+    "hardhat-gas-reporter": "^1.0.8",
+    "mocha": "^10.0.0",
+    "npm-run-all": "^4.1.5",
+    "prettier": "^2.1.1",
+    "prettier-plugin-organize-imports": "^2.1.0",
+    "prettier-plugin-solidity": "^1.0.0-beta.19",
+    "solhint": "^3.3.7",
+    "solhint-plugin-prettier": "^0.0.5",
+    "solidity-coverage": "^0.7.20",
+    "ts-node": "^9.0.0",
+    "typechain": "^7.0.0",
+    "typescript": "^4.2.2"
+  }
+}
