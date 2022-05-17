@@ -64,8 +64,7 @@ contract idoCoinContract is  Ownable {
         uint256     partnerNumber;       //参与者持有DAOToken数量
         bool        bDAO;                //是否监管
         uint256     uDAONumber;          //监管比例，如30%,输入30
-        uint        blockTime;           //区块时间
-        uint        openTime;            //开始时间，将天设置为秒 1天=86400
+        uint        expireTime;          //到期时间，将天设置为秒 1天=86400
 
     }
     struct idoCoinInfo{
@@ -160,8 +159,8 @@ contract idoCoinContract is  Ownable {
     }
     //设定注册费
     function setregisterAmount(uint256 _registerAmount) public onlyOwner returns(uint256){
-        registerAmount = _registerAmount
-        return _registerAmount
+        registerAmount = _registerAmount;
+        return _registerAmount;
     }
     /**
     新建IDO上币资料
@@ -206,28 +205,13 @@ contract idoCoinContract is  Ownable {
         emit CreateIeoCoin(msg.sender,idoCoinHead.coinAddress,block.timestamp,amount);      
         return true;
     }
-    //blockTime
-    function checkBuyStatus(address coinAddress) private view returns(bool){
-        bool bStatus = false;
-        if(block.timestamp > idoCoin[coinAddress].idoCoinHead.blockTime ){
-            if( block.timestamp  > idoCoin[coinAddress].idoCoinHead.openTime ){
-               bStatus = true;
-            }
-            else{
-                bStatus = false;
-            }
-        }
-        else{
-            bStatus = false;
-        }
-        return bStatus;
-    }
     //打新
     function IPOsubscription(address coinAddress,uint256 amount) public payable returns(bool){
         require(idoCoin[coinAddress].bExpired == false);        
  
         require(idoCoin[coinAddress].idoCoinHead.coinAddress != address(0));
-        require(checkBuyStatus(coinAddress) == false ) ;   //还没有结束 
+        //require(checkBuyStatus(coinAddress) == false ) ;   //还没有结束 
+        require(block.timestamp < idoCoin[coinAddress].idoCoinHead.expireTime); //还没有到期
 
         address applyAddress = applyCoinAddress[idoCoin[coinAddress].idoCoinHead.collectType];
         address APPLYCOIN  = applyCoin[applyAddress].contractAddress ; 
@@ -313,7 +297,7 @@ contract idoCoinContract is  Ownable {
         require(idoCoin[coinAddress].collectAmount >= 0);                      
         require(idoCoin[coinAddress].createUserAddress == msg.sender );            
 
-        require(checkBuyStatus(coinAddress) == true); 
+        require(block.timestamp >= idoCoin[coinAddress].idoCoinHead.expireTime); //到期了
 
         uint256 collectAmount = idoCoin[coinAddress].collectAmount;
         address applyAddress = applyCoinAddress[idoCoin[coinAddress].idoCoinHead.collectType];
