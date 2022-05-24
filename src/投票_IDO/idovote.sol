@@ -143,9 +143,9 @@ contract idovoteContract is  Ownable {
                 peopleVoteIncome = peopleVoteIncome.div(10);
                 
                 if( lastVoteStatus[msg.sender] ){
-                    peopleVoteIncome = peopleVoteIncome.div(votecoin[coinAddress].pass);
+                    peopleVoteIncome = peopleVoteIncome.div(votecoin[coinAddress].pass+1);
                 }else{
-                    peopleVoteIncome = peopleVoteIncome.div(votecoin[coinAddress].deny);
+                    peopleVoteIncome = peopleVoteIncome.div(votecoin[coinAddress].deny+1);
                 }
                 votePeople[msg.sender][coinAddress].peopleVoteIncome = peopleVoteIncome;
                 //累计用户总投票收益
