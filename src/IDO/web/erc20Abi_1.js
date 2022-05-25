@@ -1,4 +1,4 @@
-const erc20miniAbi =[
+const erc20Abi =[
 	{
 		'constant': false,
 		'inputs': [

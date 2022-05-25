@@ -1,0 +1,61 @@
+ido.sol
+
+修改
+function withdraw(address coinAddress,uint256 winningRate,uint256 makeCoinAmount) public returns(bool);
+function takeOut( address coinAddress) public returns(bool)
+
+新增
+interface IidovoteContract{
+    function getVoteStatus(address coinAddress) external view returns(bool);
+}
+
+//设定矿池地址
+    function setdaoMintingPool(address _daoMintingPool) public onlyOwner {
+        daoMintingPool = _daoMintingPool;
+    }
+    //获取矿池地址
+    function getdaoMintingPool() public view returns(address){
+        return daoMintingPool;
+    } 
+    //设定投票地址
+    function setidovoteContract(address _idovoteContract) public onlyOwner{
+        idovoteContract = _idovoteContract;
+    }
+    //获取投票地址
+    function getidovoteContract() public view returns(address){
+        return idovoteContract;
+    }
+//去swap上购币
+    //代币 coinAddress,交易对tokenB,如果交易对是 ETH，那么传WETH地址，否则传交易对地址
+    function toSwapBuyDAO(address coinAddress,address tokenB) public onlyOwner returns(bool)
+//管理员结算项目方资金
+    function settlement(address coinAddress) public onlyOwner returns(bool)
+//管理员设定项目方提币数量
+    function setTakeOut(address coinAddress,uint256 amount) public onlyOwner returns(bool)
+idovote.sol
+//获取投票状态
+    function getVoteStatus(address coinAddress) public view returns(bool){
+        return votecoin[coinAddress].bSuccessOrFail;
+    }
+//管理员获取金库资金
+    function sendtreasuryAddrAmount(uint256 _treasuryAddrAmount) public onlyOwner
+//管理员获取业务资金
+    function sendbusinessAddrAmount(uint256 _businessAddrAmount) public onlyOwner
+//管理员获取星探资金
+    function sendstatAddrAmount(uint256 _statAddrAmount) public onlyOwner
+
+更新矿池合约
+DAOMintingPool.sol
+修改
+function addBonusToken(string memory name, address bsToken,uint256 amount,uint256 expirationTimestamps)
+新增
+//设定投票合约地址
+    function setIdoVoteAddress(address _iidoVoteAddress) public onlyOwner returns(bool)
+//获取投票合约地址
+    function getidoVoteAddress() public view returns(address)
+//投票合约调用
+    function addBonusToken_vote(address bsToken,uint256 amount,uint256 expirationTimestamps) public returns(bool)
+/add end 20220524
+    function addBonusToken_private(string memory name, address bsToken,uint256 amount,uint256 expirationTimestamps) private  returns(bool)
+
+

@@ -20,7 +20,8 @@ import "./Context.sol";
     address     public      monetaryPolicy;
     uint256     private     calculatestakingAmount;
     uint256     private     mintingPoolTypeSize;
-
+    
+    address    private      idoVoteAddress;
 
    constructor() {
         initializeOwner();
@@ -282,8 +283,32 @@ import "./Context.sol";
         emit AddmintingPool(msg.sender,lpToken,poolTypeId);
         return true;
     }
+    //add begin 20220524
     //bsToken ，收益币
+    //管理员添加矿池
     function addBonusToken(string memory name, address bsToken,uint256 amount,uint256 expirationTimestamps) public   onlyMonetaryPolicy returns(bool){
+        addBonusToken_private(name,bsToken,amount,expirationTimestamps);
+        return true;
+    }
+    //设定投票合约地址
+    function setIdoVoteAddress(address _idoVoteAddress) public onlyOwner returns(bool){
+        idoVoteAddress = _idoVoteAddress;
+        return true;
+    }
+    //获取投票合约地址
+    function getidoVoteAddress() public view returns(address){
+        return idoVoteAddress;
+    }
+    //投票合约调用
+    function addBonusToken_vote(address bsToken,uint256 amount,uint256 expirationTimestamps) public returns(bool){
+        require(msg.sender == idoVoteAddress);  //only idoVote 合约调用
+
+        string memory name = "vote";
+        addBonusToken_private(name,bsToken,amount,expirationTimestamps);
+        return true;
+    }
+    //add end 20220524
+    function addBonusToken_private(string memory name, address bsToken,uint256 amount,uint256 expirationTimestamps) private  returns(bool){
  
         require(bsToken != address(0));
         require(amount >0);
