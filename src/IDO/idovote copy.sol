@@ -28,24 +28,20 @@ contract idovoteContract is  Ownable {
     uint256    private minVoteVeDao;
 
     uint256    private totalStaking;
-    
-    mapping(address=>address []) vote_p_list;   //用户参与投票的列表
-    struct votePerson{
-        address     who;
-        uint256     weight;
-    }
-    mapping(address => votePerson) voet_p_weight;   //权重：开始1，正确1次，加0.1，错误一次减0.1  : 默认10，每次增加1，最后/10  
-
     //用户信息
     struct peopleInfo{
         uint256     timestamp;
         uint256     veDao;                  // veDao数量                
         bool        bVoted;                 //是否投过这个币的票
-        bool        weightSettled;          //是否统计权重
+        uint256     weight;                 //权重：开始1，正确1次，加0.1，错误一次减0.1  : 默认10，每次增加1，最后/10   
+        uint256     peopleVoteIncome;       //用户收益
         bool        bStatus;
-        bool        withdrawIncome;         //是否支取过收益
     }
     mapping(address => mapping(address=> peopleInfo )) votePeople;
+    mapping(address => uint256) voteWeight;
+    mapping (address=>address) lastVoteAddress;
+    mapping (address=>bool)  lastVoteStatus;
+    mapping (address=>uint256) peopleTotalVoteIncome;
     //币投票信息
     struct vcoinInfo{
         uint256     timestamp;              //时间戳
@@ -113,54 +109,47 @@ contract idovoteContract is  Ownable {
         require(coinAddress != address(0));
         return votecoin[coinAddress];
     }
-    //获取用户投票权重
-    function getVoetPeoperWeight(address who) public view returns(uint256){
-        require(who != address(0));
-        return voet_p_weight[who].weight;
-    }
     //投票
+    //下次投票后，才结算上次投票的收益
+    mapping(address=>address []) vote_p_list; //用户参与投票的列表
+    mapping(address =>uint256) voet_p_weight;
+
     function vote(address coinAddress,bool bStatus) public returns(bool) 
     {
         require(coinAddress != address(0));
         require(daoMintingPool.getuserTotalVeDao(msg.sender) > 0 );
         require(votePeople[msg.sender][coinAddress].bVoted == false); //投过后，就不允许再次投票
 
+        require(lastVoteAddress[msg.sender] != coinAddress); //投过后，就不允许再次投票
         
         peopleInfo memory newpeopleInfo = peopleInfo({
             timestamp:          block.timestamp,
             veDao:              daoMintingPool.getuserTotalVeDao(msg.sender),
             bVoted:             true,
-            weightSettled:      false,
-            bStatus:            bStatus,
-            withdrawIncome:     false
+            weight:             votePeople[msg.sender][coinAddress].weight,
+            peopleVoteIncome:   votePeople[msg.sender][coinAddress].peopleVoteIncome,
+            bStatus:            bStatus
         });
-        //开始初始化为权重为 10
-        if( voet_p_weight[msg.sender].who == address(0) ){
-            voet_p_weight[msg.sender].who       = msg.sender;
-            voet_p_weight[msg.sender].weight    = 10;
-        }
+
         votePeople[msg.sender][coinAddress] =  newpeopleInfo;
 
         vote_p_list[msg.sender].push(coinAddress);
 
         for(uint256 i = 0;i< vote_p_list[msg.sender].length;i++ ){
-            //已经结束的票
             if( votecoin[vote_p_list[msg.sender][i]].bEnd ){
-                //如果没有统计过权重的，开始统计用户权重
-                if( votePeople[msg.sender][vote_p_list[msg.sender][i]].weightSettled == false ){
-                    if( votecoin[vote_p_list[msg.sender][i]].bSuccessOrFail){
-                        voet_p_weight[msg.sender].weight = voet_p_weight[msg.sender].weight.add(1);
-                    }
-                    else{
-                        voet_p_weight[msg.sender].weight = voet_p_weight[msg.sender].weight.sub(1);
-                    }
-                    votePeople[msg.sender][vote_p_list[msg.sender][i]].weightSettled = true;
+                //开始统计用户权重
+                if( votecoin[vote_p_list[msg.sender][i]].bSuccessOrFail){
+                    voet_p_weight[msg.sender] = voet_p_weight[msg.sender].add(1);
+                }
+                else{
+                    voet_p_weight[msg.sender] = voet_p_weight[msg.sender].sub(1);
                 }
             }
         }
+        
         //voteVeDao 投票总量
         uint256 voteVeDao = votePeople[msg.sender][coinAddress].veDao;
-        voteVeDao = voteVeDao.add(votePeople[msg.sender][coinAddress].veDao.mul(voet_p_weight[msg.sender].weight).div(10));
+        voteVeDao = voteVeDao.add(votePeople[msg.sender][coinAddress].veDao.mul(votePeople[msg.sender][coinAddress].weight).div(10));
 
         vcoinInfo memory newvcoinInfo = vcoinInfo({
             timestamp:          block.timestamp,
@@ -176,7 +165,7 @@ contract idovoteContract is  Ownable {
         });
         votecoin[coinAddress] = newvcoinInfo;
 
-        uint256 weight = voet_p_weight[msg.sender].weight;
+        uint256 weight = voet_p_weight[msg.sender] .weight;
 
         if(bStatus){
             votecoin[coinAddress].pass = votecoin[coinAddress].pass.add(voteVeDao.mul(weight).div(10));
@@ -190,6 +179,90 @@ contract idovoteContract is  Ownable {
         votecoin[coinAddress].cvotingRatio = votecoin[coinAddress].voteVeDao.mul(100).div(totalStaking);
 
 
+        lastVoteAddress[msg.sender] = coinAddress;  //记录这次投票地址
+        lastVoteStatus[msg.sender] = bStatus;
+        emit Vote(msg.sender,coinAddress,bStatus);
+        return true;
+    }
+    function vote_old(address coinAddress,bool bStatus) public returns(bool) 
+    {
+        require(coinAddress != address(0));
+        require(daoMintingPool.getuserTotalVeDao(msg.sender) > 0 );
+        require(votePeople[msg.sender][coinAddress].bVoted == false);
+        require(lastVoteAddress[msg.sender] != coinAddress); //投过后，就不允许再次投票
+        
+        peopleInfo memory newpeopleInfo = peopleInfo({
+            timestamp:          block.timestamp,
+            veDao:              daoMintingPool.getuserTotalVeDao(msg.sender),
+            bVoted:             true,
+            weight:             votePeople[msg.sender][coinAddress].weight,
+            peopleVoteIncome:   votePeople[msg.sender][coinAddress].peopleVoteIncome,
+            bStatus:            bStatus
+        });
+
+        votePeople[msg.sender][coinAddress] =  newpeopleInfo;  
+        bool isOk; 
+        if( lastVoteAddress[msg.sender] == address(0) )
+        {
+            votePeople[msg.sender][coinAddress].weight = 10 ; //此处 乘于一个 参数  220425
+        }
+        else
+        {
+            isOk = lastVoteStatus[msg.sender] == votecoin[lastVoteAddress[msg.sender]].bSuccessOrFail?true:false;
+            if(isOk)
+            {
+                votePeople[msg.sender][coinAddress].weight = (votePeople[msg.sender][coinAddress].weight).add(1);
+                //结算投票后收益
+                uint256 peopleVoteIncome  = votePeople[msg.sender][coinAddress].veDao.mul(votePeople[msg.sender][coinAddress].weight);
+                peopleVoteIncome = peopleVoteIncome.div(10);
+                
+                //我需要再 读一下代码
+                if( lastVoteStatus[msg.sender] ){
+                    peopleVoteIncome = peopleVoteIncome.div(votecoin[coinAddress].pass);
+                }else{
+                    peopleVoteIncome = peopleVoteIncome.div(votecoin[coinAddress].deny);
+                }
+                votePeople[msg.sender][coinAddress].peopleVoteIncome = peopleVoteIncome;
+                //累计用户总投票收益
+                peopleTotalVoteIncome[msg.sender] = peopleTotalVoteIncome[msg.sender].add(peopleVoteIncome);
+
+            }else{
+                votePeople[msg.sender][coinAddress].weight = (votePeople[msg.sender][coinAddress].weight).sub(1);
+            }  
+        }    
+        //voteVeDao 投票总量
+        uint256 voteVeDao = votePeople[msg.sender][coinAddress].veDao;
+        voteVeDao = voteVeDao.add(votePeople[msg.sender][coinAddress].veDao.mul(votePeople[msg.sender][coinAddress].weight).div(10));
+
+        vcoinInfo memory newvcoinInfo = vcoinInfo({
+            timestamp:          block.timestamp,
+            bOpen:              true,
+            cpassingRate:       votecoin[coinAddress].cpassingRate,
+            cvotingRatio:       votecoin[coinAddress].cvotingRatio,
+            pass:               votecoin[coinAddress].pass,
+            deny:               votecoin[coinAddress].deny,
+            voteVeDao:          voteVeDao,
+            bEnd:               votecoin[coinAddress].bEnd,
+            bSuccessOrFail:     votecoin[coinAddress].bSuccessOrFail,
+            daoVoteIncome:      votecoin[coinAddress].daoVoteIncome
+        });
+        votecoin[coinAddress] = newvcoinInfo;
+        uint256 weight = votePeople[msg.sender][coinAddress].weight;
+        if(bStatus){
+            votecoin[coinAddress].pass = votecoin[coinAddress].pass.add(voteVeDao.mul(weight).div(10));
+            votePeople[msg.sender][coinAddress].weight = votePeople[msg.sender][coinAddress].weight.add(1);
+        }
+        else{
+            votecoin[coinAddress].deny = votecoin[coinAddress].deny.add(voteVeDao.mul(weight).div(10));
+            votePeople[msg.sender][coinAddress].weight = votePeople[msg.sender][coinAddress].weight.sub(1);
+        }
+        totalStaking = daoMintingPool.getcalculatestakingAmount();
+        votecoin[coinAddress].cpassingRate = votecoin[coinAddress].pass.mul(100).div( votecoin[coinAddress].pass.add(votecoin[coinAddress].deny));
+        votecoin[coinAddress].cvotingRatio = votecoin[coinAddress].voteVeDao.mul(100).div(totalStaking);
+
+
+        lastVoteAddress[msg.sender] = coinAddress;  //记录这次投票地址
+        lastVoteStatus[msg.sender] = bStatus;
         emit Vote(msg.sender,coinAddress,bStatus);
         return true;
     }
@@ -210,7 +283,6 @@ contract idovoteContract is  Ownable {
     }
     //获取投票状态
     function getVoteStatus(address coinAddress) public view returns(bool){
-        require(votecoin[coinAddress].bEnd);
         return votecoin[coinAddress].bSuccessOrFail;
     }
     //管理员设定投票分配收益
@@ -223,78 +295,17 @@ contract idovoteContract is  Ownable {
         return (coinAddress,amount);
     }
     //查看用户投票收益，
-    function viewDaoVoteIncome(address coinAddress) public view returns(uint256) {
-        require(coinAddress != address(0));
-        require(votecoin[coinAddress].timestamp != 0);
-        require(votePeople[msg.sender][coinAddress].timestamp != 0);
-        require(votecoin[coinAddress].bEnd); //该币已经投票结束
-        if(votePeople[msg.sender][coinAddress].withdrawIncome){
-            return 0;
-        }
-        uint256 weight = voet_p_weight[msg.sender].weight ;
-        //预估weight
-        for(uint256 i = 0;i< vote_p_list[msg.sender].length;i++ ){
-            //已经结束的票
-            if( votecoin[vote_p_list[msg.sender][i]].bEnd ){
-                //如果没有统计过权重的，开始统计用户权重
-                if( votePeople[msg.sender][vote_p_list[msg.sender][i]].weightSettled == false ){
-                    if( votecoin[vote_p_list[msg.sender][i]].bSuccessOrFail){
-                        weight = weight.add(1);
-                    }
-                    else{
-                        weight = weight.sub(1);
-                    }
-                }
-            }
-        }
-        //开始计算收益
-        uint256 peopleVoteIncome  = votePeople[msg.sender][coinAddress].veDao.mul(weight);
-        peopleVoteIncome = peopleVoteIncome.div(10);
-        if( votePeople[msg.sender][coinAddress].bStatus ){
-            peopleVoteIncome = peopleVoteIncome.div(votecoin[coinAddress].pass);
-        }
-        else{
-            peopleVoteIncome = peopleVoteIncome.div(votecoin[coinAddress].deny);
-        }
-        return peopleVoteIncome;     
+    function viewDaoVoteIncome() public view returns(uint256) {
+        return peopleTotalVoteIncome[msg.sender];        
     }
     //提取用户投票收益
-    function tokeoutVoteIncome(address coinAddress) public returns (uint256){
-        require(coinAddress != address(0));
-        require(votecoin[coinAddress].timestamp != 0);
-        require(votePeople[msg.sender][coinAddress].timestamp != 0);
-        require(votecoin[coinAddress].bEnd); //该币已经投票结束
-        require(votePeople[msg.sender][coinAddress].withdrawIncome == false);
-        //更新weight
-        for(uint256 i = 0;i< vote_p_list[msg.sender].length;i++ ){
-            //已经结束的票
-            if( votecoin[vote_p_list[msg.sender][i]].bEnd ){
-                //如果没有统计过权重的，开始统计用户权重
-                if( votePeople[msg.sender][vote_p_list[msg.sender][i]].weightSettled == false ){
-                    if( votecoin[vote_p_list[msg.sender][i]].bSuccessOrFail){
-                        voet_p_weight[msg.sender].weight = voet_p_weight[msg.sender].weight.add(1);
-                    }
-                    else{
-                        voet_p_weight[msg.sender].weight = voet_p_weight[msg.sender].weight.sub(1);
-                    }
-                    votePeople[msg.sender][vote_p_list[msg.sender][i]].weightSettled = true;
-                }
-            }
-        }
-        
-        //开始计算收益
-        uint256 peopleVoteIncome  = votePeople[msg.sender][coinAddress].veDao.mul(voet_p_weight[msg.sender].weight);
-        peopleVoteIncome = peopleVoteIncome.div(10);
-        if( votePeople[msg.sender][coinAddress].bStatus ){
-            peopleVoteIncome = peopleVoteIncome.div(votecoin[coinAddress].pass);
-        }
-        else{
-            peopleVoteIncome = peopleVoteIncome.div(votecoin[coinAddress].deny);
-        }
-        votePeople[msg.sender][coinAddress].withdrawIncome = true;
-        //提取用户投票收益
+    function tokeoutVoteIncome() public returns (uint256){
+        require(peopleTotalVoteIncome[msg.sender] > 0 );
+        uint256 peopleVoteIncome = peopleTotalVoteIncome[msg.sender];
+        peopleTotalVoteIncome[msg.sender] = 0;
         IERC20(DAOToken).safeTransfer(msg.sender,peopleVoteIncome);
         emit TokeoutVoteIncome(msg.sender,peopleVoteIncome);
         return peopleVoteIncome;
     }
+
 }

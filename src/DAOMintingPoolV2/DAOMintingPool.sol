@@ -21,7 +21,7 @@ import "./Context.sol";
     uint256     private     calculatestakingAmount;
     uint256     private     mintingPoolTypeSize;
     
-    address    private      idoVoteAddress;
+    address    private      idoAddress;
 
    constructor() {
         initializeOwner();
@@ -291,17 +291,17 @@ import "./Context.sol";
         return true;
     }
     //设定投票合约地址
-    function setIdoVoteAddress(address _idoVoteAddress) public onlyOwner returns(bool){
-        idoVoteAddress = _idoVoteAddress;
+    function setIdoAddress(address _idoAddress) public onlyOwner returns(bool){
+        idoAddress = _idoAddress;
         return true;
     }
     //获取投票合约地址
-    function getidoVoteAddress() public view returns(address){
-        return idoVoteAddress;
+    function getidoAddress() public view returns(address){
+        return idoAddress;
     }
     //投票合约调用
     function addBonusToken_vote(address bsToken,uint256 amount,uint256 expirationTimestamps) public returns(bool){
-        require(msg.sender == idoVoteAddress);  //only idoVote 合约调用
+        require(msg.sender == idoAddress);  //only idoVote 合约调用
 
         string memory name = "vote";
         addBonusToken_private(name,bsToken,amount,expirationTimestamps);
