@@ -208,13 +208,20 @@ contract idovoteContract is  Ownable {
         emit SetVoteCoinEnd(msg.sender,coinAddress);
         return true;
     }
+    // 获取投票是否结束
+    function getVoteEnd(address coinAddress) public view returns(bool){
+        require(coinAddress != address(0));
+        return votecoin[coinAddress].bEnd;
+    }
     //获取投票状态
     function getVoteStatus(address coinAddress) public view returns(bool){
+        require(coinAddress != address(0));
         require(votecoin[coinAddress].bEnd);
         return votecoin[coinAddress].bSuccessOrFail;
     }
     //管理员设定投票分配收益
     function setDaoVoteIncome(address coinAddress,uint256 amount) public onlyOwner payable returns(address, uint256){
+        require(coinAddress != address(0));
         require(votecoin[coinAddress].timestamp != 0);
         require(amount>0);
         votecoin[coinAddress].daoVoteIncome = amount;

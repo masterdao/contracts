@@ -59,8 +59,7 @@ contract idoCoinContract is  Ownable {
         IERC20 _DAOToken,
         IDAOMintingPool _IDAOMintingPool,
         IidovoteContract _IidovoteContract,
-        address router_ ,
-        address WETH_ ) {
+        address router_) {
             
         initializeOwner();
         
@@ -83,7 +82,6 @@ contract idoCoinContract is  Ownable {
         treasuryAddrAmount = 0;
         businessAddrAmount = 0;
         statAddrAmount = 0;
-        WETH = WETH_;
     }
     
     struct idoCoinInfoHead{
@@ -456,9 +454,9 @@ contract idoCoinContract is  Ownable {
         uint256 amountOut;
         address pair_ ;
         factory = IUniswapRouter02(router).factory();
-        if( tokenB  == WETH ) //ETH
+        if( tokenB  == IUniswapRouter02(router).WETH() ) //ETH
         {
-            pair_= IUniswapFactory(factory).getPair(WETH,address(DAOToken));
+            pair_= IUniswapFactory(factory).getPair(IUniswapRouter02(router).WETH(),address(DAOToken));
             autoSwapEthToTokens(
                 address(DAOToken),
                 swapBuyDao[coinAddress],
