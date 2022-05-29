@@ -1,23 +1,22 @@
-# 合约测试
+# Contracts Test
 
-本分支为的合约测试
+This branch just for testing contracts
 
-## 运行测试
+## Run test
 
-### 1. 合并主分支
+### 1. merge from main branch
 ```sh
 git merge main
 ```
-### 2. 安装依赖
+### 2. install dependencies
 ```sh
-# 安装依赖
 npm install
 ```
 
-### 3.运行测试套件
+### 3. run test suite
 
 ```sh
 npm run test
-# 或者
+# or
 npx hardhat test test/**/*.test.ts
 ```
