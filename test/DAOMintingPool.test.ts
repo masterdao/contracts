@@ -9,12 +9,11 @@ describe('DAOMinitingPool contract test', () => {
   let contract: DAOMintingPool;
   let dao: ERC20;
   let owner: SignerWithAddress;
-  let account1: SignerWithAddress;
 
   before(async () => {
     contract = (await deploy(contracts.vedao)) as any;
     dao = (await deployDAO()) as any;
-    [owner, account1] = await ethers.getSigners();
+    [owner] = await ethers.getSigners();
   });
 
   it(`should add minting pool type`, async () => {

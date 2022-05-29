@@ -2,5 +2,7 @@ artifacts/
 cache/
 node_modules/
 types/
+temp/
+tmp/
 .env
 .DS_Store

@@ -14,7 +14,7 @@ describe('DAO token test', () => {
     [owner, account1] = await ethers.getSigners();
   });
 
-  it('deployment should success', async () => {
+  it(`deployment should success`, async () => {
     expect(await contract.name()).to.equals('DAO token');
     expect(await contract.symbol()).to.equals('DAO');
     expect(await contract.owner()).to.equals(owner.address);
@@ -31,7 +31,7 @@ describe('DAO token test', () => {
     const length = await contract.getmultiAddresslength();
     expect(length).to.equals(2);
 
-    // get two multi-signature address
+    // retrive two addresses
     const addresses = await Promise.all(
       [0, 1].map((i) => contract.getmultiAddressinfo(i)),
     );
@@ -40,7 +40,6 @@ describe('DAO token test', () => {
   });
 });
 
-// 发币
 describe('mint', () => {
   let contract: ERC20;
   let owner: SignerWithAddress;
@@ -50,23 +49,22 @@ describe('mint', () => {
     contract = (await deploy(contracts.dao, 'DAO token', 'DAO')) as any;
     [owner, account1] = await ethers.getSigners();
 
-    // 设置多签地址，和多签最少要求数量
     await (await contract.setmultiAddress(owner.address)).wait();
     await (await contract.setmultiAddress(account1.address)).wait();
     await (await contract.setmultiNumber(1)).wait();
   });
 
   it('minting DAO', async () => {
-    // 开启发币提案
+    // proposal
     await run(contract.startmultisignatureperiod);
 
-    // 发行 100 个 DAO
+    // mint 100 ether DAO
     const amount = 100;
 
-    // WARN: 这里的单位是 ether 不是 wei
+    // WARN: this unit is ether, NOT wei!
     await run(contract.mint, amount);
 
-    // WARN: 这里的单位是 wei 不是 ether
+    // WARN: but it's wei in here, NOT ether
     const total = await contract.totalSupply();
     expect(total).equals(ethers.utils.parseEther('100'));
 
