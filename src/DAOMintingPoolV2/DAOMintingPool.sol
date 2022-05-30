@@ -161,7 +161,7 @@ import "./Context.sol";
             return bcheck;
         }
         for(uint256 i=0;i<mintingPoolTypeSize;i++){
-           if( mintingPoolTypeList[mintingPoolTypeSize-1].poolLength == poolLength  ){
+           if( mintingPoolTypeList[i].poolLength == poolLength  ){
                bcheck = true;
            }
         }
@@ -283,14 +283,7 @@ import "./Context.sol";
         emit AddmintingPool(msg.sender,lpToken,poolTypeId);
         return true;
     }
-    //add begin 20220524
-    //bsToken ，收益币
-    //管理员添加矿池
-    function addBonusToken(string memory name, address bsToken,uint256 amount,uint256 expirationTimestamps) public   onlyMonetaryPolicy returns(bool){
-        addBonusToken_private(name,bsToken,amount,expirationTimestamps);
-        return true;
-    }
-    //设定投票合约地址
+     //设定投票合约地址
     function setIdoAddress(address _idoAddress) public onlyOwner returns(bool){
         idoAddress = _idoAddress;
         return true;
@@ -299,9 +292,17 @@ import "./Context.sol";
     function getidoAddress() public view returns(address){
         return idoAddress;
     }
+    //add begin 20220524
+    //bsToken ，收益币
+    //管理员添加矿池
+    function addBonusToken(string memory name, address bsToken,uint256 amount,uint256 expirationTimestamps) public   onlyMonetaryPolicy returns(bool){
+        addBonusToken_private(name,bsToken,amount,expirationTimestamps);
+        return true;
+    }
+   
     //投票合约调用
     function addBonusToken_vote(address bsToken,uint256 amount,uint256 expirationTimestamps) public returns(bool){
-        require(msg.sender == idoAddress);  //only idoVote 合约调用
+        require(msg.sender == idoAddress);  //only ido 合约调用
 
         string memory name = "vote";
         addBonusToken_private(name,bsToken,amount,expirationTimestamps);

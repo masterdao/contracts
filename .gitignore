@@ -1,8 +1,8 @@
+.env
+.vscode/
+node_modules/
 artifacts/
 cache/
-node_modules/
-types/
 temp/
-tmp/
-.env
+types/
 .DS_Store
