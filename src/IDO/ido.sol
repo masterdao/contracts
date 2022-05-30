@@ -248,7 +248,7 @@ contract idoCoinContract is  Ownable {
     /**
     新建IDO上币资料
      */
-    function createIeoCoin(idoCoinInfoHead memory idoCoinHead) public payable returns(bool){
+    function createIeoCoin(idoCoinInfoHead memory idoCoinHead,bool bstar) public payable returns(bool){
         require(idoCoinHead.coinAddress != address(0));
         
         require(idoCoinHead.idoAmount > 0);
@@ -256,9 +256,10 @@ contract idoCoinContract is  Ownable {
         require(idovoteContract.getVoteStatus(coinAddress));  //检查是否已经投票通过
 
         require(idoCoin[coinAddress].idoCoinHead.coinAddress == address(0));  
-        //require(msg.value >=  registerAmount );         //收取至少一个ETH   
-        require(DAOToken.balanceOf(msg.sender) >= registerAmount);       //收取一定数量DAO    
-         
+        //require(msg.value >=  registerAmount );         //收取至少一个ETH 
+        if(bstar){
+            require(DAOToken.balanceOf(msg.sender) >= registerAmount);       //收取一定数量DAO 
+        }  
         idoCoinInfo memory newidoCoinInfo = idoCoinInfo({
             idoCoinHead:            idoCoinHead,
             timestamp:              block.timestamp,
