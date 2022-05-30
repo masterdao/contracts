@@ -38,8 +38,6 @@ contract idoCoinContract is  Ownable {
     IDAOMintingPool  public daoMintingPool;
     IidovoteContract public idovoteContract;
     
-    uint256     private fee;
-    uint256     private feeBase;
     uint        applyCoinId;
     address     public daoAddress;
     uint256     public registeFee;
@@ -70,8 +68,6 @@ contract idoCoinContract is  Ownable {
         TOKEN_DECIMALS  = 18;
         PRICE_DECIMALS  = 6;
         registerAmount  = 1 * (10 ** uint256(TOKEN_DECIMALS));
-        fee             = 5;
-        feeBase         = 1000;
         applyCoinId     = 1;
         addapplyCoin(msg.sender ,"ETH",18);          
         registeFee      = 0;
@@ -353,7 +349,7 @@ contract idoCoinContract is  Ownable {
     }
     function checkwinningRate(uint256 winningRate) private pure returns(bool){
         uint256 temp = winningRate.div(1e8);
-        if(temp >= 0 || temp <=100){
+        if(temp >= 0 && temp <=100){
             return true;
         }else{
             return false;
@@ -445,16 +441,24 @@ contract idoCoinContract is  Ownable {
    
     //去swap上购币
     //代币 coinAddress,交易对tokenB,如果交易对是 ETH，那么传WETH地址，否则传交易对地址
-    function toSwapBuyDAO(address coinAddress,address tokenB) public onlyOwner returns(bool){
+    function toSwapBuyDAO(address coinAddress) public onlyOwner returns(bool){
         //ETH或者BNB
         require(coinAddress != address(0));
-        require(tokenB != address(0));
         uint256 reserve0;
         uint256 reserve1;
         uint256 amountOut;
         address pair_ ;
+        address tokenB = applyCoinAddress[idoCoin[coinAddress].idoCoinHead.collectType];
         factory = IUniswapRouter02(router).factory();
-        if( tokenB  == IUniswapRouter02(router).WETH() ) //ETH
+         //获取储量
+        ( reserve0,  reserve1, ) = IUniswapPair(pair_).getReserves();
+        //计算本次购买数量    
+        amountOut = IUniswapRouter02(router).getAmountOut(
+            swapBuyDao[coinAddress],
+            reserve0,
+            reserve1
+            );
+        if( idoCoin[coinAddress].idoCoinHead.collectType  == 1 ) //ETH
         {
             pair_= IUniswapFactory(factory).getPair(IUniswapRouter02(router).WETH(),address(DAOToken));
             autoSwapEthToTokens(
@@ -473,14 +477,7 @@ contract idoCoinContract is  Ownable {
             );
         
         }
-        //获取储量
-        ( reserve0,  reserve1, ) = IUniswapPair(pair_).getReserves();
-        //计算本次购买数量    
-        amountOut = IUniswapRouter02(router).getAmountOut(
-            swapBuyDao[coinAddress],
-            reserve0,
-            reserve1
-            );
+       
         //开始记账：
        zeorAddrAmount = zeorAddrAmount.add(amountOut.mul(30).div(100));
        //开始销毁
