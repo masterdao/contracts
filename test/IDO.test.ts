@@ -6,11 +6,11 @@ import { IdoCoinContract } from '../types/IDO/ido.sol';
 import { ERC20 } from '../types/token';
 
 import { idoFixture } from './fixtures/ido';
-import { loadFixture, run } from './helper';
+import { deploy, loadFixture, run } from './helper';
 
 const { parseEther, formatEther } = ethers.utils;
 
-describe.only('ido contract', () => {
+describe('ido contract', () => {
   let dao: ERC20;
   let ido: IdoCoinContract;
   let myToken: MockToken;
@@ -19,7 +19,12 @@ describe.only('ido contract', () => {
     const setup = await loadFixture(idoFixture);
     ido = setup.ido as any;
     dao = setup.dao as any;
-    myToken = setup.token as any;
+    myToken = (await deploy(
+      'MockToken',
+      'myToken',
+      'MTK',
+      parseEther('1000000'),
+    )) as any;
     [owner] = await ethers.getSigners();
     console.log({
       dao: dao.address,
@@ -31,6 +36,7 @@ describe.only('ido contract', () => {
   });
 
   it(`create project`, async () => {
+    // console.log('ok');
     const head: IdoCoinContract.IdoCoinInfoHeadStruct = {
       coinAddress: myToken.address,
       symbol: await myToken.symbol(),
@@ -47,19 +53,17 @@ describe.only('ido contract', () => {
       // 秒
       expireTime: Date.now() + 86400,
     };
-
     await run(dao.approve, ido.address, parseEther('1'));
     await run(myToken.approve, ido.address, parseEther('100'));
-
     await run(ido.createIeoCoin, head);
 
+    // validation
     const idoCoin = await ido.getidoCoin(myToken.address);
     expect(idoCoin).not.null;
-
     expect(idoCoin.idoCoinHead.coinAddress).eq(myToken.address);
   });
 
-  it(`IPO subscription`, async () => {
+  it.skip(`IPO subscription`, async () => {
     const balance = await owner.getBalance();
     console.log('balance', formatEther(balance));
 

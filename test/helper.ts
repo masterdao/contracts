@@ -9,26 +9,15 @@ type ContractInfo = {
 
 /** 合约配置 */
 export const contracts = {
-  dao: {
-    // name: 'ERC20',
-    name: 'src/token/ERC20.sol:ERC20',
-  },
-  vedao: {
-    name: 'DAOMintingPool',
-  },
-  ido: {
-    name: 'idoCoinContract',
-  },
-  idoVote: {
-    name: 'idovoteContract',
-  },
+  dao: 'src/token/ERC20.sol:ERC20',
+  pool: 'DAOMintingPool',
+  ido: 'idoCoinContract',
+  idoVote: 'idovoteContract',
   uniswapV2: {
     factory: 'UniswapV2Factory',
     router: 'UniswapV2Router02',
   },
-  weth: {
-    name: 'WETH9',
-  },
+  weth: 'WETH9',
 };
 
 /** 部署合约 */
@@ -89,5 +78,5 @@ export async function loadFixture<T>(fixture: Fixture<T>) {
   const { provider, createFixtureLoader } = waffle;
   const accounts = provider.getWallets();
   const load = createFixtureLoader(accounts, provider);
-  return await load(fixture);
+  return load(fixture);
 }

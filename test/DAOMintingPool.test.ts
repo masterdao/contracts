@@ -11,7 +11,7 @@ describe('DAOMinitingPool contract test', () => {
   let owner: SignerWithAddress;
 
   before(async () => {
-    contract = (await deploy(contracts.vedao)) as any;
+    contract = (await deploy(contracts.pool)) as any;
     dao = (await deployDAO()) as any;
     [owner] = await ethers.getSigners();
   });
@@ -49,10 +49,7 @@ describe('DAOMinitingPool contract test', () => {
     expect(pool.stakingTotal).eq(0);
   });
 
-  it(`addBonus`, async () => {
-    // TODO
-  });
-
+  // NOTE: 该测试方式不正确，每个测试要纯净的前置条件，而该测试使用了其它测试的副作用
   it(`deposit`, async () => {
     const lpToken = dao.address;
     // 质押 100 个 DAO
