@@ -3,6 +3,7 @@ const path = require('path');
 const fs = require('fs');
 
 async function main() {
+    const destarg = process.argv[2];
     const contracts = [
         { artifact: 'token/ERC20.sol/ERC20', typings: 'token/ERC20', target: 'DAOERC20' },
         { artifact: 'DAOMintingPoolV2/DAOMintingPool.sol/DAOMintingPool', typings: 'DAOMintingPoolV2/DAOMintingPool', target: 'DAOMintingPool' },
@@ -14,13 +15,18 @@ async function main() {
         types: path.join(__dirname, '../types/src'),
         dist: path.join(__dirname, '../tmp')
     }
-
-    if (fs.existsSync(dirs.dist)) {
-        fs.rmdirSync(dirs.dist, { force: true, recursive: true })
+    if (destarg) {
+        dirs.dist = path.resolve(destarg)
+        console.log('dist', dirs.dist)
     }
-    fs.mkdirSync(dirs.dist);
-    fs.mkdirSync(path.join(dirs.dist, 'abi'))
-    fs.mkdirSync(path.join(dirs.dist, 'types'))
+
+
+    if (!fs.existsSync(dirs.dist)) {
+        // fs.rmdirSync(dirs.dist, { force: true, recursive: true })
+        fs.mkdirSync(dirs.dist);
+        fs.mkdirSync(path.join(dirs.dist, 'abi'))
+        fs.mkdirSync(path.join(dirs.dist, 'types'))
+    }
 
     for (const contract of contracts) {
         const abi = {
