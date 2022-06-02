@@ -127,6 +127,13 @@ contract idovoteContract is  Ownable {
         }
         return ret;
     }
+    
+    // 获取当前用户指定项目投票记录
+    function getVoteRecord(address coinAddress) public view returns(peopleInfo memory) {
+        require(coinAddress != address(0));
+        return votePeople[msg.sender][coinAddress];
+    }
+
     //投票
     function vote(address coinAddress,bool bStatus) public returns(bool) 
     {
