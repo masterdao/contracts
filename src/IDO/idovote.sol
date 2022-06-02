@@ -128,12 +128,19 @@ contract idovoteContract is  Ownable {
         require(index>=0);
         return votecoin[vote_p_list[who][index]];
     }
-    
-    // 获取当前用户指定项目投票记录
+    function  getVotePeoperInfo(address who,uint256  index) public view returns(vcoinInfo memory){
+        require(who != address(0));
+        require(index>=0);
+        uint256 count =getVotePeoperInfoSize(who);
+        require(count>=1,"vote is empty");
+        return votecoin[vote_p_list[who][index]];
+    }
+     // 获取当前用户指定项目投票记录
     function getVoteRecord(address coinAddress) public view returns(peopleInfo memory) {
         require(coinAddress != address(0));
         return votePeople[msg.sender][coinAddress];
     }
+
 
     //投票
     function vote(address coinAddress,bool bStatus) public returns(bool) 
