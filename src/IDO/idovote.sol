@@ -118,6 +118,7 @@ contract idovoteContract is  Ownable {
         require(who != address(0));
         return voet_p_weight[who].weight;
     }
+
     function  getVotePeoperInfoSize(address who) public view returns(uint256){
         require(who != address(0));
         uint256 count = vote_p_list[who].length;
