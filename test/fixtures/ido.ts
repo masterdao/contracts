@@ -120,6 +120,7 @@ export function createIdoFixture(opt: Options) {
       decimals: 18,
       collectType: options.ido?.collectType || 1,
       idoAmount,
+      // 6 位精度
       price: (options.ido?.price || 1) * 1e6,
       bBuyLimit: false,
       uBuyLimitNumber: 1,

@@ -26,12 +26,12 @@ describe('ido contract', () => {
     before(async () => {
       [owner, user, founder] = await ethers.getSigners();
       const fixture = createIdoFixture({
-        token: { symbol: 'GLD' },
+        token: { symbol: 'MTK' },
         ido: {
           founder,
           collectType: 1,
-          price: 1, // 兑换比 1
-          expire: 25,
+          price: 1, // 兑换比 1:1
+          expire: 30,
         },
       });
 
@@ -50,21 +50,27 @@ describe('ido contract', () => {
       // 让 user 去打新 1 ETH
       const amount = parseEther('1');
       // 如果 collectType == 1, 必须传 value, 且 value >= amount
-      await run(ido.connect(user).IPOsubscription, token.address, amount, {
-        value: amount,
-      });
+      const rec = await run(
+        ido.connect(user).IPOsubscription,
+        token.address,
+        amount,
+        {
+          value: amount,
+        },
+      );
 
       // validation
       const afterBuyerBalance = await user.getBalance();
-      // user 余额减少了 1ETH + some gas
-      expect(afterBuyerBalance.lt(buyerBalance.sub(amount))).to.be.true;
+      const gas = rec.gasUsed.mul(rec.effectiveGasPrice);
+      // user 余额减少了 1ETH + gas
+      expect(afterBuyerBalance).equals(buyerBalance.sub(amount).sub(gas));
     });
 
     it('withdraw', async () => {
       const oldBalance = await user.getBalance();
       // 10**10 是 100%
       const winningRate = ethers.utils.parseUnits('1', 'gwei');
-      // 购买(提现 0.5 GLD, 剩余 ETH 退回)
+      // 购买(提现 0.5 MTK, 剩余 ETH 退回)
       const amount = parseEther('0.5');
 
       const makeCoinAmount = ethers.BigNumber.from(user.address)
@@ -90,7 +96,7 @@ describe('ido contract', () => {
     // 项目方提币
     it('takeOut', async () => {
       // 等待项目完成ipo
-      await delay(15000);
+      await delay(8000);
       // 1. 管理员结算项目方资金
       await ido.settlement(token.address);
 

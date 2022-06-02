@@ -124,11 +124,7 @@ contract idovoteContract is  Ownable {
         uint256 count = vote_p_list[who].length;
         return count;
     }
-    function  getVotePeoperInfo(address who,uint256  index) public view returns(vcoinInfo memory){
-        require(who != address(0));
-        require(index>=0);
-        return votecoin[vote_p_list[who][index]];
-    }
+
     function  getVotePeoperInfo(address who,uint256  index) public view returns(vcoinInfo memory){
         require(who != address(0));
         require(index>=0);

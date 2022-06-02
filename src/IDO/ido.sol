@@ -255,7 +255,6 @@ contract idoCoinContract is  Ownable {
         require(idoCoinHead.idoAmount > 0);
         address coinAddress = idoCoinHead.coinAddress;
        
-
         require(idoCoin[coinAddress].idoCoinHead.coinAddress == address(0));  
         //require(msg.value >=  registerAmount );         //收取至少一个ETH 
         require(DAOToken.balanceOf(msg.sender) >= registerAmount);       //收取一定数量DAO 
@@ -295,9 +294,9 @@ contract idoCoinContract is  Ownable {
     function IPOsubscription(address coinAddress,uint256 amount) public payable returns(bool){
         require(idoCoin[coinAddress].idoCoinHead.coinAddress != address(0));
         
-        require(idovoteContract.getVoteStatus(coinAddress));  //检查是否已经投票通过
+        require(idovoteContract.getVoteStatus(coinAddress), 'vote not pass');  //检查是否已经投票通过
 
-        require(block.timestamp < idoCoin[coinAddress].idoCoinHead.expireTime); //还没有到期
+        require(block.timestamp < idoCoin[coinAddress].idoCoinHead.expireTime, 'ipo not end'); //还没有到期
         
         address applyAddress = applyCoinAddress[idoCoin[coinAddress].idoCoinHead.collectType];
         address APPLYCOIN  = applyCoin[applyAddress].contractAddress ; 
@@ -348,7 +347,7 @@ contract idoCoinContract is  Ownable {
 
         uint256 allmakeCoinAmount = calculateAllMakeCoinAmount(coinAddress);
 
-        uint256 takeBalance = allmakeCoinAmount.sub(makeCoinAmount).mul(10 ** decimals).div(10 ** to_decimals); 
+        uint256 takeBalance = allmakeCoinAmount.sub(makeCoinAmount).mul(10 ** decimals).div(10 ** to_decimals);
         // takeBalance 和 allmakeCoinAmount, makeCoinAmount 是相同位数的值，因此不需要处理数位
         // takeBalance = takeBalance.div(PRICE_DECIMALS); 
         // takeBalance = takeBalance.div(1e4);
@@ -362,13 +361,14 @@ contract idoCoinContract is  Ownable {
     // makeCoinAmount = userAddress % 10 **10 + amount 
     function withdraw(address coinAddress,uint256 winningRate,uint256 makeCoinAmount) public returns(bool){
         require(msg.sender != address(0));
-        require(usercoin[msg.sender][coinAddress].takeCoinAmount > 0);
+        require(usercoin[msg.sender][coinAddress].takeCoinAmount > 0, 'zero take amout');
 
-        require(usercoin[msg.sender][coinAddress].userAddress == msg.sender);
+        require(usercoin[msg.sender][coinAddress].userAddress == msg.sender, 'no authentication');
 
-        require(winningRate<=1e10);
+        require(winningRate<=1e10, 'winning rate exceed');
 
-        makeCoinAmount = makeCoinAmount.sub(uint256(msg.sender) % 10 ** 10);        
+        require(makeCoinAmount >= uint256(msg.sender) % 10 ** 10, 'make amount negative');
+        makeCoinAmount = makeCoinAmount.sub(uint256(msg.sender) % 10 ** 10);
 
         address APPLYCOIN = applyCoinAddress[idoCoin[coinAddress].idoCoinHead.collectType];
         
@@ -376,7 +376,8 @@ contract idoCoinContract is  Ownable {
         
         require(allMakeCoinAmount >= makeCoinAmount); //提币数量必须大于或者登录能购买到的数量
 
-        uint256 takeBalance = calculateTakeBalnce(coinAddress,makeCoinAmount) ; //计算要退的钱
+        uint256 takeBalance = allMakeCoinAmount.sub(makeCoinAmount);
+        // uint256 takeBalance = calculateTakeBalnce(coinAddress,makeCoinAmount) ; //计算要退的钱
 
         usercoin[msg.sender][coinAddress].makeCoinAmount =  makeCoinAmount;
         //提取购买币
@@ -536,7 +537,7 @@ contract idoCoinContract is  Ownable {
     }
     //项目方提币
     function takeOut( address coinAddress) public returns(bool){
-        require(block.timestamp >= idoCoin[coinAddress].idoCoinHead.expireTime); //到期了
+        require(block.timestamp >= idoCoin[coinAddress].idoCoinHead.expireTime, 'ipo not end'); //到期了
         require(idoCoin[coinAddress].createUserAddress == msg.sender ); 
         require(idoCoin[coinAddress].withdrawAmount>0);
         require(idoCoin[coinAddress].bTakeOut); 
