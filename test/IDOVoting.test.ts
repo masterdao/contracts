@@ -39,7 +39,7 @@ describe('idovote.sol vote', () => {
     await run(pool.connect(user1).deposit, dao.address, amount, 0);
   });
 
-  it.only(`vote by regular member`, async () => {
+  it(`vote by regular member`, async () => {
     const info = await vote.getvotecoin(token.address);
     expect(info.bOpen).is.false;
     await run(vote.connect(user1).vote, token.address, true);
@@ -48,7 +48,7 @@ describe('idovote.sol vote', () => {
     const info2 = await vote.getvotecoin(token.address);
     expect(info2.bOpen).is.true;
 
-    const userInfo = await vote.connect(user1).getVoterInfo(token.address);
+    const userInfo = await vote.connect(user1).getVoteRecord(token.address);
     expect(userInfo.bVoted).to.be.true;
     expect(userInfo.bStatus).to.be.true;
   });
