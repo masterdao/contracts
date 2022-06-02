@@ -1,7 +1,7 @@
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { expect } from 'chai';
 import { ethers } from 'hardhat';
-import { ERC20 } from '../types/token/ERC20';
+import { ERC20 } from '../types/src/token/ERC20';
 import { run, contracts, deploy } from './helper';
 
 describe('DAO token test', () => {

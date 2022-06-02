@@ -1,7 +1,7 @@
 import { ethers } from 'hardhat';
 import { contracts, deployDAO, deploy, run } from '../helper';
 const { parseEther, formatEther } = ethers.utils;
-import { DAOMintingPool } from '../../types/DAOMintingPoolV2/DAOMintingPool';
+import { DAOMintingPool } from '../../types/src/DAOMintingPoolV2/DAOMintingPool';
 import { BigNumberish } from 'ethers';
 
 // 生成默认的 fixture 创建 pool 合约并添加默认的 poolTpye 和 pool

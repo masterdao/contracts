@@ -2,10 +2,10 @@ import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { expect } from 'chai';
 import { ethers } from 'hardhat';
 import { MockToken } from '../types';
-import { DAOMintingPool } from '../types/DAOMintingPoolV2';
-import { IdoCoinContract } from '../types/IDO/ido.sol';
-import { IdovoteContract } from '../types/IDO/idovote.sol/IdovoteContract';
-import { ERC20 } from '../types/token';
+import { DAOMintingPool } from '../types/src/DAOMintingPoolV2';
+import { IdoCoinContract } from '../types/src/IDO/ido.sol';
+import { IdovoteContract } from '../types/src/IDO/idovote.sol/IdovoteContract';
+import { ERC20 } from '../types/src/token';
 
 import { createIdoFixture, idoFixture } from './fixtures/ido';
 import { delay, deploy, loadFixture, run } from './helper';

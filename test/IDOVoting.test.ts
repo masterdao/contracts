@@ -3,9 +3,9 @@ import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { loadFixture, run } from './helper';
 import { createIdoFixture } from './fixtures/ido';
 import { MockToken } from '../types';
-import { DAOMintingPool } from '../types/DAOMintingPoolV2';
-import { IdovoteContract } from '../types/IDO/idovote.sol';
-import { ERC20 } from '../types/token/ERC20';
+import { DAOMintingPool } from '../types/src/DAOMintingPoolV2';
+import { IdovoteContract } from '../types/src/IDO/idovote.sol';
+import { ERC20 } from '../types/src/token/ERC20';
 import { expect } from 'chai';
 
 const { parseEther, formatEther } = ethers.utils;
@@ -48,7 +48,7 @@ describe('idovote.sol vote', () => {
     const info2 = await vote.getvotecoin(token.address);
     expect(info2.bOpen).is.true;
 
-    // const userInfo = await vote.getVoetPeoperWeight;
+    const userInfo = await vote;
     // TODO: 验证用户投票状态, 合约中缺少该方法
   });
 });

@@ -1,7 +1,7 @@
 import { Fixture } from '@ethereum-waffle/provider';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { ethers, waffle } from 'hardhat';
-import { ERC20 } from '../types/token/ERC20';
+import { ERC20 } from '../types/src/token/ERC20';
 
 type ContractInfo = {
   name: string;

@@ -1,8 +1,8 @@
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { expect } from 'chai';
 import { ethers } from 'hardhat';
-import { ERC20 } from '../types';
-import { DAOMintingPool } from '../types/DAOMintingPoolV2/DAOMintingPool';
+import { ERC20 } from '../types/src/token/ERC20';
+import { DAOMintingPool } from '../types/src/DAOMintingPoolV2/DAOMintingPool';
 import { contracts, deploy, deployDAO, run } from './helper';
 
 describe('DAOMinitingPool contract test', () => {
