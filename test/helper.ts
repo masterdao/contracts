@@ -1,6 +1,7 @@
 import { Fixture } from '@ethereum-waffle/provider';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { ethers, waffle } from 'hardhat';
+import { ERC20 } from '../types/token/ERC20';
 
 type ContractInfo = {
   name: string;
@@ -40,6 +41,30 @@ export async function run<T extends Function>(func: T, ...args: any[]) {
   return await tx.wait();
 }
 
+export async function deployMockToken(
+  options: {
+    name?: string;
+    symbol?: string;
+    initSupply?: number;
+    owner?: SignerWithAddress;
+  } = {},
+) {
+  let {
+    name = 'MyToken',
+    symbol = 'MTK',
+    initSupply = 1000000,
+    owner,
+  } = options;
+  if (!owner) {
+    [owner] = await ethers.getSigners();
+  }
+  const supply = ethers.utils.parseEther(String(initSupply));
+  const fac = await ethers.getContractFactory('MockToken', owner);
+  const token = await fac.deploy(name, symbol, supply);
+  await token.deployed();
+  return token;
+}
+
 /** 部署并发行 DAO */
 export async function deployDAO(
   /** 初始发行数量 */
@@ -70,7 +95,7 @@ export async function deployDAO(
 
   // 发币
   await run(dao.mint, initTotal);
-  return dao;
+  return dao as ERC20;
 }
 
 /** 加载测试夹具 */
@@ -79,4 +104,8 @@ export async function loadFixture<T>(fixture: Fixture<T>) {
   const accounts = provider.getWallets();
   const load = createFixtureLoader(accounts, provider);
   return load(fixture);
+}
+
+export function delay(ms: number = 0) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }

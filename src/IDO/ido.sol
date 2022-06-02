@@ -10,6 +10,7 @@ import "./SafeERC20.sol";
 import "./IUniswapFactory.sol";
 import "./IUniswapPair.sol";
 import "./IUniswapRouter02.sol";
+import "hardhat/console.sol";
 
 
 interface IDAOMintingPool {
@@ -295,15 +296,16 @@ contract idoCoinContract is  Ownable {
         require(idoCoin[coinAddress].idoCoinHead.coinAddress != address(0));
         
         require(idovoteContract.getVoteStatus(coinAddress));  //检查是否已经投票通过
-        
+
         require(block.timestamp < idoCoin[coinAddress].idoCoinHead.expireTime); //还没有到期
         
         address applyAddress = applyCoinAddress[idoCoin[coinAddress].idoCoinHead.collectType];
         address APPLYCOIN  = applyCoin[applyAddress].contractAddress ; 
-        address payable myOwner = address(uint160(_owner));
+        // address payable myOwner = address(uint160(_owner));
         if(idoCoin[coinAddress].idoCoinHead.collectType == 1){                                        
-            require(msg.value >= amount );  
-            myOwner.transfer(amount);                        
+            require(msg.value >= amount );
+            // 因为要退款，因此不能转给 owner，只能保留在合约内  
+            // myOwner.transfer(amount);                        
         }
         else{
             require(IERC20(APPLYCOIN).balanceOf(msg.sender) >= amount);
@@ -333,8 +335,9 @@ contract idoCoinContract is  Ownable {
 
         makeCoinAmount = (usercoin[msg.sender][coinAddress].takeCoinAmount.mul(10 ** to_decimals)).div(10 ** decimals);
         makeCoinAmount = makeCoinAmount.mul( idoCoin[coinAddress].idoCoinHead.price );
-        makeCoinAmount = makeCoinAmount.div(10 ** uint256(PRICE_DECIMALS)); 
-        makeCoinAmount = makeCoinAmount.div(1e4);//除以10的4次方
+        makeCoinAmount = makeCoinAmount.div(10 ** uint256(PRICE_DECIMALS));
+        // 这个应该是控制精度的，上一行已经完成了，这行是遗留代码？
+        // makeCoinAmount = makeCoinAmount.div(1e4);//除以10的4次方
         return makeCoinAmount;
     }
  
@@ -346,18 +349,12 @@ contract idoCoinContract is  Ownable {
         uint256 allmakeCoinAmount = calculateAllMakeCoinAmount(coinAddress);
 
         uint256 takeBalance = allmakeCoinAmount.sub(makeCoinAmount).mul(10 ** decimals).div(10 ** to_decimals); 
-        takeBalance = takeBalance.div(PRICE_DECIMALS); 
-        takeBalance = takeBalance.div(1e4);
+        // takeBalance 和 allmakeCoinAmount, makeCoinAmount 是相同位数的值，因此不需要处理数位
+        // takeBalance = takeBalance.div(PRICE_DECIMALS); 
+        // takeBalance = takeBalance.div(1e4);
         return takeBalance;
     }
-    function checkwinningRate(uint256 winningRate) private pure returns(bool){
-        uint256 temp = winningRate.div(1e8);
-        if(temp >= 0 && temp <=100){
-            return true;
-        }else{
-            return false;
-        }
-    }
+
     //用户提币
     //winningRate 放大10^10次方  winningRate = winningRate.div(1e10) 必须在0--1之间
     //用户推广返佣
@@ -369,7 +366,7 @@ contract idoCoinContract is  Ownable {
 
         require(usercoin[msg.sender][coinAddress].userAddress == msg.sender);
 
-        require(checkwinningRate(winningRate));
+        require(winningRate<=1e10);
 
         makeCoinAmount = makeCoinAmount.sub(uint256(msg.sender) % 10 ** 10);        
 
@@ -386,12 +383,13 @@ contract idoCoinContract is  Ownable {
         COIN = IERC20(idoCoin[coinAddress].idoCoinHead.coinAddress);   
         COIN.safeTransfer(msg.sender,makeCoinAmount );
 
-        
         //统计卖掉的币
         idoCoin[coinAddress].idoAmountComplete = makeCoinAmount.add(idoCoin[coinAddress].idoAmountComplete);   
 
         //退款支付币
         if( allMakeCoinAmount != makeCoinAmount ){
+            // 要减去已募资金部分
+            idoCoin[coinAddress].ipoCollectAmount = idoCoin[coinAddress].ipoCollectAmount.sub(takeBalance);
             //address payable sender = address(uint160(msg.sender));
             if(idoCoin[coinAddress].idoCoinHead.collectType == 1){
                 address(uint160(msg.sender)).transfer(takeBalance); 
@@ -414,26 +412,26 @@ contract idoCoinContract is  Ownable {
         //换算精度
         address applyAddress = applyCoinAddress[idoCoin[coinAddress].idoCoinHead.collectType];
         uint256 decimals = applyCoin[applyAddress].decimals;              
-        uint256 to_decimals = idoCoin[coinAddress].idoCoinHead.decimals;   
+        uint256 to_decimals = idoCoin[coinAddress].idoCoinHead.decimals;
 
         uint256 ipotakecoinamount = ipoCollectAmount.mul(to_decimals).div(decimals); 
-        ipotakecoinamount = ipotakecoinamount.mul((1e4));
-        ipotakecoinamount = ipoCollectAmount.div(idoCoin[coinAddress].idoCoinHead.price);  //换算为币
+        ipotakecoinamount = ipotakecoinamount.mul(10**PRICE_DECIMALS);
+        ipotakecoinamount = ipotakecoinamount.div(idoCoin[coinAddress].idoCoinHead.price);  //换算为币
 
         if(ipotakecoinamount >= idoCoin[coinAddress].idoCoinHead.idoAmount) //大于需要募集的币
         {
-           idoCoin[coinAddress].allCollectAmount = idoCoin[coinAddress].idoCoinHead.idoAmount.mul(to_decimals).div(decimals);
-           idoCoin[coinAddress].allCollectAmount = idoCoin[coinAddress].allCollectAmount.mul(1e4);
-           idoCoin[coinAddress].allCollectAmount = idoCoin[coinAddress].allCollectAmount.div(idoCoin[coinAddress].idoCoinHead.price);
+            idoCoin[coinAddress].allCollectAmount = idoCoin[coinAddress].idoCoinHead.idoAmount.mul(to_decimals).div(decimals);
+            idoCoin[coinAddress].allCollectAmount = idoCoin[coinAddress].allCollectAmount.mul(10**PRICE_DECIMALS);
+            idoCoin[coinAddress].allCollectAmount = idoCoin[coinAddress].allCollectAmount.div(idoCoin[coinAddress].idoCoinHead.price);
 
-           idoCoin[coinAddress].ipoAmount = idoCoin[coinAddress].idoCoinHead.idoAmount;
+            idoCoin[coinAddress].ipoAmount = idoCoin[coinAddress].idoCoinHead.idoAmount;
 
         }
         else{
-           idoCoin[coinAddress].allCollectAmount =  ipoCollectAmount;
-           idoCoin[coinAddress].ipoAmount = ipoCollectAmount.mul(to_decimals).div(decimals);
-           idoCoin[coinAddress].ipoAmount = idoCoin[coinAddress].ipoAmount.mul(1e4);  
-           idoCoin[coinAddress].ipoAmount = ipoCollectAmount.div(idoCoin[coinAddress].idoCoinHead.price);
+            idoCoin[coinAddress].allCollectAmount =  ipoCollectAmount;
+            idoCoin[coinAddress].ipoAmount = ipoCollectAmount.mul(to_decimals).div(decimals);
+            idoCoin[coinAddress].ipoAmount = idoCoin[coinAddress].ipoAmount.mul(10**PRICE_DECIMALS);
+            idoCoin[coinAddress].ipoAmount = idoCoin[coinAddress].ipoAmount.div(idoCoin[coinAddress].idoCoinHead.price);
         }
         idoCoin[coinAddress].allCollectAmount = idoCoin[coinAddress].allCollectAmount.mul(9);
         idoCoin[coinAddress].allCollectAmount = idoCoin[coinAddress].allCollectAmount.div(10);

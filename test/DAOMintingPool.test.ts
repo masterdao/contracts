@@ -61,7 +61,7 @@ describe('DAOMinitingPool contract test', () => {
     // 质押 DAO
     await run(contract.deposit, lpToken, amount, poolTypeId);
 
-    // vaidation
+    // validation
     const info = await contract.getminerInfo(
       owner.address,
       lpToken,
@@ -71,4 +71,6 @@ describe('DAOMinitingPool contract test', () => {
     expect(info.amount).eq(amount);
     expect(info.veDao).eq(amount.mul(2).div(10));
   });
+
+  it(`TODO:提取收益`);
 });

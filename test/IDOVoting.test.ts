@@ -47,5 +47,8 @@ describe('idovote.sol vote', () => {
     // validation;
     const info2 = await vote.getvotecoin(token.address);
     expect(info2.bOpen).is.true;
+
+    // const userInfo = await vote.getVoetPeoperWeight;
+    // TODO: 验证用户投票状态, 合约中缺少该方法
   });
 });
