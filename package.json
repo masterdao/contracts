@@ -32,7 +32,7 @@
   "scripts": {
     "compile": "hardhat compile",
     "pretest": "hardhat compile",
-    "test": "hardhat test --parallel **/*.test.ts",
+    "test": "hardhat test **/*.test.ts",
     "dev": "hardhat node"
   }
 }

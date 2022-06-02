@@ -48,7 +48,8 @@ describe('idovote.sol vote', () => {
     const info2 = await vote.getvotecoin(token.address);
     expect(info2.bOpen).is.true;
 
-    const userInfo = await vote;
+    // const userInfo = await vote.getVotePeoperInfo(user1.address);
+    // console.log('userinfo', userInfo);
     // TODO: 验证用户投票状态, 合约中缺少该方法
   });
 });
