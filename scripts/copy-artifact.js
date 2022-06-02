@@ -11,7 +11,7 @@ async function main() {
     ]
     const dirs = {
         artifacts: path.join(__dirname, '../artifacts/src'),
-        types: path.join(__dirname, '../types'),
+        types: path.join(__dirname, '../types/src'),
         dist: path.join(__dirname, '../tmp')
     }
 
@@ -33,7 +33,7 @@ async function main() {
         }
         copyAbiSync(abi);
         copyTypeSync(typing);
-        fs.copyFileSync(path.join(dirs.types, 'common.ts'), path.join(dirs.dist, 'types', 'common.ts'));
+        fs.copyFileSync(path.resolve(dirs.types, '../common.ts'), path.join(dirs.dist, 'types', 'common.ts'));
     }
 
 
