@@ -4,5 +4,6 @@ node_modules/
 artifacts/
 cache/
 temp/
+tmp/
 types/
 .DS_Store
