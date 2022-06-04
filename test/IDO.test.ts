@@ -1,5 +1,7 @@
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { expect } from 'chai';
+import { BigNumber } from 'ethers';
+import { parseUnits } from 'ethers/lib/utils';
 import { ethers } from 'hardhat';
 import { MockToken } from '../types';
 import { DAOMintingPool } from '../types/src/DAOMintingPoolV2';
@@ -23,14 +25,17 @@ describe('ido contract', () => {
     let user: SignerWithAddress;
     // 项目发起者
     let founder: SignerWithAddress;
+    const price = 0.001;
+
     before(async () => {
       [owner, user, founder] = await ethers.getSigners();
       const fixture = createIdoFixture({
-        token: { symbol: 'MTK' },
+        token: { symbol: 'MTK', decimals: 17 },
         ido: {
+          amount: 1000,
           founder,
           collectType: 1,
-          price: 1, // 兑换比 1:1
+          price,
           expire: 30,
         },
       });
@@ -64,20 +69,25 @@ describe('ido contract', () => {
       const gas = rec.gasUsed.mul(rec.effectiveGasPrice);
       // user 余额减少了 1ETH + gas
       expect(afterBuyerBalance).equals(buyerBalance.sub(amount).sub(gas));
+
+      const coin = await ido.getidoCoin(token.address);
+      // console.log('idoCoin', objf(coin));
+      expect(coin.ipoCollectAmount).equals(amount);
+      // idoAmountTotal 是可用项目币总数
     });
 
     it('withdraw', async () => {
       const oldBalance = await user.getBalance();
       // 10**10 是 100%
-      const winningRate = ethers.utils.parseUnits('1', 'gwei');
-      // 购买(提现 0.5 MTK, 剩余 ETH 退回)
-      const amount = parseEther('0.5');
+      const winningRate = ethers.utils.parseUnits('10', 'gwei');
+      // 购买(提现 500 MTK, 剩余 0.5ETH 退回)
+      const amount = parseEther('500');
 
       const makeCoinAmount = ethers.BigNumber.from(user.address)
         .mod(1e10)
         .add(amount);
 
-      await run(
+      const rec = await run(
         ido.connect(user).withdraw,
         token.address,
         winningRate,
@@ -86,11 +96,12 @@ describe('ido contract', () => {
 
       // validation
       const tokenBalance = await token.balanceOf(user.address);
-      expect(tokenBalance).equals(parseEther('0.5'));
+      expect(tokenBalance).equals(amount);
 
       const newBalance = await user.getBalance();
-      // newBalance 大于 old 表明已退回(大概吧，除非 gas 超过 0.5 ETH)
-      expect(newBalance).gt(oldBalance);
+      const gas = rec.gasUsed.mul(rec.effectiveGasPrice);
+      // 旧余额 + 退回 eth - gas = 新余额
+      expect(newBalance).equals(oldBalance.add(parseEther('0.5')).sub(gas));
     });
 
     // 项目方提币
@@ -111,7 +122,9 @@ describe('ido contract', () => {
       ]);
 
       // 3. 项目方提币
-      await ido.connect(founder).takeOut(token.address);
+      const rec = await run(ido.connect(founder).takeOut, token.address);
+
+      const gas = rec.gasUsed.mul(rec.effectiveGasPrice);
 
       // validation
       const [balance, tokenBalance, daoBalance] = await Promise.all([
@@ -121,9 +134,11 @@ describe('ido contract', () => {
       ]);
 
       // 提了 0.3ETH
-      expect(balance.gt(oldBalance));
-      expect(tokenBalance.eq(parseEther('99.5')));
-      expect(daoBalance.sub(oldDaoBalance).eq(parseEther('1')));
+      expect(balance).equals(oldBalance.add(parseEther('0.3')).sub(gas));
+      // 退回 500
+      expect(tokenBalance).equals(oldTokenBalance.add(parseEther('500')));
+      // 退回1注册费
+      // expect(daoBalance.sub(oldDaoBalance).eq(parseEther('1')));
     });
   });
 
@@ -172,20 +187,6 @@ describe('ido contract', () => {
   });
 });
 
-// async function waitFor(predicate: () => Promise<boolean>, overtime = 30000) {
-//   return new Promise<void>((resolve, reject) => {
-//     setTimeout(() => reject('over time'), overtime);
-//     const itl = setInterval(() => {
-//       predicate().then((ok) => {
-//         if (ok) {
-//           clearInterval(itl);
-//           resolve();
-//         }
-//       });
-//     }, 1000);
-//   });
-// }
-
 async function makeVotePass({
   dao,
   token,
@@ -212,4 +213,29 @@ async function makeVotePass({
   if (result.bOpen || !result.bEnd || !result.bSuccessOrFail) {
     throw 'vote not passed';
   }
+}
+
+// 将 amount 专为 human readable
+function objf(obj: any) {
+  const out: any = {};
+  for (const key in obj) {
+    if (!isNaN(key as any)) {
+      continue;
+    }
+    if (Object.prototype.hasOwnProperty.call(obj, key)) {
+      const value = obj[key];
+      if (BigNumber.isBigNumber(value)) {
+        if (key.match(/amount/gi)) {
+          out[key] = formatEther(value);
+        } else {
+          out[key] = value.toNumber();
+        }
+      } else if (typeof value === 'object') {
+        out[key] = objf(value);
+      } else {
+        out[key] = value;
+      }
+    }
+  }
+  return out;
 }

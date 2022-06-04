@@ -75,6 +75,8 @@ type Options = {
     symbol?: string;
     // 默认 1,000,000
     initSupply?: number;
+    // 默认 18
+    decimals?: number;
   };
   ido?: {
     // 项目发起者, 不提供则为 ido 的 owner
@@ -105,6 +107,10 @@ export function createIdoFixture(opt: Options) {
       initSupply: options.token?.initSupply || 1000000,
       owner: founder,
     });
+
+    if (options.token?.decimals) {
+      await token.connect(founder).setDecimals(options.token.decimals);
+    }
 
     const setup = await idoFixture();
 
