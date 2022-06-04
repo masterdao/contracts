@@ -1,7 +1,9 @@
-.vscode
-node_modules
-artifacts
-cache
-temp
-types
+.env
+.vscode/
+node_modules/
+artifacts/
+cache/
+temp/
+tmp/
+types/
 .DS_Store
