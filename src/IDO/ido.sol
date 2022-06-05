@@ -335,8 +335,6 @@ contract idoCoinContract is  Ownable {
         makeCoinAmount = (usercoin[msg.sender][coinAddress].takeCoinAmount.mul(10 ** to_decimals)).div(10 ** decimals);
         makeCoinAmount = makeCoinAmount.mul(10 ** uint256(PRICE_DECIMALS));
         makeCoinAmount = makeCoinAmount.div( idoCoin[coinAddress].idoCoinHead.price );
-        // 这个应该是控制精度的，上一行已经完成了，这行是遗留代码？
-        // makeCoinAmount = makeCoinAmount.div(1e4);//除以10的4次方
         return makeCoinAmount;
     }
  
@@ -348,10 +346,8 @@ contract idoCoinContract is  Ownable {
         uint256 allmakeCoinAmount = calculateAllMakeCoinAmount(coinAddress);
 
         uint256 takeBalance = allmakeCoinAmount.sub(makeCoinAmount).mul(10 ** decimals).div(10 ** to_decimals);
-        // takeBalance 和 allmakeCoinAmount, makeCoinAmount 是相同位数的值，因此不需要处理数位
         takeBalance = takeBalance.mul(idoCoin[coinAddress].idoCoinHead.price);
         takeBalance = takeBalance.div(10 ** uint256(PRICE_DECIMALS)); 
-        // takeBalance = takeBalance.div(1e4);
         return takeBalance;
     }
 
@@ -363,7 +359,7 @@ contract idoCoinContract is  Ownable {
     function withdraw(address coinAddress,uint256 winningRate,uint256 makeCoinAmount) public returns(bool){
         require(msg.sender != address(0));
         require(usercoin[msg.sender][coinAddress].takeCoinAmount > 0, "zero take amout");
-
+        require(usercoin[msg.sender][coinAddress].makeCoinAmount == 0, "already withdraw");
         require(usercoin[msg.sender][coinAddress].userAddress == msg.sender, "no authentication");
 
         require(winningRate<=1e10, "winning rate exceed");
