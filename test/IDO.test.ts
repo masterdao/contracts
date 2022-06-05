@@ -1,6 +1,6 @@
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { expect } from 'chai';
-import { BigNumber } from 'ethers';
+import { BigNumber, BigNumberish } from 'ethers';
 import { parseUnits } from 'ethers/lib/utils';
 import { ethers } from 'hardhat';
 import { MockToken } from '../types';
@@ -53,7 +53,7 @@ describe('ido contract', () => {
       const buyerBalance = await user.getBalance();
 
       // 让 user 去打新 1 ETH
-      const amount = parseEther('1');
+      const amount = parseEther('0.001');
       // 如果 collectType == 1, 必须传 value, 且 value >= amount
       const rec = await run(
         ido.connect(user).IPOsubscription,
@@ -79,13 +79,21 @@ describe('ido contract', () => {
     it('withdraw', async () => {
       const oldBalance = await user.getBalance();
       // 10**10 是 100%
-      const winningRate = ethers.utils.parseUnits('10', 'gwei');
-      // 购买(提现 500 MTK, 剩余 0.5ETH 退回)
-      const amount = parseEther('500');
+      // const winningRate = ethers.utils.parseUnits('10', 'gwei');
+      const amount = parseEther('1');
+      const { winningRate, makeCoinAmount } = getEncryptMakeAmount(
+        1,
+        amount,
+        user.address,
+      );
 
-      const makeCoinAmount = ethers.BigNumber.from(user.address)
-        .mod(1e10)
-        .add(amount);
+      // console.log('withdraw', {
+      //   amount,
+      //   wallet: user.address,
+      //   modAddress: BigNumber.from(user.address).mod(1e10).toNumber(),
+      //   amountEth: formatEther(amount),
+      //   makeAmount: formatEther(makeCoinAmount),
+      // });
 
       const rec = await run(
         ido.connect(user).withdraw,
@@ -101,7 +109,7 @@ describe('ido contract', () => {
       const newBalance = await user.getBalance();
       const gas = rec.gasUsed.mul(rec.effectiveGasPrice);
       // 旧余额 + 退回 eth - gas = 新余额
-      expect(newBalance).equals(oldBalance.add(parseEther('0.5')).sub(gas));
+      expect(newBalance).equals(oldBalance.add(parseEther('0')).sub(gas));
     });
 
     // 项目方提币
@@ -185,7 +193,82 @@ describe('ido contract', () => {
       expect(idoCoin.idoCoinHead.coinAddress).eq(myToken.address);
     });
   });
+
+  describe(`shouldn't withdraw more than once`, () => {
+    let token: MockToken;
+    let user: SignerWithAddress;
+    // 项目发起者
+    let founder: SignerWithAddress;
+    const price = 0.001;
+
+    before(async () => {
+      [owner, user, founder] = await ethers.getSigners();
+      const fixture = createIdoFixture({
+        token: { symbol: 'MTK', decimals: 17 },
+        ido: {
+          amount: 1000,
+          founder,
+          collectType: 1,
+          price,
+          expire: 30,
+        },
+      });
+
+      const setup = await fixture();
+      // const setup = await loadFixture(fixture);
+      ido = setup.ido as any;
+      dao = setup.dao as any;
+      token = setup.token as any;
+      // owner 质押/投票/让投票通过
+      await makeVotePass(setup as any);
+
+      // ipo prepurchase
+      const amount = parseEther('0.001');
+      // 如果 collectType == 1, 必须传 value, 且 value >= amount
+      await run(ido.connect(user).IPOsubscription, token.address, amount, {
+        value: amount,
+      });
+    });
+
+    it(``, async () => {
+      const amount = parseEther('1');
+
+      const { winningRate, makeCoinAmount } = getEncryptMakeAmount(
+        1,
+        amount,
+        user.address,
+      );
+
+      await run(
+        ido.connect(user).withdraw,
+        token.address,
+        winningRate,
+        makeCoinAmount,
+      );
+
+      await expect(
+        ido.connect(user).withdraw(token.address, winningRate, makeCoinAmount),
+      ).revertedWith('already withdraw');
+    });
+  });
 });
+
+function getEncryptMakeAmount(
+  winRate: number,
+  amount: BigNumber,
+  walletAddress: string,
+) {
+  if (winRate > 1) throw `winRate shouldnt great than 1`;
+  const winningRate = Math.floor(winRate * 1e10);
+
+  const makeCoinAmount = ethers.BigNumber.from(walletAddress)
+    .mod(1e10)
+    .add(amount);
+  return {
+    winningRate: BigNumber.from(winningRate),
+    makeCoinAmount,
+  };
+}
 
 async function makeVotePass({
   dao,
