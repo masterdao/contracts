@@ -28,7 +28,8 @@ contract idovoteContract is  Ownable {
     uint256    private minVoteVeDao;
 
     uint256    private totalStaking;
-    
+    uint256    private voteTime;
+    address public ISMPolicy;
     mapping(address=>address []) vote_p_list;   //用户参与投票的列表
     struct votePerson{
         address     who;
@@ -67,6 +68,7 @@ contract idovoteContract is  Ownable {
     event SetVoteCoinEnd(address who,address coinAddress);
     event SetDaoVoteIncome(address who,address coinAddress,uint256 amount);
     event TokeoutVoteIncome(address who,uint256 peopleVoteIncome);
+    event LogISMPolicyUpdated(address ISMPolicy);
 
 
 
@@ -76,9 +78,35 @@ contract idovoteContract is  Ownable {
         daoMintingPool = _IDAOMintingPool;
         passingRate = 80;
         votingRatio = 50;
+        ISMPolicy = msg.sender;
+        voteTime = 86400 * 3;
+    }
+    
+
+    modifier onlyISMPolicy() {
+        require(msg.sender == ISMPolicy || msg.sender == owner());
+        _;
+    }
+    /**
+     * @param ISMPolicy_ The address of the monetary policy contract to use for authentication.
+     */
+    function setISMPolicy(address ISMPolicy_)
+        external
+        onlyOwner
+    {
+        ISMPolicy = ISMPolicy_;
+        emit LogISMPolicyUpdated(ISMPolicy);
+    }
+    //管理员设定投票时间
+    function setVoteTime(uint256 _voteTime) public onlyISMPolicy {
+        require(_voteTime>0);
+        voteTime = _voteTime;
+    }
+    function getVoteTime() public view returns(uint256){
+        return voteTime;
     }
     //设定矿池合约地址
-    function setdaoMintingPool(address poolAddr) public onlyOwner {
+    function setdaoMintingPool(address poolAddr) public onlyISMPolicy {
         require(poolAddr != address(0));
         daoMintingPool = IDAOMintingPool(poolAddr);
     }
@@ -87,7 +115,7 @@ contract idovoteContract is  Ownable {
         return address(daoMintingPool);
     }
     //设定通过率
-    function setpassingRate(uint256 _passingRate) public onlyOwner returns(uint256){
+    function setpassingRate(uint256 _passingRate) public onlyISMPolicy returns(uint256){
         require(_passingRate>0);
         passingRate = _passingRate;
         emit SetpassingRate(msg.sender,_passingRate);
@@ -98,7 +126,7 @@ contract idovoteContract is  Ownable {
         return passingRate;
     }
     //设定投票率
-    function setvotingRatio(uint256 _votingRatio) public onlyOwner returns(uint256){
+    function setvotingRatio(uint256 _votingRatio) public onlyISMPolicy returns(uint256){
         require(_votingRatio>0);
         votingRatio = _votingRatio;
         emit SetvotingRatio(msg.sender,_votingRatio);
@@ -146,6 +174,7 @@ contract idovoteContract is  Ownable {
         require(daoMintingPool.getuserTotalVeDao(msg.sender) > 0 );
         require(votePeople[msg.sender][coinAddress].bVoted == false); //投过后，就不允许再次投票
 
+        require(votecoin[coinAddress].timestamp.add(voteTime) >= block.timestamp );  //过期不允许投
         
         peopleInfo memory newpeopleInfo = peopleInfo({
             timestamp:          block.timestamp,
@@ -215,7 +244,7 @@ contract idovoteContract is  Ownable {
         return true;
     }
     //管理员设定否票结束
-    function setVoteCoinEnd(address coinAddress) public onlyOwner returns(bool){
+    function setVoteCoinEnd(address coinAddress) public onlyISMPolicy returns(bool){
         require(votecoin[coinAddress].bOpen);
         votecoin[coinAddress].bOpen = false;
         votecoin[coinAddress].bEnd = true;
@@ -224,7 +253,8 @@ contract idovoteContract is  Ownable {
              votecoin[coinAddress].bSuccessOrFail = true;
         }
         else{
-             votecoin[coinAddress].bSuccessOrFail = false;
+            require(votecoin[coinAddress].timestamp.add(voteTime) <= block.timestamp );  //只能允许过期
+            votecoin[coinAddress].bSuccessOrFail = false;
         }
         emit SetVoteCoinEnd(msg.sender,coinAddress);
         return true;
@@ -241,7 +271,7 @@ contract idovoteContract is  Ownable {
         return votecoin[coinAddress].bSuccessOrFail;
     }
     //管理员设定投票分配收益
-    function setDaoVoteIncome(address coinAddress,uint256 amount) public onlyOwner payable returns(address, uint256){
+    function setDaoVoteIncome(address coinAddress,uint256 amount) public onlyISMPolicy payable returns(address, uint256){
         require(coinAddress != address(0));
         require(votecoin[coinAddress].timestamp != 0);
         require(amount>0);
