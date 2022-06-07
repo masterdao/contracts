@@ -2,8 +2,8 @@
 let web3;
 const DAO = "0x5e0289c130BcC61FBe5cEc5dce5fE775E50752bf"
 const OWNER = "0x4Cf2EE6f44C53931b52bdbce3A15F123bf073162"
-const IDOVOTECONTRACT ="0x63BFA4dE8d4d1B31A5B725fF9661423E21FE1CbA"
-const IDOCONTRACT="0x749FbBcFa9aE427f8afc977C390E581E89E1Fe9d"
+const IDOVOTECONTRACT ="0x3570A49e5b69d8A20392Ce1545FDb244d56a329B"
+const IDOCONTRACT="0x965f9599346c098a8115271EFa23B313320d84e4"
 const ROUTER="0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45"
 let voteStauts;
 
@@ -39,6 +39,7 @@ async function getstatus(){
     getpassingRate()
     getvotingRatio()
     viewDaoVoteIncome()
+    setStartBlockTime()
  
  
 }
@@ -153,6 +154,12 @@ async function approveToken () {
     const poolTypeId= document.getElementById("set-poolTypeId").value
     return await contract.methods.vote(coinAddress,poolTypeId,true).send({from:coinbase})
  }
+ async function setVoteTime(){
+     const contract = await getErc20Contract(IDOVOTE,IDOVOTECONTRACT);
+     const coinbase = await getCurrentAccount()
+     const time= document.getElementById("set-time-coinAddress").value
+     return await contract.methods.setVoteTime(time).send({from:coinbase})
+ }
  //设定投票结束
  async function setVoteCoinEnd(){
     const contract = await getErc20Contract(IDOVOTE,IDOVOTECONTRACT);
@@ -175,6 +182,30 @@ async function viewDaoVoteIncome(){
     return await contract.methods.tokeoutVoteIncome().send({from:coinbase})
 
  }
+async function setStartTime(){
+    const contract = await getErc20Contract(IDOVOTE,IDOCONTRACT);
+    const coinbase = await getCurrentAccount()
+    const coinAddress= document.getElementById("set-start-coinAddress").value
+    const time= document.getElementById("set-start-time").value
+    return await contract.methods.setStartTime(coinAddress,time).send({from:coinbase})
+
+}
+
+
+async function setStartBlockTime(){
+    const time = Math.floor(Date.now()/1000);
+    document.getElementById("set-start-time").value = time
+
+}
+
+
+async function setIpoTime(){
+    const contract = await getErc20Contract(IDOVOTE,IDOCONTRACT);
+    const coinbase = await getCurrentAccount()
+    const time= document.getElementById("set-ipo-time").value
+    return await contract.methods.setipoTime(time).send({from:coinbase})
+
+}
 
  async function settlement(){
      const contract = await getErc20Contract(IDOABI,IDOCONTRACT);
@@ -187,7 +218,5 @@ async function setTakeOut(){
     const contract = await getErc20Contract(IDOABI,IDOCONTRACT);
     const coinbase = await getCurrentAccount()
     const coinAddress= document.getElementById("set-take-coinAddress").value
-    const amount= document.getElementById("set-take-amount").value
-    const approveValue = web3.utils.toWei(amount, 'ether')
-    return await contract.methods.setTakeOut(coinAddress,approveValue).send({from:coinbase})
+    return await contract.methods.setTakeOut(coinAddress).send({from:coinbase})
 }
