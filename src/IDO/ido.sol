@@ -15,7 +15,7 @@ import "./IUniswapRouter02.sol";
 // import "hardhat/console.sol";
 
 /////////////////
-
+/// andy add 20220607
 interface IDAOMintingPool {
     function getuserTotalVeDao(address who) external view returns(uint256); //获取用户总抵押veDao
     function getcalculatestakingAmount() external view returns(uint256);  //获取矿池总抵押veDaO
