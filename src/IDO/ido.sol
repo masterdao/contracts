@@ -8,8 +8,6 @@ import "./SafeMath.sol";
 import "./SafeERC20.sol";
 import "./Create2.sol";
 import "./InitializableAdminUpgradeabilityProxy.sol";
-// alay edited  ---3333
-// alay edited2
 import "./IUniswapFactory.sol";
 import "./IUniswapPair.sol";
 import "./IUniswapRouter02.sol";
