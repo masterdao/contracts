@@ -226,9 +226,8 @@ contract idoCoinContract is  Ownable {
     mapping(uint256 => uint256 ) planNumber;  //方案1 ，分几次提
     mapping (uint256=>mapping(uint256=>uint256)) planContent;  //方案1，中各个元素内容
     uint256[] planList;
-    function setPlan(uint256 planId,uint256 id,uint256 content ,uint256 num ) public onlyISMPolicy returns(bool){
+    function setPlan(uint256 planId,uint256 content ,uint256 num ) public onlyISMPolicy returns(bool){
         require(planId >0);
-        require(id>0);
         require(content >0);
         require(num >0);
         
@@ -246,7 +245,6 @@ contract idoCoinContract is  Ownable {
     }
     function getPlan(uint256 planId,uint256 id) public view returns(uint256){
         require(planId >0);
-        require(id>0);
         return planContent[planId][id];
     }
     function getPlanNumber(uint256 planId) public view returns(uint256){
