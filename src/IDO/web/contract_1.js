@@ -220,3 +220,11 @@ async function setTakeOut(){
     const coinAddress= document.getElementById("set-take-coinAddress").value
     return await contract.methods.setTakeOut(coinAddress).send({from:coinbase})
 }
+async function setPlan(){
+    const contract = await getErc20Contract(IDOABI,IDOCONTRACT);
+    const coinbase = await getCurrentAccount()
+    const planId= document.getElementById("set-plan-id").value
+    const content= document.getElementById("set-plan-content").value
+    const num= document.getElementById("set-plan-num").value
+    return await contract.methods.setPlan(planId,content,num).send({from:coinbase})
+}
