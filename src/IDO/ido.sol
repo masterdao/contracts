@@ -232,7 +232,11 @@ contract idoCoinContract is  Ownable {
     mapping (uint256=>mapping(uint256=>uint256)) planContent;  //方案1，中各个元素内容
     uint256[] planList;
     function setPlan(uint256 planId,uint256 content ,uint256 num ) public onlyISMPolicy returns(bool){
+<<<<<<< HEAD
         require(planId >0);  
+=======
+        require(planId >0);
+>>>>>>> 004bc06fa28f1bf58ea887af6e4642675347ffe9
         require(content >0);
         require(num >0);
         
