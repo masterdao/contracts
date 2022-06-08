@@ -12,6 +12,9 @@ interface IDAOMintingPool {
     function getuserTotalVeDao(address who) external view returns(uint256); //获取用户总抵押veDao
     function getcalculatestakingAmount() external view returns(uint256);
 }
+interface IidoCoinContract{
+    function getIpoRate(address coinAddress) external view returns(uint256,bool);
+}
 /*
  * 投票 合约 
 */
@@ -22,6 +25,7 @@ contract idovoteContract is  Ownable {
     IERC20 public DAOToken;
 
     IDAOMintingPool  public daoMintingPool;
+    IidoCoinContract public idoCoinContract;
     uint256    private passingRate;         //通过率，默认80/100   
     uint256    private votingRatio;         //投票率，默认50/100  
 
@@ -58,6 +62,7 @@ contract idovoteContract is  Ownable {
         uint256     deny;                   //拒绝数量
         bool        bEnd;                   //是否结束
         bool        bSuccessOrFail;         //通过还是失败
+        bool        bIpoSuccOrFail;
         uint256     daoVoteIncome;          //投票要分配的收益
     }
     mapping(address => vcoinInfo) votecoin;
@@ -72,10 +77,13 @@ contract idovoteContract is  Ownable {
 
 
 
-    constructor(IERC20 _DAOToken,IDAOMintingPool _IDAOMintingPool){
+    constructor(IERC20 _DAOToken,
+                IDAOMintingPool _IDAOMintingPool,
+                IidoCoinContract _idoCoinContract){
         initializeOwner();
         DAOToken            = _DAOToken;
         daoMintingPool = _IDAOMintingPool;
+        idoCoinContract = _idoCoinContract;
         passingRate = 80;
         votingRatio = 50;
         ISMPolicy = msg.sender;
@@ -97,13 +105,14 @@ contract idovoteContract is  Ownable {
         ISMPolicy = ISMPolicy_;
         emit LogISMPolicyUpdated(ISMPolicy);
     }
-    //管理员设定投票时间
-    function setVoteTime(uint256 _voteTime) public onlyISMPolicy {
-        require(_voteTime>0);
-        voteTime = _voteTime;
+    //设定IDO合约地址
+    function setidoCoinContract(address _idoCoinContract) public onlyOwner{
+        require(_idoCoinContract != address(0));
+        idoCoinContract = IidoCoinContract(_idoCoinContract);
     }
-    function getVoteTime() public view returns(uint256){
-        return voteTime;
+    //获取IDO合约地址
+    function getidoCoinContract() public view returns(address){
+        return address(idoCoinContract);
     }
     //设定矿池合约地址
     function setdaoMintingPool(address poolAddr) public onlyISMPolicy {
@@ -114,6 +123,15 @@ contract idovoteContract is  Ownable {
     function getdaoMintingPool() public view returns(address){
         return address(daoMintingPool);
     }
+    //管理员设定投票时间
+    function setVoteTime(uint256 _voteTime) public onlyISMPolicy {
+        require(_voteTime>0);
+        voteTime = _voteTime;
+    }
+    function getVoteTime() public view returns(uint256){
+        return voteTime;
+    }
+    
     //设定通过率
     function setpassingRate(uint256 _passingRate) public onlyISMPolicy returns(uint256){
         require(_passingRate>0);
@@ -165,8 +183,22 @@ contract idovoteContract is  Ownable {
         require(coinAddress != address(0));
         return votePeople[msg.sender][coinAddress];
     }
-
-
+    //获取IPO接受后，销售比率 0：未结束，1：超过70,2：小于70
+    function setIopSuccOrFail(address coinAddress) public view onlyISMPolicy returns(uint256){
+        uint256 ipoRate;
+        bool    bend;
+        (ipoRate,bend) = idoCoinContract.getIpoRate(coinAddress);
+        if(bend == false){
+            return 0;
+        }else{
+            if(ipoRate >= 70){
+                return 1;
+            }
+            else{
+                return 2;
+            }
+        }
+    }
     //投票
     function vote(address coinAddress,bool bStatus) public returns(bool) 
     {
@@ -198,13 +230,24 @@ contract idovoteContract is  Ownable {
             if( votecoin[vote_p_list[msg.sender][i]].bEnd ){
                 //如果没有统计过权重的，开始统计用户权重
                 if( votePeople[msg.sender][vote_p_list[msg.sender][i]].weightSettled == false ){
-                    if( votecoin[vote_p_list[msg.sender][i]].bSuccessOrFail){
+                    if(setIopSuccOrFail(coinAddress) == 1){
+                        if( votecoin[vote_p_list[msg.sender][i]].bSuccessOrFail){
                         voet_p_weight[msg.sender].weight = voet_p_weight[msg.sender].weight.add(1);
+                        }
+                        else{
+                            voet_p_weight[msg.sender].weight = voet_p_weight[msg.sender].weight.sub(1);
+                        }
+                        votePeople[msg.sender][vote_p_list[msg.sender][i]].weightSettled = true;
                     }
-                    else{
-                        voet_p_weight[msg.sender].weight = voet_p_weight[msg.sender].weight.sub(1);
+                    else if( setIopSuccOrFail(coinAddress) == 2 ){
+                        if( votecoin[vote_p_list[msg.sender][i]].bSuccessOrFail){
+                            voet_p_weight[msg.sender].weight = voet_p_weight[msg.sender].weight.sub(1);
+                        }
+                        else{
+                            voet_p_weight[msg.sender].weight = voet_p_weight[msg.sender].weight.add(1);
+                        }
+                        votePeople[msg.sender][vote_p_list[msg.sender][i]].weightSettled = true;
                     }
-                    votePeople[msg.sender][vote_p_list[msg.sender][i]].weightSettled = true;
                 }
             }
         }
@@ -222,6 +265,7 @@ contract idovoteContract is  Ownable {
             voteVeDao:          voteVeDao,
             bEnd:               votecoin[coinAddress].bEnd,
             bSuccessOrFail:     votecoin[coinAddress].bSuccessOrFail,
+            bIpoSuccOrFail:     votecoin[coinAddress].bIpoSuccOrFail,
             daoVoteIncome:      votecoin[coinAddress].daoVoteIncome
         });
         votecoin[coinAddress] = newvcoinInfo;
@@ -296,11 +340,21 @@ contract idovoteContract is  Ownable {
             if( votecoin[vote_p_list[msg.sender][i]].bEnd ){
                 //如果没有统计过权重的，开始统计用户权重
                 if( votePeople[msg.sender][vote_p_list[msg.sender][i]].weightSettled == false ){
-                    if( votecoin[vote_p_list[msg.sender][i]].bSuccessOrFail){
-                        weight = weight.add(1);
+                    if(setIopSuccOrFail(coinAddress) == 1){
+                        if( votecoin[vote_p_list[msg.sender][i]].bSuccessOrFail){
+                            weight = weight.add(1);
+                        }
+                        else{
+                            weight = weight.sub(1);
+                        }
                     }
-                    else{
-                        weight = weight.sub(1);
+                    else if(setIopSuccOrFail(coinAddress) == 2){
+                        if( votecoin[vote_p_list[msg.sender][i]].bSuccessOrFail){
+                            weight = weight.sub(1);
+                        }
+                        else{
+                            weight = weight.add(1);
+                        }
                     }
                 }
             }
@@ -329,13 +383,24 @@ contract idovoteContract is  Ownable {
             if( votecoin[vote_p_list[msg.sender][i]].bEnd ){
                 //如果没有统计过权重的，开始统计用户权重
                 if( votePeople[msg.sender][vote_p_list[msg.sender][i]].weightSettled == false ){
-                    if( votecoin[vote_p_list[msg.sender][i]].bSuccessOrFail){
-                        voet_p_weight[msg.sender].weight = voet_p_weight[msg.sender].weight.add(1);
+                    if(setIopSuccOrFail(coinAddress) == 1){
+                        if( votecoin[vote_p_list[msg.sender][i]].bSuccessOrFail){
+                            voet_p_weight[msg.sender].weight = voet_p_weight[msg.sender].weight.add(1);
+                        }
+                        else{
+                            voet_p_weight[msg.sender].weight = voet_p_weight[msg.sender].weight.sub(1);
+                        }
+                        votePeople[msg.sender][vote_p_list[msg.sender][i]].weightSettled = true;
                     }
-                    else{
-                        voet_p_weight[msg.sender].weight = voet_p_weight[msg.sender].weight.sub(1);
+                    else if(setIopSuccOrFail(coinAddress) == 2){
+                        if( votecoin[vote_p_list[msg.sender][i]].bSuccessOrFail){
+                            voet_p_weight[msg.sender].weight = voet_p_weight[msg.sender].weight.sub(1);
+                        }
+                        else{
+                            voet_p_weight[msg.sender].weight = voet_p_weight[msg.sender].weight.add(1);
+                        }
+                        votePeople[msg.sender][vote_p_list[msg.sender][i]].weightSettled = true;
                     }
-                    votePeople[msg.sender][vote_p_list[msg.sender][i]].weightSettled = true;
                 }
             }
         }
