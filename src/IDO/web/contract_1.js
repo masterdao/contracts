@@ -1,5 +1,3 @@
-import {run} from "../../../test/helper";
-
 let web3;
 const DAO = "0x5e0289c130BcC61FBe5cEc5dce5fE775E50752bf"
 const OWNER = "0x4Cf2EE6f44C53931b52bdbce3A15F123bf073162"
@@ -293,11 +291,15 @@ async function setUpCoin() {
 }
 
 //授权
-async function approveCoinToken () {
+async function approveCoinToken() {
     const contractAddress = DAO
     const spenderAddr = IDOCONTRACT
-    const contract =await getErc20Contract(erc20Abi,contractAddress);
+    const contract = await getErc20Contract(erc20Abi, contractAddress);
+    const coinAddress = document.getElementById("set-coin-coinAddress").value;
+    const fudContract = await getErc20Contract(erc20Abi, coinAddress);
     const approveValue = web3.utils.toWei('100000000', 'ether')
-    console.log("spenderAddr  " , spenderAddr )
-    return await contract.methods.approve(spenderAddr, approveValue).send({ from: this.coinbase })
+    console.log("spenderAddr  ", spenderAddr)
+    await contract.methods.approve(spenderAddr, approveValue).send({from: this.coinbase})
+    return await fudContract.methods.approve(spenderAddr, approveValue).send({from: this.coinbase})
+
 }
