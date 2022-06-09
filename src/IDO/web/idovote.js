@@ -10,11 +10,6 @@ const IDOVOTE=[
 				"internalType": "contract IDAOMintingPool",
 				"name": "_IDAOMintingPool",
 				"type": "address"
-			},
-			{
-				"internalType": "contract IidoCoinContract",
-				"name": "_idoCoinContract",
-				"type": "address"
 			}
 		],
 		"stateMutability": "nonpayable",
