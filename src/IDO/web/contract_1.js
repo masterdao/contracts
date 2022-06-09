@@ -162,7 +162,6 @@ async function vote() {
     const contract = await getErc20Contract(IDOVOTE, IDOVOTECONTRACT);
     const coinbase = await getCurrentAccount()
     const coinAddress = document.getElementById("set-coinAddress").value
-    const poolTypeId = document.getElementById("set-poolTypeId").value
     return await contract.methods.vote(coinAddress, poolTypeId, true).send({from: coinbase})
 }
 
