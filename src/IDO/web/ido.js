@@ -485,6 +485,30 @@ const IDOABI =[
     {
         "inputs": [
             {
+                "internalType": "address",
+                "name": "coinAddress",
+                "type": "address"
+            }
+        ],
+        "name": "getIpoRate",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            },
+            {
+                "internalType": "bool",
+                "name": "",
+                "type": "bool"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
                 "internalType": "uint256",
                 "name": "planId",
                 "type": "uint256"
@@ -874,6 +898,11 @@ const IDOABI =[
                         "internalType": "address",
                         "name": "createUserAddress",
                         "type": "address"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "ipoRate",
+                        "type": "uint256"
                     }
                 ],
                 "internalType": "struct idoCoinContract.idoCoinInfo",
@@ -1097,11 +1126,6 @@ const IDOABI =[
             {
                 "internalType": "uint256",
                 "name": "planId",
-                "type": "uint256"
-            },
-            {
-                "internalType": "uint256",
-                "name": "id",
                 "type": "uint256"
             },
             {
