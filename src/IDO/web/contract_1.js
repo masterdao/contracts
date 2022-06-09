@@ -268,26 +268,26 @@ async function setUpCoin() {
     const bundle = document.getElementById("set-bundle").value;
     const maxbundle = document.getElementById("set-max-bundle").value;
     const planId = document.getElementById("set-coin-plan-id").value;
-    const idoCoinHead = {
-        coinAddress: coinAddress,
-        symbol: symbol,
-        decimals: decimals,
-        collectType: collectType,
-        idoAmount: idoAmount,
-        price: price,
-        bBuyLimit: bBuyLimit,
-        uBuyLimitNumber: uBuyLimitNumber,
-        bPartner: bPartner,
-        partnerNumber: partnerNumber,
-        bDAO: bDAO,
-        uDAONumber: uDAONumber,
+    const idoCoinHead = [
+        coinAddress,
+        symbol,
+        decimals,
+        collectType,
+        idoAmount,
+        price,
+        bBuyLimit,
+        uBuyLimitNumber,
+        bPartner,
+        partnerNumber,
+        bDAO,
+        uDAONumber,
         // 秒
-        startTime: startTime,
-        expireTime: expireTime,
-        bundle: bundle,
-        maxbundle: maxbundle,
-        planId: planId,
-    };
+        startTime,
+        expireTime,
+        bundle,
+        maxbundle,
+        planId
+    ];
     return await contract.methods.createIeoCoin(idoCoinHead).send({from: coinbase})
 }
 
