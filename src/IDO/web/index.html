@@ -62,7 +62,42 @@
     <hr>
     <br>
     四、上币：<br>
+<!--    address     coinAddress;         //募集币种地址-->
+<!--    string      symbol;              //募集币种名称-->
+<!--    uint        decimals;            //精度-->
+<!--    uint        collectType;         //1:ETH  2:USDT  3:DAOToken-->
+<!--    uint256     idoAmount;           //本次募集数量-->
+<!--    uint256     price;               //兑换比例-->
+<!--    bool        bBuyLimit;           //购买限制（参与者）-->
+<!--    uint256     uBuyLimitNumber;     //地址购买限制数量-->
+<!--    bool        bPartner;            //参与者是否限制持有DAOToken-->
+<!--    uint256     partnerNumber;       //参与者持有DAOToken数量-->
+<!--    bool        bDAO;                //是否监管-->
+<!--    uint256     uDAONumber;          //监管比例，如30%,输入30-->
+<!--    uint256     startTime;-->
+<!--    uint        expireTime;          //到期时间，将天设置为秒 1天=86400-->
+<!--    uint256     bundle;              //一手多少币-->
+<!--    uint256     maxbundle;           //最多买几手-->
+<!--    uint256     planId;-->
     coinAddress:<input type="text" id="set-coin-coinAddress" value="0x000000000" size=60><br><br>
+    symbol:<input type="text" id="set-symbol" value="ABC" size=60><br><br>
+    decimals:<input type="text" id="set-decimals" value="18" size=60><br><br>
+    collectType:<input type="text" id="set-collect-type" value="1" size=60><br><br>
+    idoAmount:<input type="text" id="set-ido-amount" value="0" size=60><br><br>
+    price(兑换比例):<input type="text" id="set-ido-price" value="0" size=60><br><br>
+    bBuyLimit(购买限制（参与者）):<input type="text" id="set-buy-limit" value="0" size=60><br><br>
+    uBuyLimitNumber(地址购买限制数量):<input type="text" id="set-buy-number" value="0" size=60><br><br>
+    bPartner(参与者是否限制持有DAO):<input type="text" id="set-partner" value="0" size=60><br><br>
+    partnerNumber(参与者持有DAO数量):<input type="text" id="set-partner-number" value="0" size=60><br><br>
+    bDAO:<input type="text" id="set-dao" value="false" size=60><br><br>
+    uDAONumber:<input type="text" id="set-dao-number" value="0" size=60><br><br>
+    startTime:<input type="text" id="set-coin-start-time" value="" size=60><br><br>
+    expireTime:<input type="text" id="set-coin-expire-time" value="" size=60><br><br>
+    bundle:<input type="text" id="set-bundle" value="" size=60><br><br>
+    maxbundle:<input type="text" id="set-max-bundle" value="" size=60><br><br>
+    planId:<input type="text" id="set-coin-plan-id" value="1" size=60><br><br>
+    <button onclick="setUpCoin()"> 授权</button>
+    <button onclick="setUpCoin()"> 上币</button>
 
     <hr>
     <br>
