@@ -701,7 +701,7 @@ contract idoCoinContract is  Ownable {
 
     //管理员按提币方案启动提币
     function setTakeOut(address coinAddress) public onlyISMPolicy returns(bool){
-         return _setTakeOut();
+         return _setTakeOut(coinAddress);
     }
     //项目方提币
     function takeOut( address coinAddress) public returns(bool){
