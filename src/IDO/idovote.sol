@@ -78,12 +78,10 @@ contract idovoteContract is  Ownable {
 
 
     constructor(IERC20 _DAOToken,
-                IDAOMintingPool _IDAOMintingPool,
-                IidoCoinContract _idoCoinContract){
+                IDAOMintingPool _IDAOMintingPool){
         initializeOwner();
         DAOToken            = _DAOToken;
         daoMintingPool = _IDAOMintingPool;
-        idoCoinContract = _idoCoinContract;
         passingRate = 80;
         votingRatio = 50;
         ISMPolicy = msg.sender;
