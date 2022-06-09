@@ -211,6 +211,7 @@ async function setStartTime() {
 async function setStartBlockTime() {
     const time = Math.floor(Date.now() / 1000);
     document.getElementById("set-start-time").value = time
+    document.getElementById("set-coin-start-time").value = time;
 
 }
 
@@ -291,15 +292,21 @@ async function setUpCoin() {
 }
 
 //授权
-async function approveCoinToken() {
+async function approveDAOToken() {
     const contractAddress = DAO
     const spenderAddr = IDOCONTRACT
     const contract = await getErc20Contract(erc20Abi, contractAddress);
+    const approveValue = web3.utils.toWei('100000000', 'ether')
+    console.log("spenderAddr  ", spenderAddr)
+    return await contract.methods.approve(spenderAddr, approveValue).send({from: this.coinbase})
+
+}
+
+async function approveCoinToken() {
+    const spenderAddr = IDOCONTRACT
     const coinAddress = document.getElementById("set-coin-coinAddress").value;
     const fudContract = await getErc20Contract(erc20Abi, coinAddress);
     const approveValue = web3.utils.toWei('100000000', 'ether')
     console.log("spenderAddr  ", spenderAddr)
-    await contract.methods.approve(spenderAddr, approveValue).send({from: this.coinbase})
     return await fudContract.methods.approve(spenderAddr, approveValue).send({from: this.coinbase})
-
 }

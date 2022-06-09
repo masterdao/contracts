@@ -79,12 +79,13 @@
     bundle:<input type="text" id="set-bundle" value="" size=60><br><br>
     maxbundle:<input type="text" id="set-max-bundle" value="" size=60><br><br>
     planId:<input type="text" id="set-coin-plan-id" value="1" size=60><br><br>
-    <button onclick="approveCoinToken()"> 授权(DAO和项目coin)</button>
+    <button onclick="approveCoinToken()"> 授权(项目coin)</button>
+    <button onclick="approveDAOToken()"> 授权(DAO)</button>
     <button onclick="setUpCoin()"> 上币</button>
 
     <hr>
     <br>
-    四、投票：<br>
+    五、投票：<br>
     coinAddress:<input type="text" id="set-coinAddress" value="0x000000000" size=60><br><br>
     poolTypeId:<input type="text" id="set-poolTypeId" value="0" size=60>
     <from class="status">
@@ -95,11 +96,11 @@
     <button onclick="vote()"> 投票</button>
     <br>
     <hr>
-    五、设定投票结束时间<br>
+    六、设定投票结束时间<br>
     coinAddress:<input type="text" id="set-time-coinAddress" value="86400" size=60><br><br>
     <button onclick="setVoteTime()"> 设定投票结束时间</button>
     <hr>
-    六、设定投票结束<br>
+    七、设定投票结束<br>
     coinAddress:<input type="text" id="set-end-coinAddress" value="0x000000000" size=60><br><br>
     <button onclick="setVoteCoinEnd()"> 设定投票结束</button>
     <hr>
@@ -108,21 +109,21 @@
     time:<input type="text" id="set-start-time" value="" size=60><br><br>
     <button onclick="setStartTime()"> 设定打新开始时间</button>
     <hr>
-    八、设置提款计划<br>
+    九、设置提款计划(几次content加起之和100，num和id不变  初始化例如：1，25，3；1，25，3；1，50，3)<br>
     planId:<input type="text" id="set-plan-id" value="0" size=60><br><br>
     content:<input type="text" id="set-plan-content" value="25" size=60><br><br>
-    num:<input type="text" id="set-plan-num" value="25" size=60><br><br>
+    num:<input type="text" id="set-plan-num" value="3" size=60><br><br>
     <button onclick="setPlan()"> 提款计划</button>
     <hr>
-    九、设置ipo时间（打新开始时间+IPO时间=过期时间）<br>
+    十、设置ipo时间（打新开始时间+IPO时间=过期时间）<br>
     time:<input type="text" id="set-ipo-time" value="86400" size=60><br><br>
     <button onclick="setIpoTime()"> 设定IPO时间</button>
     <hr>
-    七、结算<br>
+    十一、结算<br>
     coinAddress:<input type="text" id="set-settlement-coinAddress" value="0x000000000" size=60><br><br>
     <button onclick="settlement()"> 结算</button>
     <hr>
-    八、设置设置项目方启动提币<br>
+    十二、设置设置项目方启动提币<br>
     coinAddress:<input type="text" id="set-take-coinAddress" value="0x000000000" size=60><br><br>
     <button onclick="setTakeOut()"> 提币金额</button>
     <hr>
