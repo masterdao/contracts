@@ -33,6 +33,7 @@ contract idovoteContract is  Ownable {
 
     uint256    private totalStaking;
     uint256    private voteTime;
+    uint256    private passRate;      // IPO申购通过率 
     address public ISMPolicy;
     mapping(address=>address []) vote_p_list;   //用户参与投票的列表
     struct votePerson{
@@ -86,6 +87,7 @@ contract idovoteContract is  Ownable {
         votingRatio = 50;
         ISMPolicy = msg.sender;
         voteTime = 86400 * 3;
+        passRate = 70;
     }
     
 
@@ -120,6 +122,15 @@ contract idovoteContract is  Ownable {
     //获取矿池地址
     function getdaoMintingPool() public view returns(address){
         return address(daoMintingPool);
+    }
+    //管理员设定IPO通过率 
+    function setpassRate(uint256 _passRate) public onlyISMPolicy {
+        require(_passRate>0);
+        passRate = _passRate;
+    }
+    //
+    function getpassRate() public view returns(uint256){
+        return passRate;
     }
     //管理员设定投票时间
     function setVoteTime(uint256 _voteTime) public onlyISMPolicy {
