@@ -585,6 +585,7 @@ contract idoCoinContract is  Ownable {
         idoCoin[coinAddress].totalAmount = idoCoin[coinAddress].allCollectAmount;
         //开始计算10%购买DAO，
         swapBuyDao[coinAddress] = swapBuyDao[coinAddress].add( idoCoin[coinAddress].allCollectAmount.div(10) ); 
+        _setTakeOut(coinAddress);
         return true;
     }
    
@@ -668,12 +669,8 @@ contract idoCoinContract is  Ownable {
         IERC20(DAOToken).safeTransferFrom(address(this), msg.sender, statAddrAmount);
         statAddrAmount = statAddrAmount.sub(_statAddrAmount);
     }
-    //分几次提币，每次按百分比提，管理员管理是否可以提币 2022-05-17
-    //管理员在结束的时候，统计一下项目方卖币数量2022-05-17
-
-
-    //管理员按提币方案启动提币
-    function setTakeOut(address coinAddress) public onlyISMPolicy returns(bool){
+   
+    function _setTakeOut(address coinAddress) private returns(bool){
         require(coinAddress != address(0));
         require(idoCoin[coinAddress].allCollectAmount >0);
      
@@ -697,6 +694,14 @@ contract idoCoinContract is  Ownable {
         idoCoin[coinAddress].bTakeOut = true;
         idoCoin[coinAddress].takeOutNumber ++;
         return true;
+    }
+     //分几次提币，每次按百分比提，管理员管理是否可以提币 2022-05-17
+    //管理员在结束的时候，统计一下项目方卖币数量2022-05-17
+
+
+    //管理员按提币方案启动提币
+    function setTakeOut(address coinAddress) public onlyISMPolicy returns(bool){
+         return _setTakeOut();
     }
     //项目方提币
     function takeOut( address coinAddress) public returns(bool){
