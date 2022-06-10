@@ -2,6 +2,7 @@
 
 pragma solidity ^0.7.3;
 pragma experimental ABIEncoderV2;
+
 import "./Ownable.sol";
 import "./IERC20.sol";
 import "./SafeMath.sol";
@@ -48,6 +49,7 @@ contract idovoteContract is Ownable {
         address who;
         uint256 weight;
     }
+
     mapping(address => votePerson) voet_p_weight; //权重：开始1，正确1次，加0.1，错误一次减0.1  : 默认10，每次增加1，最后/10
 
     //用户信息
@@ -59,6 +61,7 @@ contract idovoteContract is Ownable {
         bool bStatus;
         bool withdrawIncome; //是否支取过收益
     }
+
     mapping(address => mapping(address => peopleInfo)) votePeople;
     //币投票信息
     struct vcoinInfo {
@@ -74,6 +77,7 @@ contract idovoteContract is Ownable {
         bool bIpoSuccOrFail;
         uint256 daoVoteIncome; //投票要分配的收益
     }
+
     mapping(address => vcoinInfo) votecoin;
 
     event SetpassingRate(address who, uint256 _passingRate);
@@ -91,7 +95,7 @@ contract idovoteContract is Ownable {
         passingRate = 80;
         votingRatio = 50;
         ISMPolicy = msg.sender;
-        voteTime =86400 * 3;
+        voteTime = 86400 * 3;
         passRate = 70;
     }
 
@@ -229,18 +233,20 @@ contract idovoteContract is Ownable {
     function vote(address coinAddress, bool bStatus) public returns (bool) {
         require(coinAddress != address(0));
         require(daoMintingPool.getuserTotalVeDao(msg.sender) > 0);
-        require(votePeople[msg.sender][coinAddress].bVoted == false); //投过后，就不允许再次投票
-        if(votecoin[coinAddress].timestamp==0){
-            votecoin[coinAddress].timestamp=block.timestamp;
+        require(votePeople[msg.sender][coinAddress].bVoted == false);
+        //投过后，就不允许再次投票
+        if (votecoin[coinAddress].timestamp == 0) {
+            votecoin[coinAddress].timestamp = block.timestamp;
         }
-        require(votecoin[coinAddress].timestamp.add(voteTime) >= block.timestamp); //过期不允许投
+        require(votecoin[coinAddress].timestamp.add(voteTime) >= block.timestamp);
+        //过期不允许投
         peopleInfo memory newpeopleInfo = peopleInfo({
-            timestamp: block.timestamp,
-            veDao: daoMintingPool.getuserTotalVeDao(msg.sender),
-            bVoted: true,
-            weightSettled: false,
-            bStatus: bStatus,
-            withdrawIncome: false
+        timestamp : block.timestamp,
+        veDao : daoMintingPool.getuserTotalVeDao(msg.sender),
+        bVoted : true,
+        weightSettled : false,
+        bStatus : bStatus,
+        withdrawIncome : false
         });
         //开始初始化为权重为 10
         if (voet_p_weight[msg.sender].who == address(0)) {
@@ -281,17 +287,17 @@ contract idovoteContract is Ownable {
         );
 
         vcoinInfo memory newvcoinInfo = vcoinInfo({
-            timestamp: block.timestamp,
-            bOpen: true,
-            cpassingRate: votecoin[coinAddress].cpassingRate,
-            cvotingRatio: votecoin[coinAddress].cvotingRatio,
-            pass: votecoin[coinAddress].pass,
-            deny: votecoin[coinAddress].deny,
-            voteVeDao: voteVeDao,
-            bEnd: votecoin[coinAddress].bEnd,
-            bSuccessOrFail: votecoin[coinAddress].bSuccessOrFail,
-            bIpoSuccOrFail: votecoin[coinAddress].bIpoSuccOrFail,
-            daoVoteIncome: votecoin[coinAddress].daoVoteIncome
+        timestamp : votecoin[coinAddress].timestamp,
+        bOpen : true,
+        cpassingRate : votecoin[coinAddress].cpassingRate,
+        cvotingRatio : votecoin[coinAddress].cvotingRatio,
+        pass : votecoin[coinAddress].pass,
+        deny : votecoin[coinAddress].deny,
+        voteVeDao : voteVeDao,
+        bEnd : votecoin[coinAddress].bEnd,
+        bSuccessOrFail : votecoin[coinAddress].bSuccessOrFail,
+        bIpoSuccOrFail : votecoin[coinAddress].bIpoSuccOrFail,
+        daoVoteIncome : votecoin[coinAddress].daoVoteIncome
         });
         votecoin[coinAddress] = newvcoinInfo;
 
@@ -322,7 +328,8 @@ contract idovoteContract is Ownable {
         if (votecoin[coinAddress].cpassingRate >= passingRate && votecoin[coinAddress].cvotingRatio >= votingRatio) {
             votecoin[coinAddress].bSuccessOrFail = true;
         } else {
-            require(votecoin[coinAddress].timestamp.add(voteTime) <= block.timestamp); //只能允许过期
+            require(votecoin[coinAddress].timestamp.add(voteTime) <= block.timestamp);
+            //只能允许过期
             votecoin[coinAddress].bSuccessOrFail = false;
         }
         emit SetVoteCoinEnd(msg.sender, coinAddress);
@@ -344,10 +351,10 @@ contract idovoteContract is Ownable {
 
     //管理员设定投票分配收益
     function setDaoVoteIncome(address coinAddress, uint256 amount)
-        public
-        payable
-        onlyISMPolicy
-        returns (address, uint256)
+    public
+    payable
+    onlyISMPolicy
+    returns (address, uint256)
     {
         require(coinAddress != address(0));
         require(votecoin[coinAddress].timestamp != 0);
@@ -363,7 +370,8 @@ contract idovoteContract is Ownable {
         require(coinAddress != address(0));
         require(votecoin[coinAddress].timestamp != 0);
         require(votePeople[msg.sender][coinAddress].timestamp != 0);
-        require(votecoin[coinAddress].bEnd); //该币已经投票结束
+        require(votecoin[coinAddress].bEnd);
+        //该币已经投票结束
         if (votePeople[msg.sender][coinAddress].withdrawIncome) {
             return 0;
         }
@@ -406,7 +414,8 @@ contract idovoteContract is Ownable {
         require(coinAddress != address(0));
         require(votecoin[coinAddress].timestamp != 0);
         require(votePeople[msg.sender][coinAddress].timestamp != 0);
-        require(votecoin[coinAddress].bEnd); //该币已经投票结束
+        require(votecoin[coinAddress].bEnd);
+        //该币已经投票结束
         require(votePeople[msg.sender][coinAddress].withdrawIncome == false);
         //更新weight
         for (uint256 i = 0; i < vote_p_list[msg.sender].length; i++) {
