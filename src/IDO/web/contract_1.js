@@ -307,5 +307,6 @@ async function approveCoinToken() {
     const fudContract = await getErc20Contract(erc20Abi, coinAddress);
     const approveValue = web3.utils.toWei('100000000', 'ether')
     console.log("spenderAddr  ", spenderAddr)
+    console.log("coinAddress  ", coinAddress)
     return await fudContract.methods.approve(spenderAddr, approveValue).send({from: this.coinbase})
 }
