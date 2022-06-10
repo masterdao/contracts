@@ -21,7 +21,6 @@ interface IDAOMintingPool {
 
 interface IidoCoinContract {
     function getIpoRate(address coinAddress) external view returns (uint256, bool);
-    function getIdoCoinTime(address coinAddress) external view returns (uint256);
 }
 
 /*
@@ -92,7 +91,7 @@ contract idovoteContract is Ownable {
         passingRate = 80;
         votingRatio = 50;
         ISMPolicy = msg.sender;
-        voteTime = 86400 * 3;
+        voteTime =86400 * 3;
         passRate = 70;
     }
 
@@ -231,8 +230,10 @@ contract idovoteContract is Ownable {
         require(coinAddress != address(0));
         require(daoMintingPool.getuserTotalVeDao(msg.sender) > 0);
         require(votePeople[msg.sender][coinAddress].bVoted == false); //投过后，就不允许再次投票
-        uint256 time= idoCoinContract.getIdoCoinTime(coinAddress);
-        require(time.add(voteTime) >= block.timestamp); //过期不允许投
+        if(votecoin[coinAddress].timestamp==0){
+            votecoin[coinAddress].timestamp=block.timestamp;
+        }
+        require(votecoin[coinAddress].timestamp.add(voteTime) >= block.timestamp); //过期不允许投
         peopleInfo memory newpeopleInfo = peopleInfo({
             timestamp: block.timestamp,
             veDao: daoMintingPool.getuserTotalVeDao(msg.sender),
