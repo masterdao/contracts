@@ -7,7 +7,7 @@ import "./IERC20.sol";
 import "./IERC20Metadata.sol";
 import "./Context.sol";
 import "./Ownable.sol";
-import "./multisignature.sol";
+import "./MultiSignature.sol";
 import "./SafeMath.sol";
 
 /**
@@ -35,8 +35,8 @@ import "./SafeMath.sol";
  * functions have been added to mitigate the well-known issues around setting
  * allowances. See {IERC20-approve}.
  */
-contract ERC20 is Context, IERC20, IERC20Metadata,Ownable,multi_signature {
-    using SafeMath for uint256; 
+contract ERC20 is Context, IERC20, IERC20Metadata, Ownable, MultiSignature {
+    using SafeMath for uint256;
     mapping(address => uint256) private _balances;
 
     mapping(address => mapping(address => uint256)) private _allowances;
@@ -60,8 +60,8 @@ contract ERC20 is Context, IERC20, IERC20Metadata,Ownable,multi_signature {
     constructor(string memory name_, string memory symbol_) {
         _name = name_;
         _symbol = symbol_;
-        uint256 total = 2000000000;  //未来总量 20 亿
-        _alltotalsupply = total *10 ** decimals();
+        uint256 total = 2000000000; //未来总量 20 亿
+        _alltotalsupply = total * 10**decimals();
     }
 
     /**
@@ -106,7 +106,13 @@ contract ERC20 is Context, IERC20, IERC20Metadata,Ownable,multi_signature {
     /**
      * @dev See {IERC20-balanceOf}.
      */
-    function balanceOf(address account) public view virtual override returns (uint256) {
+    function balanceOf(address account)
+        public
+        view
+        virtual
+        override
+        returns (uint256)
+    {
         return _balances[account];
     }
 
@@ -118,7 +124,12 @@ contract ERC20 is Context, IERC20, IERC20Metadata,Ownable,multi_signature {
      * - `recipient` cannot be the zero address.
      * - the caller must have a balance of at least `amount`.
      */
-    function transfer(address recipient, uint256 amount) public virtual override returns (bool) {
+    function transfer(address recipient, uint256 amount)
+        public
+        virtual
+        override
+        returns (bool)
+    {
         _transfer(_msgSender(), recipient, amount);
         return true;
     }
@@ -126,7 +137,13 @@ contract ERC20 is Context, IERC20, IERC20Metadata,Ownable,multi_signature {
     /**
      * @dev See {IERC20-allowance}.
      */
-    function allowance(address owner, address spender) public view virtual override returns (uint256) {
+    function allowance(address owner, address spender)
+        public
+        view
+        virtual
+        override
+        returns (uint256)
+    {
         return _allowances[owner][spender];
     }
 
@@ -137,7 +154,12 @@ contract ERC20 is Context, IERC20, IERC20Metadata,Ownable,multi_signature {
      *
      * - `spender` cannot be the zero address.
      */
-    function approve(address spender, uint256 amount) public virtual override returns (bool) {
+    function approve(address spender, uint256 amount)
+        public
+        virtual
+        override
+        returns (bool)
+    {
         _approve(_msgSender(), spender, amount);
         return true;
     }
@@ -163,7 +185,10 @@ contract ERC20 is Context, IERC20, IERC20Metadata,Ownable,multi_signature {
         _transfer(sender, recipient, amount);
 
         uint256 currentAllowance = _allowances[sender][_msgSender()];
-        require(currentAllowance >= amount, "ERC20: transfer amount exceeds allowance");
+        require(
+            currentAllowance >= amount,
+            "ERC20: transfer amount exceeds allowance"
+        );
         unchecked {
             _approve(sender, _msgSender(), currentAllowance - amount);
         }
@@ -183,8 +208,16 @@ contract ERC20 is Context, IERC20, IERC20Metadata,Ownable,multi_signature {
      *
      * - `spender` cannot be the zero address.
      */
-    function increaseAllowance(address spender, uint256 addedValue) public virtual returns (bool) {
-        _approve(_msgSender(), spender, _allowances[_msgSender()][spender] + addedValue);
+    function increaseAllowance(address spender, uint256 addedValue)
+        public
+        virtual
+        returns (bool)
+    {
+        _approve(
+            _msgSender(),
+            spender,
+            _allowances[_msgSender()][spender] + addedValue
+        );
         return true;
     }
 
@@ -202,9 +235,16 @@ contract ERC20 is Context, IERC20, IERC20Metadata,Ownable,multi_signature {
      * - `spender` must have allowance for the caller of at least
      * `subtractedValue`.
      */
-    function decreaseAllowance(address spender, uint256 subtractedValue) public virtual returns (bool) {
+    function decreaseAllowance(address spender, uint256 subtractedValue)
+        public
+        virtual
+        returns (bool)
+    {
         uint256 currentAllowance = _allowances[_msgSender()][spender];
-        require(currentAllowance >= subtractedValue, "ERC20: decreased allowance below zero");
+        require(
+            currentAllowance >= subtractedValue,
+            "ERC20: decreased allowance below zero"
+        );
         unchecked {
             _approve(_msgSender(), spender, currentAllowance - subtractedValue);
         }
@@ -237,7 +277,10 @@ contract ERC20 is Context, IERC20, IERC20Metadata,Ownable,multi_signature {
         _beforeTokenTransfer(sender, recipient, amount);
 
         uint256 senderBalance = _balances[sender];
-        require(senderBalance >= amount, "ERC20: transfer amount exceeds balance");
+        require(
+            senderBalance >= amount,
+            "ERC20: transfer amount exceeds balance"
+        );
         unchecked {
             _balances[sender] = senderBalance - amount;
         }
@@ -268,19 +311,20 @@ contract ERC20 is Context, IERC20, IERC20Metadata,Ownable,multi_signature {
 
         _afterTokenTransfer(address(0), account, amount);
     }
-    function mint(uint256 amount) public  returns(bool){
-        require(amount >0,"" );
-        uint256 currencyAmount = amount * 10 ** decimals();
-        if(multisignature(currencyAmount)) //多签通过
+
+    function mint(uint256 amount) public returns (bool) {
+        require(amount > 0, "");
+        uint256 currencyAmount = amount * 10**decimals();
+        if (multiSignature(currencyAmount)) //多签通过
         {
-            require( _totalSupply.add(currencyAmount) <= _alltotalsupply ,"" );
-            _mint(owner(),currencyAmount);
+            require(_totalSupply.add(currencyAmount) <= _alltotalsupply, "");
+            _mint(owner(), currencyAmount);
             return true;
-        }
-        else{
+        } else {
             return false;
         }
     }
+
     /**
      * @dev Destroys `amount` tokens from `account`, reducing the
      * total supply.

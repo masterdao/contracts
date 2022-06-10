@@ -8,6 +8,7 @@ import { TASK_COMPILE_SOLIDITY_GET_SOURCE_PATHS } from 'hardhat/builtin-tasks/ta
 import { HardhatUserConfig, subtask } from 'hardhat/config';
 import path from 'path';
 // import 'hardhat-gas-reporter';
+import "@nomiclabs/hardhat-solhint";
 
 // skip paths
 const excludes = [/\/INO\//, /idovote\scopy/];
