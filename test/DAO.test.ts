@@ -24,16 +24,16 @@ describe('DAO token test', () => {
     // add two accounts
     await Promise.all(
       [owner, account1].map((account) =>
-        run(contract.setmultiAddress, account.address),
+        run(contract.setMultiAddress, account.address),
       ),
     );
 
-    const length = await contract.getmultiAddresslength();
+    const length = await contract.getMultiAddresslength();
     expect(length).to.equals(2);
 
     // retrive two addresses
     const addresses = await Promise.all(
-      [0, 1].map((i) => contract.getmultiAddressinfo(i)),
+      [0, 1].map((i) => contract.getMultiAddressinfo(i)),
     );
 
     expect(addresses).deep.equals([owner.address, account1.address]);
@@ -49,14 +49,14 @@ describe('mint', () => {
     contract = (await deploy(contracts.dao, 'DAO token', 'DAO')) as any;
     [owner, account1] = await ethers.getSigners();
 
-    await (await contract.setmultiAddress(owner.address)).wait();
-    await (await contract.setmultiAddress(account1.address)).wait();
-    await (await contract.setmultiNumber(1)).wait();
+    await (await contract.setMultiAddress(owner.address)).wait();
+    await (await contract.setMultiAddress(account1.address)).wait();
+    await (await contract.setMultiNumber(1)).wait();
   });
 
   it('minting DAO', async () => {
     // proposal
-    await run(contract.startmultisignatureperiod);
+    await run(contract.startMultiSignaturePeriod);
 
     // mint 100 ether DAO
     const amount = 100;
