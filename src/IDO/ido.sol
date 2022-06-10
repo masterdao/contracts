@@ -32,6 +32,7 @@ contract idoCoinContract is  Ownable {
     using SafeMath for uint256;
     uint        public priceDecimals;      
     uint256     public registerAmount;
+    uint256     private deductAmount;  //扣取注册费用
     uint8       private TOKEN_DECIMALS; 
     uint8       private PRICE_DECIMALS;
     IERC20      public COIN;
@@ -71,6 +72,7 @@ contract idoCoinContract is  Ownable {
         TOKEN_DECIMALS  = 18;
         PRICE_DECIMALS  = 6;
         registerAmount  = 1 * (10 ** uint256(TOKEN_DECIMALS));
+        deductAmount = 1 * ( 8 ** uint256(TOKEN_DECIMALS) );
         applyCoinId     = 1;
         addapplyCoin(msg.sender ,"ETH",18);          
         registeFee      = 0;
@@ -126,12 +128,14 @@ contract idoCoinContract is  Ownable {
         uint256     takeOutNumber;
         address     createUserAddress;  //创建代币的所有者
         uint256     ipoRate;            //IPO成功的比率。80% = 80 
+        bool        bshutdown;
     }
     event CreateIeoCoin(address who,address coinAddress,uint time,uint256 amount,address newCoinAddress);
     event IPOSUBscription(address who,uint256 amount,address applyAddress);
     event TakeOut(address who,uint256 amount,uint collectType ) ;
     event Withdraw(address who,IERC20 COIN,uint256 amount ,address coinAddress,uint256 takeBalance);
     event LogISMPolicyUpdated(address ISMPolicy);
+    event ShutdownIpo(address who,uint256 idoAmount);
 
     mapping(address=>idoCoinInfo) idoCoin;                  
     struct userInfo{
@@ -329,6 +333,15 @@ contract idoCoinContract is  Ownable {
         registerAmount = _registerAmount;
         return _registerAmount;
     }
+    //获取扣取注册费用
+    function getdeductAmount() public view returns(uint256){
+        return deductAmount;
+    }
+    function setdeductAmount(uint256 _deductAmount) public onlyISMPolicy returns(bool){
+        require(_deductAmount>0);
+        deductAmount = _deductAmount;
+        return true;
+    }
     /**
     新建IDO上币资料
      */
@@ -357,7 +370,8 @@ contract idoCoinContract is  Ownable {
             bTakeOut:               false,
             takeOutNumber:          0,
             createUserAddress:      msg.sender,
-            ipoRate:                0
+            ipoRate:                0,
+            bshutdown:              false
         });
         
         idoCoin[coinAddress]  = newidoCoinInfo;        
@@ -669,7 +683,29 @@ contract idoCoinContract is  Ownable {
         IERC20(DAOToken).safeTransferFrom(address(this), msg.sender, statAddrAmount);
         statAddrAmount = statAddrAmount.sub(_statAddrAmount);
     }
-   
+    //紧急停止IPO扣取注册费，返还币
+    function shutdownIpo(address coinAddress) public onlyISMPolicy returns(bool){
+        require(coinAddress != address(0));
+        require(idoCoin[coinAddress].bshutdown == false);
+        require(block.timestamp > idoCoin[coinAddress].timestamp );
+        require(block.timestamp >= idoCoin[coinAddress].idoCoinHead.startTime); //开始之前
+        uint256 idoAmount = idoCoin[coinAddress].idoCoinHead.idoAmount;
+        if( idoAmount >0 ){
+            COIN = IERC20(idoCoin[coinAddress].idoCoinHead.coinAddress); 
+            COIN.safeTransfer(idoCoin[coinAddress].createUserAddress, idoAmount); 
+            idoCoin[coinAddress].idoCoinHead.idoAmount = 0 ; 
+            idoCoin[coinAddress].idoAmountTotal = 0;
+        }
+
+        //deductAmount
+        //退注册费用 registerAmount - deductAmount(扣掉的)
+        if( registerAmount.sub(deductAmount) >0 ){
+            DAOToken.safeTransfer(idoCoin[coinAddress].createUserAddress,registerAmount.sub(deductAmount));
+        }
+        idoCoin[coinAddress].bshutdown = true; //紧急关停
+        emit ShutdownIpo(idoCoin[coinAddress].createUserAddress,idoAmount);
+        return true;
+    }
     function _setTakeOut(address coinAddress) private returns(bool){
         require(coinAddress != address(0));
         require(idoCoin[coinAddress].allCollectAmount >0);

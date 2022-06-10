@@ -55,7 +55,7 @@ contract idovoteContract is  Ownable {
     //币投票信息
     struct vcoinInfo{
         uint256     timestamp;              //时间戳
-        bool        bOpen;                  //是否开始
+        bool        bCLose;                  //是否开始
         uint256     cpassingRate;           //通过率
         uint256     cvotingRatio;           //投票率
         uint256     voteVeDao;              //总投票数
@@ -200,7 +200,7 @@ contract idovoteContract is  Ownable {
         if(bend == false){
             return 0;
         }else{
-            if(ipoRate >= 70){
+            if(ipoRate >= passRate){
                 return 1;
             }
             else{
@@ -215,8 +215,6 @@ contract idovoteContract is  Ownable {
         require(daoMintingPool.getuserTotalVeDao(msg.sender) > 0 );
         require(votePeople[msg.sender][coinAddress].bVoted == false); //投过后，就不允许再次投票
 
-        require(votecoin[coinAddress].timestamp.add(voteTime) >= block.timestamp );  //过期不允许投
-        
         peopleInfo memory newpeopleInfo = peopleInfo({
             timestamp:          block.timestamp,
             veDao:              daoMintingPool.getuserTotalVeDao(msg.sender),
@@ -260,24 +258,25 @@ contract idovoteContract is  Ownable {
                 }
             }
         }
-        //voteVeDao 投票总量
-        uint256 voteVeDao = votePeople[msg.sender][coinAddress].veDao;
-        voteVeDao = voteVeDao.add(votePeople[msg.sender][coinAddress].veDao.mul(voet_p_weight[msg.sender].weight).div(10));
-
+        uint256 voteVeDao  = votePeople[msg.sender][coinAddress].veDao.mul(voet_p_weight[msg.sender].weight).div(10);
+        
+        uint256 timestamp  = votecoin[coinAddress].timestamp == 0?block.timestamp:votecoin[coinAddress].timestamp;
         vcoinInfo memory newvcoinInfo = vcoinInfo({
-            timestamp:          block.timestamp,
-            bOpen:              true,
+            timestamp:          timestamp,
+            bCLose:             votecoin[coinAddress].bCLose,
             cpassingRate:       votecoin[coinAddress].cpassingRate,
             cvotingRatio:       votecoin[coinAddress].cvotingRatio,
             pass:               votecoin[coinAddress].pass,
             deny:               votecoin[coinAddress].deny,
-            voteVeDao:          voteVeDao,
+            voteVeDao:          votecoin[coinAddress].voteVeDao.add(voteVeDao),
             bEnd:               votecoin[coinAddress].bEnd,
             bSuccessOrFail:     votecoin[coinAddress].bSuccessOrFail,
             bIpoSuccOrFail:     votecoin[coinAddress].bIpoSuccOrFail,
             daoVoteIncome:      votecoin[coinAddress].daoVoteIncome
         });
         votecoin[coinAddress] = newvcoinInfo;
+        
+        require(votecoin[coinAddress].timestamp.add(voteTime) >= block.timestamp );  //过期不允许投
 
         uint256 weight = voet_p_weight[msg.sender].weight;
 
@@ -298,8 +297,8 @@ contract idovoteContract is  Ownable {
     }
     //管理员设定否票结束
     function setVoteCoinEnd(address coinAddress) public onlyISMPolicy returns(bool){
-        require(votecoin[coinAddress].bOpen);
-        votecoin[coinAddress].bOpen = false;
+        require(votecoin[coinAddress].bCLose == false);
+        votecoin[coinAddress].bCLose = true;
         votecoin[coinAddress].bEnd = true;
         votecoin[coinAddress].timestamp = block.timestamp; 
         if(votecoin[coinAddress].cpassingRate >= passingRate &&  votecoin[coinAddress].cvotingRatio >= votingRatio ){
