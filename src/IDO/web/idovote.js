@@ -306,7 +306,7 @@ const IDOVOTE=[
 					},
 					{
 						"internalType": "bool",
-						"name": "bOpen",
+						"name": "bCLose",
 						"type": "bool"
 					},
 					{
@@ -536,7 +536,7 @@ const IDOVOTE=[
 					},
 					{
 						"internalType": "bool",
-						"name": "bOpen",
+						"name": "bCLose",
 						"type": "bool"
 					},
 					{
