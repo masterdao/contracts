@@ -353,6 +353,11 @@ contract idoCoinContract is Ownable {
         return idoCoin[coinAddress];
     }
 
+    function getIdoCoinTime(address coinAddress) public view returns(uint256){
+        require(coinAddress != address(0));
+        return idoCoin[coinAddress].timestamp;
+    }
+
     //获取注册费
     function getregisterAmount() public view returns (uint256) {
         return registerAmount;
