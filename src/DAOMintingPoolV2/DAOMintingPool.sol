@@ -92,28 +92,15 @@ contract DAOMintingPool is Ownable {
     event SubBonusToken(address who, IERC20 token, uint256 amount);
     event AddmintingPool(address who, address lpToken, uint256 pollTypeId);
     event Deposit(address who, address lpToken, uint256 amount);
-    event WithdrawBonus(
-        address who,
-        address lpToken,
-        address bounsToken,
-        uint256 bonus
-    );
+    event WithdrawBonus(address who, address lpToken, address bounsToken, uint256 bonus);
     event Withdraw(address who, address lpToken, uint256 amount);
     event LogMonetaryPolicyUpdated(address policy);
 
-    function getuserBonus(address who, address bsToken)
-        public
-        view
-        returns (uint256)
-    {
+    function getuserBonus(address who, address bsToken) public view returns (uint256) {
         return userBonus[who][bsToken];
     }
 
-    function getuserRewardDebt(address who, address bsToken)
-        public
-        view
-        returns (uint256)
-    {
+    function getuserRewardDebt(address who, address bsToken) public view returns (uint256) {
         return userRewardDebt[who][bsToken];
     }
 
@@ -148,11 +135,7 @@ contract DAOMintingPool is Ownable {
     /**
     获取用户抵押的
      */
-    function getuserTotalDao(address who, address lpToken)
-        public
-        view
-        returns (uint256)
-    {
+    function getuserTotalDao(address who, address lpToken) public view returns (uint256) {
         require(who != address(0));
         require(lpToken != address(0));
         return userTotalDao[msg.sender][lpToken];
@@ -161,11 +144,7 @@ contract DAOMintingPool is Ownable {
     /**
     获取矿池总抵押dao
      */
-    function getpoolStakingTotal(address lpToken)
-        public
-        view
-        returns (uint256)
-    {
+    function getpoolStakingTotal(address lpToken) public view returns (uint256) {
         require(lpToken != address(0));
         return poolStakingTotal[lpToken];
     }
@@ -202,11 +181,7 @@ contract DAOMintingPool is Ownable {
     /** 
     新增矿池类型
     */
-    function addmintingPoolType(uint256 poolLength, uint256 weight)
-        public
-        onlyOwner
-        returns (bool)
-    {
+    function addmintingPoolType(uint256 poolLength, uint256 weight) public onlyOwner returns (bool) {
         require(poolLength >= 0);
         require(weight >= 0);
         require(checkpooltype(poolLength) == false, "poolLength duplicate"); //矿池 重复
@@ -233,11 +208,7 @@ contract DAOMintingPool is Ownable {
     /**
     获取矿池类型信息
      */
-    function getmintingPoolType(uint256 id)
-        public
-        view
-        returns (mintingPoolType memory)
-    {
+    function getmintingPoolType(uint256 id) public view returns (mintingPoolType memory) {
         require(id >= 0);
         require(mintingPoolTypeList[id].bstatus);
         return mintingPoolTypeList[id];
@@ -284,11 +255,7 @@ contract DAOMintingPool is Ownable {
     /**
     获取用户抵押的矿池内容
      */
-    function getminerPoolListData(address who, uint256 index)
-        public
-        view
-        returns (mintingPoolInfo memory)
-    {
+    function getminerPoolListData(address who, uint256 index) public view returns (mintingPoolInfo memory) {
         require(who != address(0));
         require(index < minerPoolList[who].length);
         return minerPoolList[who][index];
@@ -298,20 +265,12 @@ contract DAOMintingPool is Ownable {
         return listmintingPool.length;
     }
 
-    function getlistmintingPooldata(uint256 index)
-        public
-        view
-        returns (mintingPoolInfo memory)
-    {
+    function getlistmintingPooldata(uint256 index) public view returns (mintingPoolInfo memory) {
         require(index < listmintingPool.length);
         return listmintingPool[index];
     }
 
-    function getBonusToken(address lpToken)
-        public
-        view
-        returns (BonusTokenInfo memory)
-    {
+    function getBonusToken(address lpToken) public view returns (BonusTokenInfo memory) {
         require(lpToken != address(0));
         return BonusToken[lpToken];
     }
@@ -355,11 +314,7 @@ contract DAOMintingPool is Ownable {
     }
 
     //设定投票合约地址
-    function setIdoAddress(address _idoAddress)
-        public
-        onlyOwner
-        returns (bool)
-    {
+    function setIdoAddress(address _idoAddress) public onlyOwner returns (bool) {
         idoAddress = _idoAddress;
         return true;
     }
@@ -415,32 +370,26 @@ contract DAOMintingPool is Ownable {
         updateBonusShare(bsToken);
         uint256 daoPerBlock;
         uint256 passBonus;
-        uint256 startTime = BonusToken[bsToken].startTime == 0
-            ? block.timestamp
-            : BonusToken[bsToken].startTime;
+        uint256 startTime = BonusToken[bsToken].startTime == 0 ? block.timestamp : BonusToken[bsToken].startTime;
         uint256 lastRewardTime = BonusToken[bsToken].lastRewardTime == 0
             ? block.timestamp
             : BonusToken[bsToken].lastRewardTime;
 
         if (BonusToken[bsToken].totalBonus != 0) {
-            require(
-                expirationTimestamps >= BonusToken[bsToken].expirationTimestamps
-            );
+            require(expirationTimestamps >= BonusToken[bsToken].expirationTimestamps);
             name = BonusToken[bsToken].name;
             if (BonusToken[bsToken].expirationTimestamps > block.timestamp) {
                 passBonus = BonusToken[bsToken].daoPerBlock.mul(
                     block.timestamp.sub(BonusToken[bsToken].updatePoolTime)
                 );
-                BonusToken[bsToken].passBonus = passBonus.add(
-                    BonusToken[bsToken].passBonus
-                );
+                BonusToken[bsToken].passBonus = passBonus.add(BonusToken[bsToken].passBonus);
             } else {
                 BonusToken[bsToken].passBonus = BonusToken[bsToken].totalBonus;
             }
             passBonus = BonusToken[bsToken].passBonus;
-            daoPerBlock = (
-                amount.add(BonusToken[bsToken].totalBonus).sub(passBonus)
-            ).div(expirationTimestamps.sub(block.timestamp));
+            daoPerBlock = (amount.add(BonusToken[bsToken].totalBonus).sub(passBonus)).div(
+                expirationTimestamps.sub(block.timestamp)
+            );
         } else {
             daoPerBlock = amount.div(expirationTimestamps.sub(startTime));
             passBonus = 0;
@@ -471,49 +420,33 @@ contract DAOMintingPool is Ownable {
             return;
         }
         uint256 spacingTime = getspacingTime(bsToken);
-        uint256 DAOReward = spacingTime
-            .mul(BonusToken[bsToken].daoPerBlock)
-            .mul(1e18)
-            .div(lpSupply);
-        BonusToken[bsToken].accBonusPerShare = DAOReward.add(
-            BonusToken[bsToken].accBonusPerShare
-        );
+        uint256 DAOReward = spacingTime.mul(BonusToken[bsToken].daoPerBlock).mul(1e18).div(lpSupply);
+        BonusToken[bsToken].accBonusPerShare = DAOReward.add(BonusToken[bsToken].accBonusPerShare);
 
         BonusToken[bsToken].lastRewardTime = block.timestamp;
     }
 
-    function subBonusToken(address bsToken, uint256 amount)
-        public
-        onlyMonetaryPolicy
-        returns (bool)
-    {
+    function subBonusToken(address bsToken, uint256 amount) public onlyMonetaryPolicy returns (bool) {
         require(bsToken != address(0));
         require(amount > 0);
         require(block.timestamp < BonusToken[bsToken].expirationTimestamps);
         updateBonusShare(bsToken);
         uint256 passBonus;
         if (BonusToken[bsToken].expirationTimestamps > block.timestamp) {
-            passBonus = BonusToken[bsToken].daoPerBlock.mul(
-                block.timestamp.sub(BonusToken[bsToken].updatePoolTime)
-            );
-            BonusToken[bsToken].passBonus = passBonus.add(
-                BonusToken[bsToken].passBonus
-            );
+            passBonus = BonusToken[bsToken].daoPerBlock.mul(block.timestamp.sub(BonusToken[bsToken].updatePoolTime));
+            BonusToken[bsToken].passBonus = passBonus.add(BonusToken[bsToken].passBonus);
         } else {
             BonusToken[bsToken].passBonus = BonusToken[bsToken].totalBonus;
         }
         passBonus = BonusToken[bsToken].passBonus;
         require(BonusToken[bsToken].totalBonus.sub(passBonus) >= amount);
         BonusToken[bsToken].timestamps = block.timestamp;
-        BonusToken[bsToken].totalBonus = BonusToken[bsToken].totalBonus.sub(
-            amount
-        );
-        BonusToken[bsToken].lastBonus = BonusToken[bsToken].lastBonus.sub(
-            amount
-        );
+        BonusToken[bsToken].totalBonus = BonusToken[bsToken].totalBonus.sub(amount);
+        BonusToken[bsToken].lastBonus = BonusToken[bsToken].lastBonus.sub(amount);
         BonusToken[bsToken].updatePoolTime = block.timestamp;
-        uint256 daoPerBlock = (BonusToken[bsToken].totalBonus.sub(passBonus))
-            .div(BonusToken[bsToken].expirationTimestamps.sub(block.timestamp));
+        uint256 daoPerBlock = (BonusToken[bsToken].totalBonus.sub(passBonus)).div(
+            BonusToken[bsToken].expirationTimestamps.sub(block.timestamp)
+        );
         BonusToken[bsToken].daoPerBlock = daoPerBlock;
         IERC20(bsToken).safeTransfer(msg.sender, amount);
         emit SubBonusToken(msg.sender, IERC20(bsToken), amount);
@@ -522,32 +455,19 @@ contract DAOMintingPool is Ownable {
     }
 
     function updateBonusAmount(address bsToken, uint256 bonusAmount) private {
-        BonusToken[bsToken].totalBonus = bonusAmount.add(
-            BonusToken[bsToken].totalBonus
-        );
-        BonusToken[bsToken].lastBonus = bonusAmount.add(
-            BonusToken[bsToken].lastBonus
-        );
+        BonusToken[bsToken].totalBonus = bonusAmount.add(BonusToken[bsToken].totalBonus);
+        BonusToken[bsToken].lastBonus = bonusAmount.add(BonusToken[bsToken].lastBonus);
     }
 
     function getspacingTime(address bsToken) private view returns (uint256) {
-        if (
-            BonusToken[bsToken].expirationTimestamps >=
-            BonusToken[bsToken].lastRewardTime
-        ) {
+        if (BonusToken[bsToken].expirationTimestamps >= BonusToken[bsToken].lastRewardTime) {
             if (block.timestamp < BonusToken[bsToken].lastRewardTime) {
                 return 0;
             } else {
-                if (
-                    block.timestamp <= BonusToken[bsToken].expirationTimestamps
-                ) {
-                    return
-                        block.timestamp.sub(BonusToken[bsToken].lastRewardTime);
+                if (block.timestamp <= BonusToken[bsToken].expirationTimestamps) {
+                    return block.timestamp.sub(BonusToken[bsToken].lastRewardTime);
                 } else {
-                    return
-                        BonusToken[bsToken].expirationTimestamps.sub(
-                            BonusToken[bsToken].lastRewardTime
-                        );
+                    return BonusToken[bsToken].expirationTimestamps.sub(BonusToken[bsToken].lastRewardTime);
                 }
             }
         } else {
@@ -577,21 +497,17 @@ contract DAOMintingPool is Ownable {
             updateBonusShare(bonusList[i]);
             accBonusPerShare = BonusToken[bonusList[i]].accBonusPerShare;
             if (miner[msg.sender][lpToken][poolTypeId].veDao > 0) {
-                userBonus[msg.sender][bonusList[i]] = userBonus[msg.sender][
-                    bonusList[i]
-                ].add(
-                        miner[msg.sender][lpToken][poolTypeId]
-                            .veDao
-                            .mul(accBonusPerShare)
-                            .div(1e18)
-                    );
-                userBonus[msg.sender][bonusList[i]] = userBonus[msg.sender][
-                    bonusList[i]
-                ].sub(userRewardDebt[msg.sender][bonusList[i]]);
+                userBonus[msg.sender][bonusList[i]] = userBonus[msg.sender][bonusList[i]].add(
+                    miner[msg.sender][lpToken][poolTypeId].veDao.mul(accBonusPerShare).div(1e18)
+                );
+                userBonus[msg.sender][bonusList[i]] = userBonus[msg.sender][bonusList[i]].sub(
+                    userRewardDebt[msg.sender][bonusList[i]]
+                );
             }
-            userRewardDebt[msg.sender][bonusList[i]] = miner[msg.sender][
-                lpToken
-            ][poolTypeId].veDao.mul(accBonusPerShare).div(1e18);
+            userRewardDebt[msg.sender][bonusList[i]] = miner[msg.sender][lpToken][poolTypeId]
+                .veDao
+                .mul(accBonusPerShare)
+                .div(1e18);
         }
 
         uint256 veDao = 0; //投票权益
@@ -608,16 +524,13 @@ contract DAOMintingPool is Ownable {
 
         userTotalVeDao[msg.sender] = userTotalVeDao[msg.sender].add(veDao); //计算用户获取总的veDao
 
-        userTotalDao[msg.sender][lpToken] = userTotalDao[msg.sender][lpToken]
-            .add(amount); //计算用户总抵押 dao
+        userTotalDao[msg.sender][lpToken] = userTotalDao[msg.sender][lpToken].add(amount); //计算用户总抵押 dao
 
         poolStakingTotal[lpToken] = poolStakingTotal[lpToken].add(amount); //计算矿池总抵押 dao
 
         calculatestakingAmount = calculatestakingAmount.add(veDao); //换算为矿池抵押总量
         //新增
-        mintingPool[lpToken][poolTypeId].stakingTotal = amount.add(
-            mintingPool[lpToken][poolTypeId].stakingTotal
-        ); //单个矿池抵押量
+        mintingPool[lpToken][poolTypeId].stakingTotal = amount.add(mintingPool[lpToken][poolTypeId].stakingTotal); //单个矿池抵押量
 
         IERC20(lpToken).safeTransferFrom(msg.sender, address(this), amount);
 
@@ -625,10 +538,7 @@ contract DAOMintingPool is Ownable {
         return true;
     }
 
-    function withdraw(address lpToken, uint256 poolTypeId)
-        public
-        returns (bool)
-    {
+    function withdraw(address lpToken, uint256 poolTypeId) public returns (bool) {
         require(lpToken != address(0));
         require(mintingPool[lpToken][poolTypeId].lpToken != address(0)); //抵押的矿池存在
         require(miner[msg.sender][lpToken][poolTypeId].veDao >= 0);
@@ -642,54 +552,41 @@ contract DAOMintingPool is Ownable {
             accBonusPerShare = BonusToken[bonusList[i]].accBonusPerShare;
 
             if (miner[msg.sender][lpToken][poolTypeId].veDao > 0) {
-                userBonus[msg.sender][bonusList[i]] = userBonus[msg.sender][
-                    bonusList[i]
-                ].add(
-                        miner[msg.sender][lpToken][poolTypeId]
-                            .veDao
-                            .mul(accBonusPerShare)
-                            .div(1e18)
-                    );
-                userBonus[msg.sender][bonusList[i]] = userBonus[msg.sender][
-                    bonusList[i]
-                ].sub(userRewardDebt[msg.sender][bonusList[i]]);
+                userBonus[msg.sender][bonusList[i]] = userBonus[msg.sender][bonusList[i]].add(
+                    miner[msg.sender][lpToken][poolTypeId].veDao.mul(accBonusPerShare).div(1e18)
+                );
+                userBonus[msg.sender][bonusList[i]] = userBonus[msg.sender][bonusList[i]].sub(
+                    userRewardDebt[msg.sender][bonusList[i]]
+                );
             }
-            userRewardDebt[msg.sender][bonusList[i]] = miner[msg.sender][
-                lpToken
-            ][poolTypeId].veDao.mul(accBonusPerShare).div(1e18);
+            userRewardDebt[msg.sender][bonusList[i]] = miner[msg.sender][lpToken][poolTypeId]
+                .veDao
+                .mul(accBonusPerShare)
+                .div(1e18);
         }
 
         //检查是否到期，如果没有到期，只允许支取利息，到期后，可以取本息
         if (
-            miner[msg.sender][lpToken][poolTypeId].timestamps.add(
-                mintingPoolTypeList[poolTypeId].poolLength
-            ) >= block.timestamp
+            miner[msg.sender][lpToken][poolTypeId].timestamps.add(mintingPoolTypeList[poolTypeId].poolLength) >=
+            block.timestamp
         ) {
-            miner[msg.sender][lpToken][poolTypeId].amount = (
-                miner[msg.sender][lpToken][poolTypeId].amount
-            ).sub(amount);
+            miner[msg.sender][lpToken][poolTypeId].amount = (miner[msg.sender][lpToken][poolTypeId].amount).sub(amount);
             uint256 veDao = miner[msg.sender][lpToken][poolTypeId].veDao;
 
             miner[msg.sender][lpToken][poolTypeId].veDao = 0;
             //去掉抵押量
-            mintingPool[lpToken][poolTypeId].stakingTotal = mintingPool[
-                lpToken
-            ][poolTypeId].stakingTotal.sub(amount);
+            mintingPool[lpToken][poolTypeId].stakingTotal = mintingPool[lpToken][poolTypeId].stakingTotal.sub(amount);
 
             calculatestakingAmount = calculatestakingAmount.sub(veDao); //去掉veDao
 
             userTotalVeDao[msg.sender] = userTotalVeDao[msg.sender].sub(veDao);
 
-            userTotalDao[msg.sender][lpToken] = userTotalDao[msg.sender][
-                lpToken
-            ].sub(amount);
+            userTotalDao[msg.sender][lpToken] = userTotalDao[msg.sender][lpToken].sub(amount);
 
             poolStakingTotal[lpToken] = poolStakingTotal[lpToken].sub(amount);
 
             //单个矿池抵押量
-            mintingPool[lpToken][poolTypeId].stakingTotal = (
-                mintingPool[lpToken][poolTypeId].stakingTotal
-            ).sub(amount);
+            mintingPool[lpToken][poolTypeId].stakingTotal = (mintingPool[lpToken][poolTypeId].stakingTotal).sub(amount);
 
             if (amount > 0) {
                 IERC20(lpToken).safeTransfer(msg.sender, amount);
@@ -703,19 +600,12 @@ contract DAOMintingPool is Ownable {
         for (uint256 i = 0; i < bonusList.length; i++) {
             bonus = userBonus[msg.sender][bonusList[i]];
             userBonus[msg.sender][bonusList[i]] = 0;
-            BonusToken[bonusList[i]].lastBonus = BonusToken[bonusList[i]]
-                .lastBonus
-                .sub(bonus);
+            BonusToken[bonusList[i]].lastBonus = BonusToken[bonusList[i]].lastBonus.sub(bonus);
 
             if (bonus > 0) {
                 IERC20(bonusList[i]).safeTransfer(msg.sender, bonus);
             }
-            emit WithdrawBonus(
-                msg.sender,
-                lpToken,
-                address(bonusList[i]),
-                bonus
-            );
+            emit WithdrawBonus(msg.sender, lpToken, address(bonusList[i]), bonus);
         }
         return true;
     }
@@ -734,17 +624,11 @@ contract DAOMintingPool is Ownable {
 
             uint256 lpSupply = calculatestakingAmount;
 
-            uint256 DAOReward = spacingTime
-                .mul(BonusToken[bsToken].daoPerBlock)
-                .mul(1e18)
-                .div(lpSupply);
+            uint256 DAOReward = spacingTime.mul(BonusToken[bsToken].daoPerBlock).mul(1e18).div(lpSupply);
 
             accBonusPerShare = accBonusPerShare.add(DAOReward);
 
-            bonus = miner[who][lpToken][poolTypeId]
-                .veDao
-                .mul(accBonusPerShare)
-                .div(1e18);
+            bonus = miner[who][lpToken][poolTypeId].veDao.mul(accBonusPerShare).div(1e18);
             bonus = bonus.sub(userRewardDebt[msg.sender][bsToken]);
         }
         bonus = bonus.add(userBonus[msg.sender][bsToken]);
