@@ -41,10 +41,13 @@ async function getstatus(){
      //getBonusToken()
      
     // getmintingPool()
-     getMinerlist()
-     getminerVeDao()
+     getMinerlist();
+     getminerVeDao();
+
+    getuserTotalVeDao();
  
 }
+
 // 通用ERC20Abi
 async function getErc20Contract (abi,contractAddr) {
     try {
@@ -390,4 +393,11 @@ async function  deposit(lpToken,index,poolTypeId){
     console.log(lpToken,depositAmount,poolTypeId)
     
     return await contract.methods.deposit(lpToken,depositAmount,poolTypeId).send({from:coinbase})   
+}
+
+async function  getuserTotalVeDao(){
+    const coinbase = await getCurrentAccount();
+    const contract = await getErc20Contract(DAOPOOLABI,DAOPOOLCONTRACT)
+    const vedao= await contract.methods.getuserTotalVeDao(coinbase).call()
+    $('.show-vedao').html(`${ vedao }`);
 }

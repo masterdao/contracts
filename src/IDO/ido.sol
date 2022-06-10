@@ -19,15 +19,9 @@ interface IDAOMintingPool {
 
     function getcalculatestakingAmount() external view returns (uint256); //获取矿池总抵押veDaO
 
-    function getuserTotalDao(address who, address lpToken)
-        external
-        view
-        returns (uint256); //获取用户抵押的DAO总量
+    function getuserTotalDao(address who, address lpToken) external view returns (uint256); //获取用户抵押的DAO总量
 
-    function getpoolStakingTotal(address lpToken)
-        external
-        view
-        returns (uint256); //获取矿池总抵押dao
+    function getpoolStakingTotal(address lpToken) external view returns (uint256); //获取矿池总抵押dao
 
     function addBonusToken_vote(
         address bsToken,
@@ -139,22 +133,10 @@ contract idoCoinContract is Ownable {
         address createUserAddress; //创建代币的所有者
         uint256 ipoRate; //IPO成功的比率。80% = 80
     }
-    event CreateIeoCoin(
-        address who,
-        address coinAddress,
-        uint256 time,
-        uint256 amount,
-        address newCoinAddress
-    );
+    event CreateIeoCoin(address who, address coinAddress, uint256 time, uint256 amount, address newCoinAddress);
     event IPOSUBscription(address who, uint256 amount, address applyAddress);
     event TakeOut(address who, uint256 amount, uint256 collectType);
-    event Withdraw(
-        address who,
-        IERC20 COIN,
-        uint256 amount,
-        address coinAddress,
-        uint256 takeBalance
-    );
+    event Withdraw(address who, IERC20 COIN, uint256 amount, address coinAddress, uint256 takeBalance);
     event LogISMPolicyUpdated(address ISMPolicy);
 
     mapping(address => idoCoinInfo) idoCoin;
@@ -193,10 +175,7 @@ contract idoCoinContract is Ownable {
     }
 
     //设定矿池地址
-    function setdaoMintingPool(IDAOMintingPool _daoMintingPool)
-        public
-        onlyISMPolicy
-    {
+    function setdaoMintingPool(IDAOMintingPool _daoMintingPool) public onlyISMPolicy {
         daoMintingPool = _daoMintingPool;
     }
 
@@ -217,14 +196,13 @@ contract idoCoinContract is Ownable {
         path[0] = token0;
         path[1] = token1;
         IERC20(token0).approve(router, amountIn);
-        IUniswapRouter02(router)
-            .swapExactTokensForTokensSupportingFeeOnTransferTokens(
-                amountIn,
-                0,
-                path,
-                to,
-                block.timestamp.add(600)
-            );
+        IUniswapRouter02(router).swapExactTokensForTokensSupportingFeeOnTransferTokens(
+            amountIn,
+            0,
+            path,
+            to,
+            block.timestamp.add(600)
+        );
     }
 
     //swap交换 ETH/BNB
@@ -240,34 +218,21 @@ contract idoCoinContract is Ownable {
         path[1] = token;
 
         // make the swap
-        IUniswapRouter02(router)
-            .swapExactETHForTokensSupportingFeeOnTransferTokens(
-                amountIn,
-                path,
-                to,
-                block.timestamp.add(600)
-            );
+        IUniswapRouter02(router).swapExactETHForTokensSupportingFeeOnTransferTokens(
+            amountIn,
+            path,
+            to,
+            block.timestamp.add(600)
+        );
     }
 
-    function computeAddress(bytes32 salt, address deployer)
-        private
-        pure
-        returns (address)
-    {
-        bytes memory bytecode = type(InitializableAdminUpgradeabilityProxy)
-            .creationCode;
+    function computeAddress(bytes32 salt, address deployer) private pure returns (address) {
+        bytes memory bytecode = type(InitializableAdminUpgradeabilityProxy).creationCode;
         return Create2.computeAddress(salt, keccak256(bytecode), deployer);
     }
 
     function getAddress(string memory name) public view returns (address) {
-        bytes32 salt = keccak256(
-            abi.encodePacked(
-                name,
-                block.timestamp,
-                block.number,
-                block.difficulty
-            )
-        );
+        bytes32 salt = keccak256(abi.encodePacked(name, block.timestamp, block.number, block.difficulty));
         return computeAddress(salt, address(this));
     }
 
@@ -324,10 +289,7 @@ contract idoCoinContract is Ownable {
     }
 
     //设定投票地址
-    function setidovoteContract(IidovoteContract _idovoteContract)
-        public
-        onlyISMPolicy
-    {
+    function setidovoteContract(IidovoteContract _idovoteContract) public onlyISMPolicy {
         idovoteContract = _idovoteContract;
     }
 
@@ -355,11 +317,7 @@ contract idoCoinContract is Ownable {
     }
 
     //获取支付币信息
-    function getapplyCoin(address contractAddress)
-        public
-        view
-        returns (applyCoinInfo memory)
-    {
+    function getapplyCoin(address contractAddress) public view returns (applyCoinInfo memory) {
         return applyCoin[contractAddress];
     }
 
@@ -384,21 +342,13 @@ contract idoCoinContract is Ownable {
     }
 
     //获取用户信息
-    function getUserInfo(address userAddress, address coinAddress)
-        public
-        view
-        returns (userInfo memory)
-    {
+    function getUserInfo(address userAddress, address coinAddress) public view returns (userInfo memory) {
         return usercoin[userAddress][coinAddress];
     }
 
     //获取IDO币信息
     //传入上币返回的地址
-    function getidoCoin(address coinAddress)
-        public
-        view
-        returns (idoCoinInfo memory)
-    {
+    function getidoCoin(address coinAddress) public view returns (idoCoinInfo memory) {
         require(coinAddress != address(0));
         return idoCoin[coinAddress];
     }
@@ -409,11 +359,7 @@ contract idoCoinContract is Ownable {
     }
 
     //设定注册费
-    function setregisterAmount(uint256 _registerAmount)
-        public
-        onlyISMPolicy
-        returns (uint256)
-    {
+    function setregisterAmount(uint256 _registerAmount) public onlyISMPolicy returns (uint256) {
         registerAmount = _registerAmount;
         return _registerAmount;
     }
@@ -421,18 +367,12 @@ contract idoCoinContract is Ownable {
     /**
     新建IDO上币资料
      */
-    function createIeoCoin(idoCoinInfoHead memory idoCoinHead)
-        public
-        payable
-        returns (address)
-    {
+    function createIeoCoin(idoCoinInfoHead memory idoCoinHead) public payable returns (address) {
         require(idoCoinHead.coinAddress != address(0));
 
         require(idoCoinHead.idoAmount > 0);
         //新获取一个地址
-        address coinAddress = getAddress(
-            IERC20(idoCoinHead.coinAddress).symbol()
-        );
+        address coinAddress = getAddress(IERC20(idoCoinHead.coinAddress).symbol());
 
         require(DAOToken.balanceOf(msg.sender) >= registerAmount); //收取一定数量DAO
 
@@ -440,9 +380,7 @@ contract idoCoinContract is Ownable {
             idoCoinHead: idoCoinHead,
             timestamp: block.timestamp,
             coinAddress: idoCoinHead.coinAddress,
-            idoAmountTotal: (idoCoin[coinAddress].idoAmountTotal).add(
-                idoCoinHead.idoAmount
-            ),
+            idoAmountTotal: (idoCoin[coinAddress].idoAmountTotal).add(idoCoinHead.idoAmount),
             registerAmount: msg.value,
             collectAmount: 0,
             withdrawAmount: 0,
@@ -459,10 +397,7 @@ contract idoCoinContract is Ownable {
 
         idoCoin[coinAddress] = newidoCoinInfo;
 
-        idoCoin[coinAddress].idoCoinHead.expireTime = idoCoin[coinAddress]
-            .idoCoinHead
-            .startTime
-            .add(ipoTime); //更新IPO结束时间
+        idoCoin[coinAddress].idoCoinHead.expireTime = idoCoin[coinAddress].idoCoinHead.startTime.add(ipoTime); //更新IPO结束时间
 
         uint256 amount = idoCoinHead.idoAmount;
         COIN = IERC20(idoCoinHead.coinAddress);
@@ -472,73 +407,37 @@ contract idoCoinContract is Ownable {
 
         registeFee = registeFee.add(msg.value);
 
-        emit CreateIeoCoin(
-            msg.sender,
-            idoCoinHead.coinAddress,
-            block.timestamp,
-            amount,
-            coinAddress
-        );
+        emit CreateIeoCoin(msg.sender, idoCoinHead.coinAddress, block.timestamp, amount, coinAddress);
         return coinAddress;
     }
 
     //打新
     //传入上币返回的地址
-    function setStartTime(address coinAddress, uint256 startTime)
-        public
-        onlyISMPolicy
-        returns (bool)
-    {
+    function setStartTime(address coinAddress, uint256 startTime) public onlyISMPolicy returns (bool) {
         require(coinAddress != address(0));
         require(startTime > 0);
         require(startTime >= block.timestamp);
         require(idoCoin[coinAddress].idoCoinHead.startTime <= startTime);
         idoCoin[coinAddress].idoCoinHead.startTime = startTime;
-        idoCoin[coinAddress].idoCoinHead.expireTime = idoCoin[coinAddress]
-            .idoCoinHead
-            .startTime
-            .add(ipoTime);
+        idoCoin[coinAddress].idoCoinHead.expireTime = idoCoin[coinAddress].idoCoinHead.startTime.add(ipoTime);
         return true;
     }
 
-    function IPOsubscription(address coinAddress, uint256 amount)
-        public
-        payable
-        returns (bool)
-    {
+    function IPOsubscription(address coinAddress, uint256 amount) public payable returns (bool) {
         require(amount > 0, "amount must be greater than zero");
-        require(
-            idoCoin[coinAddress].idoCoinHead.coinAddress != address(0),
-            "can not zero address"
-        );
-        require(
-            idoCoin[coinAddress].idoCoinHead.startTime <= block.timestamp,
-            "must be within the validity period"
-        );
+        require(idoCoin[coinAddress].idoCoinHead.coinAddress != address(0), "can not zero address");
+        require(idoCoin[coinAddress].idoCoinHead.startTime <= block.timestamp, "must be within the validity period");
+
+        require(idovoteContract.getVoteStatus(idoCoin[coinAddress].idoCoinHead.coinAddress), "proposal has not passed"); //检查是否已经投票通过
+
+        require(block.timestamp < idoCoin[coinAddress].idoCoinHead.expireTime, "ipo not expired"); //还没有到期
 
         require(
-            idovoteContract.getVoteStatus(
-                idoCoin[coinAddress].idoCoinHead.coinAddress
-            ),
-            "proposal has not passed"
-        ); //检查是否已经投票通过
-
-        require(
-            block.timestamp < idoCoin[coinAddress].idoCoinHead.expireTime,
-            "ipo not expired"
-        ); //还没有到期
-
-        require(
-            amount <=
-                idoCoin[coinAddress].idoCoinHead.bundle.mul(
-                    idoCoin[coinAddress].idoCoinHead.maxbundle
-                ),
+            amount <= idoCoin[coinAddress].idoCoinHead.bundle.mul(idoCoin[coinAddress].idoCoinHead.maxbundle),
             "cannot exceed the purchase scope"
         );
 
-        address applyAddress = applyCoinAddress[
-            idoCoin[coinAddress].idoCoinHead.collectType
-        ];
+        address applyAddress = applyCoinAddress[idoCoin[coinAddress].idoCoinHead.collectType];
         address APPLYCOIN = applyCoin[applyAddress].contractAddress;
         address payable thiscontract = address(uint160(address(this)));
         if (idoCoin[coinAddress].idoCoinHead.collectType == 1) {
@@ -546,19 +445,13 @@ contract idoCoinContract is Ownable {
             thiscontract.transfer(amount);
         } else {
             require(IERC20(APPLYCOIN).balanceOf(msg.sender) >= amount);
-            IERC20(APPLYCOIN).safeTransferFrom(
-                msg.sender,
-                address(this),
-                amount
-            );
+            IERC20(APPLYCOIN).safeTransferFrom(msg.sender, address(this), amount);
         }
         userInfo memory newuserinfo = userInfo({
             timestamp: block.timestamp,
             coinAddress: idoCoin[coinAddress].idoCoinHead.coinAddress,
             makeCoinAmount: usercoin[msg.sender][coinAddress].makeCoinAmount,
-            takeCoinAmount: amount.add(
-                usercoin[msg.sender][coinAddress].takeCoinAmount
-            ),
+            takeCoinAmount: amount.add(usercoin[msg.sender][coinAddress].takeCoinAmount),
             userAddress: msg.sender,
             outAmount: 0,
             takeOutNumber: 0,
@@ -567,57 +460,34 @@ contract idoCoinContract is Ownable {
         });
         usercoin[msg.sender][coinAddress] = newuserinfo;
         //计算打新总共进入多少钱
-        idoCoin[coinAddress].ipoCollectAmount = idoCoin[coinAddress]
-            .ipoCollectAmount
-            .add(amount);
+        idoCoin[coinAddress].ipoCollectAmount = idoCoin[coinAddress].ipoCollectAmount.add(amount);
         emit IPOSUBscription(msg.sender, amount, APPLYCOIN);
         return true;
     }
 
     //上币返回的地址
-    function calculateAllMakeCoinAmount(address coinAddress)
-        private
-        view
-        returns (uint256)
-    {
-        address applyAddress = applyCoinAddress[
-            idoCoin[coinAddress].idoCoinHead.collectType
-        ];
+    function calculateAllMakeCoinAmount(address coinAddress) private view returns (uint256) {
+        address applyAddress = applyCoinAddress[idoCoin[coinAddress].idoCoinHead.collectType];
         uint256 decimals = applyCoin[applyAddress].decimals;
         uint256 to_decimals = idoCoin[coinAddress].idoCoinHead.decimals;
 
         uint256 makeCoinAmount; //计算用于可以购买多少币
 
-        makeCoinAmount = (
-            usercoin[msg.sender][coinAddress].takeCoinAmount.mul(
-                10**to_decimals
-            )
-        ).div(10**decimals);
+        makeCoinAmount = (usercoin[msg.sender][coinAddress].takeCoinAmount.mul(10**to_decimals)).div(10**decimals);
         makeCoinAmount = makeCoinAmount.mul(10**uint256(PRICE_DECIMALS));
-        makeCoinAmount = makeCoinAmount.div(
-            idoCoin[coinAddress].idoCoinHead.price
-        );
+        makeCoinAmount = makeCoinAmount.div(idoCoin[coinAddress].idoCoinHead.price);
         return makeCoinAmount;
     }
 
     //上币返回的地址
-    function calculateTakeBalnce(address coinAddress, uint256 makeCoinAmount)
-        private
-        view
-        returns (uint256)
-    {
-        address applyAddress = applyCoinAddress[
-            idoCoin[coinAddress].idoCoinHead.collectType
-        ];
+    function calculateTakeBalnce(address coinAddress, uint256 makeCoinAmount) private view returns (uint256) {
+        address applyAddress = applyCoinAddress[idoCoin[coinAddress].idoCoinHead.collectType];
         uint256 decimals = applyCoin[applyAddress].decimals;
         uint256 to_decimals = idoCoin[coinAddress].idoCoinHead.decimals;
 
         uint256 allmakeCoinAmount = calculateAllMakeCoinAmount(coinAddress);
 
-        uint256 takeBalance = allmakeCoinAmount
-            .sub(makeCoinAmount)
-            .mul(10**decimals)
-            .div(10**to_decimals);
+        uint256 takeBalance = allmakeCoinAmount.sub(makeCoinAmount).mul(10**decimals).div(10**to_decimals);
         takeBalance = takeBalance.mul(idoCoin[coinAddress].idoCoinHead.price);
         takeBalance = takeBalance.div(10**uint256(PRICE_DECIMALS));
         return takeBalance;
@@ -630,8 +500,7 @@ contract idoCoinContract is Ownable {
         uint256 planId = usercoin[msg.sender][coinAddress].planId;
         uint256 coinTakeOutNumber = idoCoin[coinAddress].takeOutNumber; // getPlanNumber(planId);
         require(coinTakeOutNumber > 0);
-        uint256 userTakeOutNumber = usercoin[msg.sender][coinAddress]
-            .takeOutNumber;
+        uint256 userTakeOutNumber = usercoin[msg.sender][coinAddress].takeOutNumber;
         require(userTakeOutNumber < coinTakeOutNumber);
         uint256 planNum = getPlanNumber(planId);
         require(userTakeOutNumber < planNum);
@@ -645,14 +514,9 @@ contract idoCoinContract is Ownable {
         if (userTakeOutNumber == planNum.sub(1)) {
             amount = usercoin[msg.sender][coinAddress].outAmount;
         } else {
-            amount = usercoin[msg.sender][coinAddress]
-                .makeCoinAmount
-                .mul(planCon)
-                .div(100);
+            amount = usercoin[msg.sender][coinAddress].makeCoinAmount.mul(planCon).div(100);
         }
-        usercoin[msg.sender][coinAddress].outAmount = usercoin[msg.sender][
-            coinAddress
-        ].outAmount.sub(amount);
+        usercoin[msg.sender][coinAddress].outAmount = usercoin[msg.sender][coinAddress].outAmount.sub(amount);
 
         usercoin[msg.sender][coinAddress].takeOutNumber++;
         if (amount > 0) {
@@ -673,36 +537,19 @@ contract idoCoinContract is Ownable {
         uint256 makeCoinAmount
     ) public returns (bool) {
         require(msg.sender != address(0));
-        require(
-            block.timestamp >= idoCoin[coinAddress].idoCoinHead.expireTime,
-            "ipo was expired"
-        ); //还没有到期
+        require(block.timestamp >= idoCoin[coinAddress].idoCoinHead.expireTime, "ipo was expired"); //还没有到期
         require(usercoin[msg.sender][coinAddress].settle == false); //未结算
 
-        require(
-            usercoin[msg.sender][coinAddress].takeCoinAmount > 0,
-            "zero take amout"
-        );
-        require(
-            usercoin[msg.sender][coinAddress].makeCoinAmount == 0,
-            "already withdraw"
-        );
-        require(
-            usercoin[msg.sender][coinAddress].userAddress == msg.sender,
-            "no authentication"
-        );
+        require(usercoin[msg.sender][coinAddress].takeCoinAmount > 0, "zero take amout");
+        require(usercoin[msg.sender][coinAddress].makeCoinAmount == 0, "already withdraw");
+        require(usercoin[msg.sender][coinAddress].userAddress == msg.sender, "no authentication");
 
         require(winningRate <= 1e10, "winning rate exceed");
 
-        require(
-            makeCoinAmount >= uint256(msg.sender) % 10**10,
-            "make amount is negative"
-        );
+        require(makeCoinAmount >= uint256(msg.sender) % 10**10, "make amount is negative");
         makeCoinAmount = makeCoinAmount.sub(uint256(msg.sender) % 10**10);
 
-        address APPLYCOIN = applyCoinAddress[
-            idoCoin[coinAddress].idoCoinHead.collectType
-        ];
+        address APPLYCOIN = applyCoinAddress[idoCoin[coinAddress].idoCoinHead.collectType];
 
         uint256 allMakeCoinAmount = calculateAllMakeCoinAmount(coinAddress);
 
@@ -719,46 +566,32 @@ contract idoCoinContract is Ownable {
         // COIN.safeTransfer(msg.sender,makeCoinAmount );
 
         //统计卖掉的币
-        idoCoin[coinAddress].idoAmountComplete = makeCoinAmount.add(
-            idoCoin[coinAddress].idoAmountComplete
-        );
+        idoCoin[coinAddress].idoAmountComplete = makeCoinAmount.add(idoCoin[coinAddress].idoAmountComplete);
 
         //退款支付币
         if (allMakeCoinAmount != makeCoinAmount) {
             // 要减去已募资金部分
-            idoCoin[coinAddress].ipoCollectAmount = idoCoin[coinAddress]
-                .ipoCollectAmount
-                .sub(takeBalance);
+            idoCoin[coinAddress].ipoCollectAmount = idoCoin[coinAddress].ipoCollectAmount.sub(takeBalance);
             //address payable sender = address(uint160(msg.sender));
             if (idoCoin[coinAddress].idoCoinHead.collectType == 1) {
                 address(uint160(msg.sender)).transfer(takeBalance);
             } else {
                 IERC20(APPLYCOIN).safeTransfer(msg.sender, takeBalance);
             }
-            usercoin[msg.sender][coinAddress].takeCoinAmount = usercoin[
-                msg.sender
-            ][coinAddress].takeCoinAmount.sub(takeBalance);
+            usercoin[msg.sender][coinAddress].takeCoinAmount = usercoin[msg.sender][coinAddress].takeCoinAmount.sub(
+                takeBalance
+            );
         }
         //统计获取的钱
-        idoCoin[coinAddress].collectAmount = usercoin[msg.sender][coinAddress]
-            .takeCoinAmount
-            .add(idoCoin[coinAddress].collectAmount);
-
-        emit Withdraw(
-            msg.sender,
-            COIN,
-            makeCoinAmount,
-            coinAddress,
-            takeBalance
+        idoCoin[coinAddress].collectAmount = usercoin[msg.sender][coinAddress].takeCoinAmount.add(
+            idoCoin[coinAddress].collectAmount
         );
+
+        emit Withdraw(msg.sender, COIN, makeCoinAmount, coinAddress, takeBalance);
         return true;
     }
 
-    function getIpoRate(address coinAddress)
-        public
-        view
-        returns (uint256, bool)
-    {
+    function getIpoRate(address coinAddress) public view returns (uint256, bool) {
         if (idoCoin[coinAddress].idoCoinHead.expireTime > block.timestamp) {
             return (0, false);
         } else {
@@ -767,141 +600,80 @@ contract idoCoinContract is Ownable {
     }
 
     //管理员结算项目方资金
-    function settlement(address coinAddress)
-        public
-        onlyISMPolicy
-        returns (bool)
-    {
+    function settlement(address coinAddress) public onlyISMPolicy returns (bool) {
         require(block.timestamp >= idoCoin[coinAddress].idoCoinHead.expireTime); //到期了
         uint256 ipoCollectAmount = idoCoin[coinAddress].ipoCollectAmount; //ipo收到的钱
         //换算精度
-        address applyAddress = applyCoinAddress[
-            idoCoin[coinAddress].idoCoinHead.collectType
-        ];
+        address applyAddress = applyCoinAddress[idoCoin[coinAddress].idoCoinHead.collectType];
         uint256 decimals = applyCoin[applyAddress].decimals;
         uint256 to_decimals = idoCoin[coinAddress].idoCoinHead.decimals;
 
-        uint256 ipotakecoinamount = ipoCollectAmount.mul(to_decimals).div(
-            decimals
-        );
+        uint256 ipotakecoinamount = ipoCollectAmount.mul(to_decimals).div(decimals);
         ipotakecoinamount = ipotakecoinamount.mul(10**uint256(PRICE_DECIMALS));
-        ipotakecoinamount = ipotakecoinamount.div(
-            idoCoin[coinAddress].idoCoinHead.price
-        ); //换算为币
+        ipotakecoinamount = ipotakecoinamount.div(idoCoin[coinAddress].idoCoinHead.price); //换算为币
 
-        if (
-            ipotakecoinamount >= idoCoin[coinAddress].idoCoinHead.idoAmount
-        ) //大于需要募集的币
+        if (ipotakecoinamount >= idoCoin[coinAddress].idoCoinHead.idoAmount) //大于需要募集的币
         {
-            idoCoin[coinAddress].allCollectAmount = idoCoin[coinAddress]
-                .idoCoinHead
-                .idoAmount
-                .mul(to_decimals)
-                .div(decimals);
-            idoCoin[coinAddress].allCollectAmount = idoCoin[coinAddress]
-                .allCollectAmount
-                .mul(10**uint256(PRICE_DECIMALS));
-            idoCoin[coinAddress].allCollectAmount = idoCoin[coinAddress]
-                .allCollectAmount
-                .div(idoCoin[coinAddress].idoCoinHead.price);
+            idoCoin[coinAddress].allCollectAmount = idoCoin[coinAddress].idoCoinHead.idoAmount.mul(to_decimals).div(
+                decimals
+            );
+            idoCoin[coinAddress].allCollectAmount = idoCoin[coinAddress].allCollectAmount.mul(
+                10**uint256(PRICE_DECIMALS)
+            );
+            idoCoin[coinAddress].allCollectAmount = idoCoin[coinAddress].allCollectAmount.div(
+                idoCoin[coinAddress].idoCoinHead.price
+            );
 
-            idoCoin[coinAddress].ipoAmount = idoCoin[coinAddress]
-                .idoCoinHead
-                .idoAmount;
+            idoCoin[coinAddress].ipoAmount = idoCoin[coinAddress].idoCoinHead.idoAmount;
             idoCoin[coinAddress].ipoRate = 100;
         } else {
             idoCoin[coinAddress].allCollectAmount = ipoCollectAmount;
-            idoCoin[coinAddress].ipoAmount = ipoCollectAmount
-                .mul(to_decimals)
-                .div(decimals);
-            idoCoin[coinAddress].ipoAmount = idoCoin[coinAddress].ipoAmount.mul(
-                10**uint256(PRICE_DECIMALS)
-            );
-            idoCoin[coinAddress].ipoAmount = idoCoin[coinAddress].ipoAmount.div(
-                idoCoin[coinAddress].idoCoinHead.price
-            );
-            idoCoin[coinAddress].ipoRate = ipoCollectAmount.mul(100).div(
-                idoCoin[coinAddress].idoAmountTotal
-            );
+            idoCoin[coinAddress].ipoAmount = ipoCollectAmount.mul(to_decimals).div(decimals);
+            idoCoin[coinAddress].ipoAmount = idoCoin[coinAddress].ipoAmount.mul(10**uint256(PRICE_DECIMALS));
+            idoCoin[coinAddress].ipoAmount = idoCoin[coinAddress].ipoAmount.div(idoCoin[coinAddress].idoCoinHead.price);
+            idoCoin[coinAddress].ipoRate = ipoCollectAmount.mul(100).div(idoCoin[coinAddress].idoAmountTotal);
         }
-        idoCoin[coinAddress].allCollectAmount = idoCoin[coinAddress]
-            .allCollectAmount
-            .mul(9);
-        idoCoin[coinAddress].allCollectAmount = idoCoin[coinAddress]
-            .allCollectAmount
-            .div(10);
-        idoCoin[coinAddress].totalAmount = idoCoin[coinAddress]
-            .allCollectAmount;
+        idoCoin[coinAddress].allCollectAmount = idoCoin[coinAddress].allCollectAmount.mul(9);
+        idoCoin[coinAddress].allCollectAmount = idoCoin[coinAddress].allCollectAmount.div(10);
+        idoCoin[coinAddress].totalAmount = idoCoin[coinAddress].allCollectAmount;
         //开始计算10%购买DAO，
-        swapBuyDao[coinAddress] = swapBuyDao[coinAddress].add(
-            idoCoin[coinAddress].allCollectAmount.div(10)
-        );
+        swapBuyDao[coinAddress] = swapBuyDao[coinAddress].add(idoCoin[coinAddress].allCollectAmount.div(10));
         _setTakeOut(coinAddress);
         return true;
     }
 
     //去swap上购币
     //代币 coinAddress,交易对tokenB,如果交易对是 ETH，那么传WETH地址，否则传交易对地址
-    function toSwapBuyDAO(address coinAddress)
-        public
-        onlyISMPolicy
-        returns (bool)
-    {
+    function toSwapBuyDAO(address coinAddress) public onlyISMPolicy returns (bool) {
         //ETH或者BNB
         require(coinAddress != address(0));
         uint256 reserve0;
         uint256 reserve1;
         uint256 amountOut;
         address pair_;
-        address tokenB = applyCoinAddress[
-            idoCoin[coinAddress].idoCoinHead.collectType
-        ];
+        address tokenB = applyCoinAddress[idoCoin[coinAddress].idoCoinHead.collectType];
         factory = IUniswapRouter02(router).factory();
         //获取储量
         (reserve0, reserve1, ) = IUniswapPair(pair_).getReserves();
         //计算本次购买数量
-        amountOut = IUniswapRouter02(router).getAmountOut(
-            swapBuyDao[coinAddress],
-            reserve0,
-            reserve1
-        );
+        amountOut = IUniswapRouter02(router).getAmountOut(swapBuyDao[coinAddress], reserve0, reserve1);
         if (idoCoin[coinAddress].idoCoinHead.collectType == 1) //ETH
         {
-            pair_ = IUniswapFactory(factory).getPair(
-                IUniswapRouter02(router).WETH(),
-                address(DAOToken)
-            );
-            autoSwapEthToTokens(
-                address(DAOToken),
-                swapBuyDao[coinAddress],
-                address(this)
-            );
+            pair_ = IUniswapFactory(factory).getPair(IUniswapRouter02(router).WETH(), address(DAOToken));
+            autoSwapEthToTokens(address(DAOToken), swapBuyDao[coinAddress], address(this));
         } else {
             pair_ = IUniswapFactory(factory).getPair(tokenB, address(DAOToken));
-            autoSwapTokens(
-                tokenB,
-                address(DAOToken),
-                swapBuyDao[coinAddress],
-                address(this)
-            );
+            autoSwapTokens(tokenB, address(DAOToken), swapBuyDao[coinAddress], address(this));
         }
 
         //开始记账：
         zeorAddrAmount = zeorAddrAmount.add(amountOut.mul(30).div(100));
         //开始销毁
-        IERC20(DAOToken).safeTransferFrom(
-            address(this),
-            address(0),
-            zeorAddrAmount
-        );
+        IERC20(DAOToken).safeTransferFrom(address(this), address(0), zeorAddrAmount);
         zeorAddrAmount = 0;
         //注入矿池
         mintingAddrAmount = mintingAddrAmount.add(amountOut.mul(20).div(100));
-        daoMintingPool.addBonusToken_vote(
-            address(DAOToken),
-            mintingAddrAmount,
-            block.timestamp.add(86400 * 30)
-        ); //矿池延长一年
+        daoMintingPool.addBonusToken_vote(address(DAOToken), mintingAddrAmount, block.timestamp.add(86400 * 30)); //矿池延长一年
         mintingAddrAmount = 0;
         //送入金库
         treasuryAddrAmount = treasuryAddrAmount.add(amountOut.mul(30).div(100));
@@ -913,34 +685,20 @@ contract idoCoinContract is Ownable {
     }
 
     //管理员获取金库资金
-    function sendtreasuryAddrAmount(uint256 _treasuryAddrAmount)
-        public
-        onlyOwner
-    {
+    function sendtreasuryAddrAmount(uint256 _treasuryAddrAmount) public onlyOwner {
         require(_treasuryAddrAmount > 0);
         require(treasuryAddrAmount > 0);
         require(treasuryAddrAmount.sub(_treasuryAddrAmount) > 0);
-        IERC20(DAOToken).safeTransferFrom(
-            address(this),
-            msg.sender,
-            treasuryAddrAmount
-        );
+        IERC20(DAOToken).safeTransferFrom(address(this), msg.sender, treasuryAddrAmount);
         treasuryAddrAmount = treasuryAddrAmount.sub(_treasuryAddrAmount);
     }
 
     //管理员获取业务资金
-    function sendbusinessAddrAmount(uint256 _businessAddrAmount)
-        public
-        onlyOwner
-    {
+    function sendbusinessAddrAmount(uint256 _businessAddrAmount) public onlyOwner {
         require(_businessAddrAmount > 0);
         require(businessAddrAmount > 0);
         require(businessAddrAmount.sub(_businessAddrAmount) > 0);
-        IERC20(DAOToken).safeTransferFrom(
-            address(this),
-            msg.sender,
-            businessAddrAmount
-        );
+        IERC20(DAOToken).safeTransferFrom(address(this), msg.sender, businessAddrAmount);
         businessAddrAmount = businessAddrAmount.sub(_businessAddrAmount);
     }
 
@@ -949,11 +707,7 @@ contract idoCoinContract is Ownable {
         require(_statAddrAmount > 0);
         require(statAddrAmount > 0);
         require(statAddrAmount.sub(_statAddrAmount) > 0);
-        IERC20(DAOToken).safeTransferFrom(
-            address(this),
-            msg.sender,
-            statAddrAmount
-        );
+        IERC20(DAOToken).safeTransferFrom(address(this), msg.sender, statAddrAmount);
         statAddrAmount = statAddrAmount.sub(_statAddrAmount);
     }
 
@@ -975,12 +729,8 @@ contract idoCoinContract is Ownable {
         } else {
             amount = idoCoin[coinAddress].totalAmount.mul(planCon).div(100);
         }
-        idoCoin[coinAddress].allCollectAmount = idoCoin[coinAddress]
-            .allCollectAmount
-            .sub(amount);
-        idoCoin[coinAddress].withdrawAmount = idoCoin[coinAddress]
-            .withdrawAmount
-            .add(amount);
+        idoCoin[coinAddress].allCollectAmount = idoCoin[coinAddress].allCollectAmount.sub(amount);
+        idoCoin[coinAddress].withdrawAmount = idoCoin[coinAddress].withdrawAmount.add(amount);
 
         idoCoin[coinAddress].bTakeOut = true;
         idoCoin[coinAddress].takeOutNumber++;
@@ -990,61 +740,40 @@ contract idoCoinContract is Ownable {
     //分几次提币，每次按百分比提，管理员管理是否可以提币 2022-05-17
     //管理员在结束的时候，统计一下项目方卖币数量2022-05-17
     //管理员按提币方案启动提币
-    function setTakeOut(address coinAddress)
-        public
-        onlyISMPolicy
-        returns (bool)
-    {
+    function setTakeOut(address coinAddress) public onlyISMPolicy returns (bool) {
         return _setTakeOut(coinAddress);
     }
 
     //项目方提币
     function takeOut(address coinAddress) public returns (bool) {
-        require(
-            block.timestamp >= idoCoin[coinAddress].idoCoinHead.expireTime,
-            "ipo not end"
-        ); //到期了
+        require(block.timestamp >= idoCoin[coinAddress].idoCoinHead.expireTime, "ipo not end"); //到期了
         require(idoCoin[coinAddress].createUserAddress == msg.sender);
         require(idoCoin[coinAddress].withdrawAmount > 0);
         require(idoCoin[coinAddress].bTakeOut);
         idoCoin[coinAddress].bTakeOut = false;
         uint256 withdrawAmount = idoCoin[coinAddress].withdrawAmount;
 
-        address applyAddress = applyCoinAddress[
-            idoCoin[coinAddress].idoCoinHead.collectType
-        ];
+        address applyAddress = applyCoinAddress[idoCoin[coinAddress].idoCoinHead.collectType];
         address APPLYCOIN = applyCoin[applyAddress].contractAddress;
         //将项目方要去的钱送出去
         if (idoCoin[coinAddress].idoCoinHead.collectType == 1) {
-            address payable createUserAddress = address(
-                uint160(idoCoin[coinAddress].createUserAddress)
-            );
+            address payable createUserAddress = address(uint160(idoCoin[coinAddress].createUserAddress));
             createUserAddress.transfer(withdrawAmount);
         } else {
             IERC20(APPLYCOIN).safeTransfer(msg.sender, withdrawAmount);
         }
-        uint256 amountBalance = idoCoin[coinAddress].idoCoinHead.idoAmount.sub(
-            idoCoin[coinAddress].ipoAmount
-        );
-        idoCoin[coinAddress].idoCoinHead.idoAmount = idoCoin[coinAddress]
-            .ipoAmount;
+        uint256 amountBalance = idoCoin[coinAddress].idoCoinHead.idoAmount.sub(idoCoin[coinAddress].ipoAmount);
+        idoCoin[coinAddress].idoCoinHead.idoAmount = idoCoin[coinAddress].ipoAmount;
         if (amountBalance > 0) {
             COIN = IERC20(idoCoin[coinAddress].idoCoinHead.coinAddress);
             COIN.safeTransfer(msg.sender, amountBalance);
         }
         if (idoCoin[coinAddress].registerAmount > 0) {
-            DAOToken.safeTransfer(
-                msg.sender,
-                idoCoin[coinAddress].registerAmount
-            ); //返还注册费
+            DAOToken.safeTransfer(msg.sender, idoCoin[coinAddress].registerAmount); //返还注册费
             idoCoin[coinAddress].registerAmount = 0;
         }
         idoCoin[coinAddress].withdrawAmount = 0;
-        emit TakeOut(
-            msg.sender,
-            withdrawAmount,
-            idoCoin[coinAddress].idoCoinHead.collectType
-        );
+        emit TakeOut(msg.sender, withdrawAmount, idoCoin[coinAddress].idoCoinHead.collectType);
         return true;
     }
 }

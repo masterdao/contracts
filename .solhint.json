@@ -19,6 +19,12 @@
     "indent": [
       "off",
       4
+    ],
+    "reason-string": [
+      "warn",
+      {
+        "maxLength": 64
+      }
     ]
   },
   "plugins": [

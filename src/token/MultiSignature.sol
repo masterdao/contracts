@@ -48,11 +48,7 @@ abstract contract MultiSignature is Ownable {
      */
     function setMultiAddress(address addr) public onlyOwner returns (bool) {
         require(multiInfoList[addr].bmulti == false, "already exists. ");
-        MultiInfo memory newmultiInfo = MultiInfo({
-            bmulti: true,
-            bSign: false,
-            period: 0
-        });
+        MultiInfo memory newmultiInfo = MultiInfo({bmulti: true, bSign: false, period: 0});
         multiInfoList[addr] = newmultiInfo;
         multiAddress.push(addr);
         multiId++;
@@ -78,11 +74,7 @@ abstract contract MultiSignature is Ownable {
     /*
     @删除多签地址
      */
-    function delMultiAddress(address addr, uint256 id)
-        public
-        onlyOwner
-        returns (bool)
-    {
+    function delMultiAddress(address addr, uint256 id) public onlyOwner returns (bool) {
         multiInfoList[addr].bmulti = false;
         multiInfoList[addr].bSign = false;
         multiId--;
@@ -130,11 +122,7 @@ abstract contract MultiSignature is Ownable {
     /*
      @获取多签状态
       */
-    function getMultiSignatureStatus(uint256 currencyperiod)
-        public
-        view
-        returns (bool)
-    {
+    function getMultiSignatureStatus(uint256 currencyperiod) public view returns (bool) {
         require(currencyperiod >= 0);
         if (multiInfoList[msg.sender].period == currencyperiod) {
             return multiInfoList[msg.sender].bSign;

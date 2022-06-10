@@ -39,7 +39,6 @@ function initWeb3() {
 async function getstatus() {
     getpassingRate()
     getvotingRatio()
-    viewDaoVoteIncome()
     setStartBlockTime()
 
 
@@ -162,7 +161,7 @@ async function vote() {
     const contract = await getErc20Contract(IDOVOTE, IDOVOTECONTRACT);
     const coinbase = await getCurrentAccount()
     const coinAddress = document.getElementById("set-coinAddress").value
-    return await contract.methods.vote(coinAddress, poolTypeId, true).send({from: coinbase})
+    return await contract.methods.vote(coinAddress, true).send({from: coinbase})
 }
 
 async function setVoteTime() {
@@ -184,7 +183,9 @@ async function setVoteCoinEnd() {
 async function viewDaoVoteIncome() {
     const contract = await getErc20Contract(IDOVOTE, IDOVOTECONTRACT);
     const coinbase = await getCurrentAccount()
-    const DaoVoteIncome = await contract.methods.viewDaoVoteIncome().call()
+    const coinAddress= document.getElementById("set-dao-vote-income").value;
+    const DaoVoteIncome = await contract.methods.viewDaoVoteIncome(coinAddress).call()
+    console.log("DaoVoteIncome ",DaoVoteIncome)
     //vote-Income
     $('.vote-Income').html(`${DaoVoteIncome}`);
 }
@@ -307,5 +308,6 @@ async function approveCoinToken() {
     const fudContract = await getErc20Contract(erc20Abi, coinAddress);
     const approveValue = web3.utils.toWei('100000000', 'ether')
     console.log("spenderAddr  ", spenderAddr)
+    console.log("coinAddress  ", coinAddress)
     return await fudContract.methods.approve(spenderAddr, approveValue).send({from: this.coinbase})
 }
