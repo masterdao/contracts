@@ -70,7 +70,9 @@ describe('DAOMinitingPool contract test', () => {
 
     expect(info.amount).eq(amount);
     expect(info.veDao).eq(amount.mul(2).div(10));
+
+    const userdao = await contract.getuserTotalDao(owner.address, lpToken);
+    expect(userdao).eq(amount)
   });
 
-  it(`TODO:提取收益`);
 });

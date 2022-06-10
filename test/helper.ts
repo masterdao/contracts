@@ -86,12 +86,12 @@ export async function deployDAO(
 
   // 设置多签地址
   for (const account of accounts) {
-    await run(dao.setmultiAddress, account.address);
+    await run(dao.setMultiAddress, account.address);
   }
-  await run(dao.setmultiNumber, multiNumber);
+  await run(dao.setMultiNumber, multiNumber);
 
   // 提案
-  await run(dao.startmultisignatureperiod);
+  await run(dao.startMultiSignaturePeriod);
 
   // 发币
   await run(dao.mint, initTotal);

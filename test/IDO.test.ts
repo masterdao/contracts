@@ -120,7 +120,7 @@ describe('ido contract', () => {
       await ido.settlement(token.address);
 
       // 2. 管理员设置提币数量
-      await ido.setTakeOut(token.address, parseEther('0.3'));
+      await ido.setTakeOut(token.address);
 
       // 获得执行前状态
       const [oldBalance, oldTokenBalance, oldDaoBalance] = await Promise.all([
@@ -181,7 +181,11 @@ describe('ido contract', () => {
         bDAO: false,
         uDAONumber: 0,
         // 秒
-        expireTime: Math.floor(Date.now() / 1000) + 10,
+        startTime: Math.floor(Date.now() / 100),
+        bundle: 0,
+        maxbundle: 0,
+        planId: 0,
+        expireTime: 0,
       };
       await run(dao.approve, ido.address, parseEther('1'));
       await run(myToken.approve, ido.address, parseEther('100'));
@@ -239,15 +243,21 @@ describe('ido contract', () => {
         user.address,
       );
 
+      await run(ido.connect(user).settleaccounts,
+        token.address,
+        winningRate,
+        makeCoinAmount
+      );
+
       await run(
         ido.connect(user).withdraw,
         token.address,
-        winningRate,
-        makeCoinAmount,
+        // winningRate,
+        // makeCoinAmount,
       );
 
       await expect(
-        ido.connect(user).withdraw(token.address, winningRate, makeCoinAmount),
+        ido.connect(user).withdraw(token.address),
       ).revertedWith('already withdraw');
     });
   });
