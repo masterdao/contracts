@@ -39,7 +39,6 @@ function initWeb3() {
 async function getstatus() {
     getpassingRate()
     getvotingRatio()
-    viewDaoVoteIncome()
     setStartBlockTime()
 
 
@@ -184,7 +183,9 @@ async function setVoteCoinEnd() {
 async function viewDaoVoteIncome() {
     const contract = await getErc20Contract(IDOVOTE, IDOVOTECONTRACT);
     const coinbase = await getCurrentAccount()
-    const DaoVoteIncome = await contract.methods.viewDaoVoteIncome().call()
+    const coinAddress= document.getElementById("set-dao-vote-income").value;
+    const DaoVoteIncome = await contract.methods.viewDaoVoteIncome(coinAddress).call()
+    console.log("DaoVoteIncome ",DaoVoteIncome)
     //vote-Income
     $('.vote-Income').html(`${DaoVoteIncome}`);
 }
