@@ -493,6 +493,19 @@ const IDOVOTE=[
 	},
 	{
 		"inputs": [],
+		"name": "getpassRate",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
 		"name": "getpassingRate",
 		"outputs": [
 			{
@@ -741,6 +754,19 @@ const IDOVOTE=[
 			}
 		],
 		"name": "setidoCoinContract",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_passRate",
+				"type": "uint256"
+			}
+		],
+		"name": "setpassRate",
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"

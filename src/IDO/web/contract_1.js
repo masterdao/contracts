@@ -1,10 +1,8 @@
-import {run} from "../../../test/helper";
-
 let web3;
 const DAO = "0x5e0289c130BcC61FBe5cEc5dce5fE775E50752bf"
 const OWNER = "0x4Cf2EE6f44C53931b52bdbce3A15F123bf073162"
-const IDOVOTECONTRACT = "0x76A7F3728eAb90B9Be376BAfE9615e93C0839d34"
-const IDOCONTRACT = "0x87B66ec5c4Bf2fa6c3d13189375891e7727E7C5f"
+const IDOVOTECONTRACT = "0x26664AA19AafFe3405B6fdA9Fa012904d14a393d"
+const IDOCONTRACT = "0xf31E0Fa85B83D5f1b2b49Dc40401479803A7B9A5"
 const ROUTER = "0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45"
 let voteStauts;
 
@@ -41,7 +39,6 @@ function initWeb3() {
 async function getstatus() {
     getpassingRate()
     getvotingRatio()
-    viewDaoVoteIncome()
     setStartBlockTime()
 
 
@@ -164,8 +161,7 @@ async function vote() {
     const contract = await getErc20Contract(IDOVOTE, IDOVOTECONTRACT);
     const coinbase = await getCurrentAccount()
     const coinAddress = document.getElementById("set-coinAddress").value
-    const poolTypeId = document.getElementById("set-poolTypeId").value
-    return await contract.methods.vote(coinAddress, poolTypeId, true).send({from: coinbase})
+    return await contract.methods.vote(coinAddress, true).send({from: coinbase})
 }
 
 async function setVoteTime() {
@@ -187,7 +183,9 @@ async function setVoteCoinEnd() {
 async function viewDaoVoteIncome() {
     const contract = await getErc20Contract(IDOVOTE, IDOVOTECONTRACT);
     const coinbase = await getCurrentAccount()
-    const DaoVoteIncome = await contract.methods.viewDaoVoteIncome().call()
+    const coinAddress= document.getElementById("set-dao-vote-income").value;
+    const DaoVoteIncome = await contract.methods.viewDaoVoteIncome(coinAddress).call()
+    console.log("DaoVoteIncome ",DaoVoteIncome)
     //vote-Income
     $('.vote-Income').html(`${DaoVoteIncome}`);
 }
@@ -213,6 +211,7 @@ async function setStartTime() {
 async function setStartBlockTime() {
     const time = Math.floor(Date.now() / 1000);
     document.getElementById("set-start-time").value = time
+    document.getElementById("set-coin-start-time").value = time;
 
 }
 
@@ -269,35 +268,46 @@ async function setUpCoin() {
     const bundle = document.getElementById("set-bundle").value;
     const maxbundle = document.getElementById("set-max-bundle").value;
     const planId = document.getElementById("set-coin-plan-id").value;
-    const idoCoinHead = {
-        coinAddress: coinAddress,
-        symbol: symbol,
-        decimals: decimals,
-        collectType: collectType,
-        idoAmount: idoAmount,
-        price: price,
-        bBuyLimit: bBuyLimit,
-        uBuyLimitNumber: uBuyLimitNumber,
-        bPartner: bPartner,
-        partnerNumber: partnerNumber,
-        bDAO: bDAO,
-        uDAONumber: uDAONumber,
+    const idoCoinHead = [
+        coinAddress,
+        symbol,
+        decimals,
+        collectType,
+        idoAmount,
+        price,
+        bBuyLimit,
+        uBuyLimitNumber,
+        bPartner,
+        partnerNumber,
+        bDAO,
+        uDAONumber,
         // 秒
-        startTime: startTime,
-        expireTime: expireTime,
-        bundle: bundle,
-        maxbundle: maxbundle,
-        planId: planId,
-    };
+        startTime,
+        expireTime,
+        bundle,
+        maxbundle,
+        planId
+    ];
     return await contract.methods.createIeoCoin(idoCoinHead).send({from: coinbase})
 }
 
 //授权
-async function approveCoinToken () {
+async function approveDAOToken() {
     const contractAddress = DAO
     const spenderAddr = IDOCONTRACT
-    const contract =await getErc20Contract(erc20Abi,contractAddress);
+    const contract = await getErc20Contract(erc20Abi, contractAddress);
     const approveValue = web3.utils.toWei('100000000', 'ether')
-    console.log("spenderAddr  " , spenderAddr )
-    return await contract.methods.approve(spenderAddr, approveValue).send({ from: this.coinbase })
+    console.log("spenderAddr  ", spenderAddr)
+    return await contract.methods.approve(spenderAddr, approveValue).send({from: this.coinbase})
+
+}
+
+async function approveCoinToken() {
+    const spenderAddr = IDOCONTRACT
+    const coinAddress = document.getElementById("set-coin-coinAddress").value;
+    const fudContract = await getErc20Contract(erc20Abi, coinAddress);
+    const approveValue = web3.utils.toWei('100000000', 'ether')
+    console.log("spenderAddr  ", spenderAddr)
+    console.log("coinAddress  ", coinAddress)
+    return await fudContract.methods.approve(spenderAddr, approveValue).send({from: this.coinbase})
 }

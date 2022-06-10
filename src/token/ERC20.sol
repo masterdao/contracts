@@ -7,7 +7,7 @@ import "./IERC20.sol";
 import "./IERC20Metadata.sol";
 import "./Context.sol";
 import "./Ownable.sol";
-import "./multisignature.sol";
+import "./MultiSignature.sol";
 import "./SafeMath.sol";
 
 /**
@@ -35,8 +35,8 @@ import "./SafeMath.sol";
  * functions have been added to mitigate the well-known issues around setting
  * allowances. See {IERC20-approve}.
  */
-contract ERC20 is Context, IERC20, IERC20Metadata,Ownable,multi_signature {
-    using SafeMath for uint256; 
+contract ERC20 is Context, IERC20, IERC20Metadata, Ownable, MultiSignature {
+    using SafeMath for uint256;
     mapping(address => uint256) private _balances;
 
     mapping(address => mapping(address => uint256)) private _allowances;
@@ -60,8 +60,8 @@ contract ERC20 is Context, IERC20, IERC20Metadata,Ownable,multi_signature {
     constructor(string memory name_, string memory symbol_) {
         _name = name_;
         _symbol = symbol_;
-        uint256 total = 2000000000;  //未来总量 20 亿
-        _alltotalsupply = total *10 ** decimals();
+        uint256 total = 2000000000; //未来总量 20 亿
+        _alltotalsupply = total * 10**decimals();
     }
 
     /**
@@ -268,19 +268,20 @@ contract ERC20 is Context, IERC20, IERC20Metadata,Ownable,multi_signature {
 
         _afterTokenTransfer(address(0), account, amount);
     }
-    function mint(uint256 amount) public  returns(bool){
-        require(amount >0,"" );
-        uint256 currencyAmount = amount * 10 ** decimals();
-        if(multisignature(currencyAmount)) //多签通过
+
+    function mint(uint256 amount) public returns (bool) {
+        require(amount > 0, "");
+        uint256 currencyAmount = amount * 10**decimals();
+        if (multiSignature(currencyAmount)) //多签通过
         {
-            require( _totalSupply.add(currencyAmount) <= _alltotalsupply ,"" );
-            _mint(owner(),currencyAmount);
+            require(_totalSupply.add(currencyAmount) <= _alltotalsupply, "");
+            _mint(owner(), currencyAmount);
             return true;
-        }
-        else{
+        } else {
             return false;
         }
     }
+
     /**
      * @dev Destroys `amount` tokens from `account`, reducing the
      * total supply.
