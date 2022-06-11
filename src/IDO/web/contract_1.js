@@ -199,7 +199,7 @@ async function tokeoutVoteIncome() {
 }
 
 async function setStartTime() {
-    const contract = await getErc20Contract(IDOVOTE, IDOCONTRACT);
+    const contract = await getErc20Contract(IDOABI, IDOCONTRACT);
     const coinbase = await getCurrentAccount()
     const coinAddress = document.getElementById("set-start-coinAddress").value
     const time = document.getElementById("set-start-time").value
@@ -217,10 +217,18 @@ async function setStartBlockTime() {
 
 
 async function setIpoTime() {
-    const contract = await getErc20Contract(IDOVOTE, IDOCONTRACT);
+    const contract = await getErc20Contract(IDOABI, IDOCONTRACT);
     const coinbase = await getCurrentAccount()
     const time = document.getElementById("set-ipo-time").value
     return await contract.methods.setipoTime(time).send({from: coinbase})
+
+}
+async function IPOsubscription() {
+    const contract = await getErc20Contract(IDOABI, IDOCONTRACT);
+    const coinbase = await getCurrentAccount()
+    const coinAddress = document.getElementById("set-ipo-coinAddress").value
+    const amount = document.getElementById("set-ipo-amount").value
+    return await contract.methods.IPOsubscription(coinAddress,amount).send({from: coinbase})
 
 }
 

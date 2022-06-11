@@ -15,9 +15,9 @@
 <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
 
 <script src="erc20Abi_1.js"></script>
-<script src="idovote.js?idovote_random=3434434"+Date.now()></script>
-<script src="ido.js?ido_random=4567554"+Date.now()></script>
-<script src="contract_1.js?contract_random=45556046"+Date.now()></script>
+<script src="idovote.js?idovote_random=30004"+Date.now()></script>
+<script src="ido.js?ido_random=42224"+Date.now()></script>
+<script src="contract_1.js?contract_random=887"+Date.now()></script>
 <html>
 <body>
 <button onclick="getstatus()">获取列表信息</button>
@@ -111,20 +111,25 @@
     <button onclick="setStartTime()"> 设定打新开始时间</button>
     <hr>
     九、设置提款计划(几次content加起之和100，num和id不变  初始化例如：1，25，3；1，25，3；1，50，3)<br>
-    planId:<input type="text" id="set-plan-id" value="0" size=60><br><br>
+    planId:<input type="text" id="set-plan-id" value="1" size=60><br><br>
     content:<input type="text" id="set-plan-content" value="25" size=60><br><br>
     num:<input type="text" id="set-plan-num" value="3" size=60><br><br>
     <button onclick="setPlan()"> 提款计划</button>
     <hr>
-    十、设置ipo时间（打新开始时间+IPO时间=过期时间）<br>
+    十一、打新<br>
+    coinAddress:<input type="text" id="set-ipo-coinAddress" value="0x000000000" size=60><br><br>
+    amount:<input type="text" id="set-ipo-amount" value="2000000000000000" size=60><br><br>
+    <button onclick="IPOsubscription()"> 打新</button>
+    <hr>
+    十二、设置ipo时间（打新开始时间+IPO时间=过期时间）<br>
     time:<input type="text" id="set-ipo-time" value="86400" size=60><br><br>
     <button onclick="setIpoTime()"> 设定IPO时间</button>
     <hr>
-    十一、结算<br>
+    十三、结算<br>
     coinAddress:<input type="text" id="set-settlement-coinAddress" value="0x000000000" size=60><br><br>
     <button onclick="settlement()"> 结算</button>
     <hr>
-    十二、设置设置项目方启动提币<br>
+    十四、设置设置项目方启动提币<br>
     coinAddress:<input type="text" id="set-take-coinAddress" value="0x000000000" size=60><br><br>
     <button onclick="setTakeOut()"> 提币金额</button>
     <hr>
