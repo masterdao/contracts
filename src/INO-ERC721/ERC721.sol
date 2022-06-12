@@ -26,7 +26,7 @@ contract ERC721 is Context, ERC165, IERC721, Ownable, IERC721Metadata {
 
     // Token symbol
     string private _symbol;
-    // 
+    //
     uint256 private _totalSupply;
 
     // Mapping from token ID to owner address
@@ -44,15 +44,19 @@ contract ERC721 is Context, ERC165, IERC721, Ownable, IERC721Metadata {
     /**
      * @dev Initializes the contract by setting a `name` and a `symbol` to the token collection.
      */
-    constructor(string memory name_, string memory symbol_,uint256 totalSupply_) {
+    constructor(
+        string memory name_,
+        string memory symbol_,
+        uint256 totalSupply_
+    ) {
         _name = name_;
         _symbol = symbol_;
-        _totalSupply  = totalSupply_;
-        for(uint256 i=0;i< _totalSupply ;i++){
-            safeMint(owner(),i);
+        _totalSupply = totalSupply_;
+        for (uint256 i = 0; i < _totalSupply; i++) {
+            safeMint(owner(), i);
         }
     }
-    
+
     /**
      * @dev See {IERC165-supportsInterface}.
      */
@@ -62,13 +66,15 @@ contract ERC721 is Context, ERC165, IERC721, Ownable, IERC721Metadata {
             interfaceId == type(IERC721Metadata).interfaceId ||
             super.supportsInterface(interfaceId);
     }
-   /**
-   * @dev 获取合约存储的token总数
-   * @return uint256 representing the total amount of tokens
-   */
+
+    /**
+     * @dev 获取合约存储的token总数
+     * @return uint256 representing the total amount of tokens
+     */
     function totalSupply() public view returns (uint256) {
         return _totalSupply;
     }
+
     /**
      * @dev See {IERC721-balanceOf}.
      */
@@ -247,13 +253,15 @@ contract ERC721 is Context, ERC165, IERC721, Ownable, IERC721Metadata {
         address owner = ERC721.ownerOf(tokenId);
         return (spender == owner || getApproved(tokenId) == spender || isApprovedForAll(owner, spender));
     }
+
     /**
     创建一个NFT ERC721 token 
     */
-    function safeMint(address to,uint256 tokenId) public onlyOwner returns(uint256){
-        _safeMint(to,tokenId);
+    function safeMint(address to, uint256 tokenId) public onlyOwner returns (uint256) {
+        _safeMint(to, tokenId);
         return tokenId;
     }
+
     /**
      * @dev Safely mints `tokenId` and transfers it to `to`.
      *
@@ -296,7 +304,7 @@ contract ERC721 is Context, ERC165, IERC721, Ownable, IERC721Metadata {
      *
      * Emits a {Transfer} event.
      */
-    //function mint(address to,uint256 tokenId) public onlyOwner 
+    //function mint(address to,uint256 tokenId) public onlyOwner
     function _mint(address to, uint256 tokenId) internal virtual {
         require(to != address(0), "ERC721: mint to the zero address");
         require(!_exists(tokenId), "ERC721: token already minted");

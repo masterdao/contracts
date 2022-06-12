@@ -5,3 +5,5 @@ deployments
 deploy
 scripts
 types
+src/**/*.js
+src/**/*.html

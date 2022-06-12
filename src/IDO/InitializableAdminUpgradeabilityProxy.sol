@@ -1,21 +1,22 @@
 // SPDX-License-Identifier: No License
 
 pragma solidity ^0.7.3;
-import "./Address.sol"; 
+import "./Address.sol";
+
 /**
  * @dev This abstract contract provides a fallback function that delegates all calls to another contract using the EVM
  * instruction `delegatecall`. We refer to the second contract as the _implementation_ behind the proxy, and it has to
  * be specified by overriding the virtual {_implementation} function.
- * 
+ *
  * Additionally, delegation to the implementation can be triggered manually through the {_fallback} function, or to a
  * different contract through the {_delegate} function.
- * 
+ *
  * The success and return data of the delegated call will be returned back to the caller of the proxy.
  */
 abstract contract Proxy {
     /**
      * @dev Delegates the current call to `implementation`.
-     * 
+     *
      * This function does not return to its internall call site, it will return directly to the external caller.
      */
     function _delegate(address implementation) internal {
@@ -35,8 +36,12 @@ abstract contract Proxy {
 
             switch result
             // delegatecall returns 0 on error.
-            case 0 { revert(0, returndatasize()) }
-            default { return(0, returndatasize()) }
+            case 0 {
+                revert(0, returndatasize())
+            }
+            default {
+                return(0, returndatasize())
+            }
         }
     }
 
@@ -44,11 +49,11 @@ abstract contract Proxy {
      * @dev This is a virtual function that should be overriden so it returns the address to which the fallback function
      * and {_fallback} should delegate.
      */
-    function _implementation() internal virtual view returns (address);
+    function _implementation() internal view virtual returns (address);
 
     /**
      * @dev Delegates the current call to the address returned by `_implementation()`.
-     * 
+     *
      * This function does not return to its internall call site, it will return directly to the external caller.
      */
     function _fallback() internal {
@@ -60,7 +65,7 @@ abstract contract Proxy {
      * @dev Fallback function that delegates calls to the address returned by `_implementation()`. Will run if no other
      * function in the contract matches the call data.
      */
-    fallback () payable external {
+    fallback() external payable {
         _fallback();
     }
 
@@ -68,32 +73,29 @@ abstract contract Proxy {
      * @dev Fallback function that delegates calls to the address returned by `_implementation()`. Will run if call data
      * is empty.
      */
-    receive () payable external {
+    receive() external payable {
         _fallback();
     }
 
     /**
      * @dev Hook that is called before falling back to the implementation. Can happen as part of a manual `_fallback`
      * call, or as part of the Solidity `fallback` or `receive` functions.
-     * 
+     *
      * If overriden should call `super._beforeFallback()`.
      */
-    function _beforeFallback() internal virtual {
-    }
+    function _beforeFallback() internal virtual {}
 }
-
 
 /**
  * @dev This contract implements an upgradeable proxy. It is upgradeable because calls are delegated to an
  * implementation address that can be changed. This address is stored in storage in the location specified by
  * https://eips.ethereum.org/EIPS/eip-1967[EIP1967], so that it doesn't conflict with the storage layout of the
  * implementation behind the proxy.
- * 
+ *
  * Upgradeability is only provided internally through {_upgradeTo}. For an externally upgradeable proxy see
  * {TransparentUpgradeableProxy}.
  */
 contract BaseUpgradeabilityProxy is Proxy {
-
     /**
      * @dev Storage slot with the address of the current implementation.
      * This is the keccak-256 hash of "eip1967.proxy.implementation" subtracted by 1, and is
@@ -106,7 +108,7 @@ contract BaseUpgradeabilityProxy is Proxy {
     /**
      * @dev Returns the current implementation address.
      */
-    function _implementation() internal override view returns (address impl) {
+    function _implementation() internal view override returns (address impl) {
         bytes32 slot = IMPLEMENTATION_SLOT;
         // solhint-disable-next-line no-inline-assembly
         assembly {
@@ -116,7 +118,7 @@ contract BaseUpgradeabilityProxy is Proxy {
 
     /**
      * @dev Upgrades the proxy to a new implementation.
-     * 
+     *
      * Emits an {Upgraded} event.
      */
     function _upgradeTo(address newImplementation) internal {
@@ -139,7 +141,6 @@ contract BaseUpgradeabilityProxy is Proxy {
     }
 }
 
-
 /**
  * @title BaseAdminUpgradeabilityProxy
  * @dev This contract combines an upgradeability proxy with an authorization
@@ -149,132 +150,136 @@ contract BaseUpgradeabilityProxy is Proxy {
  * feature proposal that would enable this to be done automatically.
  */
 contract BaseAdminUpgradeabilityProxy is BaseUpgradeabilityProxy {
-  /**
-   * @dev Emitted when the administration has been transferred.
-   * @param previousAdmin Address of the previous admin.
-   * @param newAdmin Address of the new admin.
-   */
-  event AdminChanged(address previousAdmin, address newAdmin);
+    /**
+     * @dev Emitted when the administration has been transferred.
+     * @param previousAdmin Address of the previous admin.
+     * @param newAdmin Address of the new admin.
+     */
+    event AdminChanged(address previousAdmin, address newAdmin);
 
-  /**
-   * @dev Storage slot with the admin of the contract.
-   * This is the keccak-256 hash of "eip1967.proxy.admin" subtracted by 1, and is
-   * validated in the constructor.
-   */
+    /**
+     * @dev Storage slot with the admin of the contract.
+     * This is the keccak-256 hash of "eip1967.proxy.admin" subtracted by 1, and is
+     * validated in the constructor.
+     */
 
-  bytes32 internal constant ADMIN_SLOT = 0xb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d6103;
+    bytes32 internal constant ADMIN_SLOT = 0xb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d6103;
 
-  /**
-   * @dev Modifier to check whether the `msg.sender` is the admin.
-   * If it is, it will run the function. Otherwise, it will delegate the call
-   * to the implementation.
-   */
-  modifier ifAdmin() {
-    if (msg.sender == _admin()) {
-      _;
-    } else {
-      _fallback();
+    /**
+     * @dev Modifier to check whether the `msg.sender` is the admin.
+     * If it is, it will run the function. Otherwise, it will delegate the call
+     * to the implementation.
+     */
+    modifier ifAdmin() {
+        if (msg.sender == _admin()) {
+            _;
+        } else {
+            _fallback();
+        }
     }
-  }
 
-  /**
-   * @return The address of the proxy admin.
-   */
-  function admin() external ifAdmin returns (address) {
-    return _admin();
-  }
-
-  /**
-   * @return The address of the implementation.
-   */
-  function implementation() external ifAdmin returns (address) {
-    return _implementation();
-  }
-
-  /**
-   * @dev Changes the admin of the proxy.
-   * Only the current admin can call this function.
-   * @param newAdmin Address to transfer proxy administration to.
-   */
-  function changeAdmin(address newAdmin) external ifAdmin {
-    require(newAdmin != address(0), "Cannot change the admin of a proxy to the zero address");
-    emit AdminChanged(_admin(), newAdmin);
-    _setAdmin(newAdmin);
-  }
-
-  /**
-   * @dev Upgrade the backing implementation of the proxy.
-   * Only the admin can call this function.
-   * @param newImplementation Address of the new implementation.
-   */
-  function upgradeTo(address newImplementation) external ifAdmin {
-    _upgradeTo(newImplementation);
-  }
-
-  /**
-   * @dev Upgrade the backing implementation of the proxy and call a function
-   * on the new implementation.
-   * This is useful to initialize the proxied contract.
-   * @param newImplementation Address of the new implementation.
-   * @param data Data to send as msg.data in the low level call.
-   * It should include the signature and the parameters of the function to be called, as described in
-   * https://solidity.readthedocs.io/en/v0.4.24/abi-spec.html#function-selector-and-argument-encoding.
-   */
-  function upgradeToAndCall(address newImplementation, bytes calldata data) payable external ifAdmin {
-    _upgradeTo(newImplementation);
-    (bool success,) = newImplementation.delegatecall(data);
-    require(success);
-  }
-
-  /**
-   * @return adm The admin slot.
-   */
-  function _admin() internal view returns (address adm) {
-    bytes32 slot = ADMIN_SLOT;
-    assembly {
-      adm := sload(slot)
+    /**
+     * @return The address of the proxy admin.
+     */
+    function admin() external ifAdmin returns (address) {
+        return _admin();
     }
-  }
 
-  /**
-   * @dev Sets the address of the proxy admin.
-   * @param newAdmin Address of the new proxy admin.
-   */
-  function _setAdmin(address newAdmin) internal {
-    bytes32 slot = ADMIN_SLOT;
-
-    assembly {
-      sstore(slot, newAdmin)
+    /**
+     * @return The address of the implementation.
+     */
+    function implementation() external ifAdmin returns (address) {
+        return _implementation();
     }
-  }
+
+    /**
+     * @dev Changes the admin of the proxy.
+     * Only the current admin can call this function.
+     * @param newAdmin Address to transfer proxy administration to.
+     */
+    function changeAdmin(address newAdmin) external ifAdmin {
+        require(newAdmin != address(0), "Cannot change the admin of a proxy to the zero address");
+        emit AdminChanged(_admin(), newAdmin);
+        _setAdmin(newAdmin);
+    }
+
+    /**
+     * @dev Upgrade the backing implementation of the proxy.
+     * Only the admin can call this function.
+     * @param newImplementation Address of the new implementation.
+     */
+    function upgradeTo(address newImplementation) external ifAdmin {
+        _upgradeTo(newImplementation);
+    }
+
+    /**
+     * @dev Upgrade the backing implementation of the proxy and call a function
+     * on the new implementation.
+     * This is useful to initialize the proxied contract.
+     * @param newImplementation Address of the new implementation.
+     * @param data Data to send as msg.data in the low level call.
+     * It should include the signature and the parameters of the function to be called, as described in
+     * https://solidity.readthedocs.io/en/v0.4.24/abi-spec.html#function-selector-and-argument-encoding.
+     */
+    function upgradeToAndCall(address newImplementation, bytes calldata data) external payable ifAdmin {
+        _upgradeTo(newImplementation);
+        (bool success, ) = newImplementation.delegatecall(data);
+        require(success);
+    }
+
+    /**
+     * @return adm The admin slot.
+     */
+    function _admin() internal view returns (address adm) {
+        bytes32 slot = ADMIN_SLOT;
+        assembly {
+            adm := sload(slot)
+        }
+    }
+
+    /**
+     * @dev Sets the address of the proxy admin.
+     * @param newAdmin Address of the new proxy admin.
+     */
+    function _setAdmin(address newAdmin) internal {
+        bytes32 slot = ADMIN_SLOT;
+
+        assembly {
+            sstore(slot, newAdmin)
+        }
+    }
 }
 
 /**
  * @title InitializableAdminUpgradeabilityProxy
- * @dev Extends from BaseAdminUpgradeabilityProxy with an initializer for 
+ * @dev Extends from BaseAdminUpgradeabilityProxy with an initializer for
  * initializing the implementation, admin, and init data.
  */
 contract InitializableAdminUpgradeabilityProxy is BaseAdminUpgradeabilityProxy {
-  /**
-   * Contract initializer.
-   * @param _logic address of the initial implementation.
-   * @param _admin Address of the proxy administrator.
-   * @param _data Data to send as msg.data to the implementation to initialize the proxied contract.
-   * It should include the signature and the parameters of the function to be called, as described in
-   * https://solidity.readthedocs.io/en/v0.4.24/abi-spec.html#function-selector-and-argument-encoding.
-   * This parameter is optional, if no data is given the initialization call to proxied contract will be skipped.
-   */
-  function initialize(address _logic, address _admin, bytes memory _data) public payable {
-    require(_implementation() == address(0));
+    /**
+     * Contract initializer.
+     * @param _logic address of the initial implementation.
+     * @param _admin Address of the proxy administrator.
+     * @param _data Data to send as msg.data to the implementation to initialize the proxied contract.
+     * It should include the signature and the parameters of the function to be called, as described in
+     * https://solidity.readthedocs.io/en/v0.4.24/abi-spec.html#function-selector-and-argument-encoding.
+     * This parameter is optional, if no data is given the initialization call to proxied contract will be skipped.
+     */
+    function initialize(
+        address _logic,
+        address _admin,
+        bytes memory _data
+    ) public payable {
+        require(_implementation() == address(0));
 
-    assert(IMPLEMENTATION_SLOT == bytes32(uint256(keccak256('eip1967.proxy.implementation')) - 1));
-    _setImplementation(_logic);
-    if(_data.length > 0) {
-      (bool success,) = _logic.delegatecall(_data);
-      require(success);
+        assert(IMPLEMENTATION_SLOT == bytes32(uint256(keccak256("eip1967.proxy.implementation")) - 1));
+        _setImplementation(_logic);
+        if (_data.length > 0) {
+            (bool success, ) = _logic.delegatecall(_data);
+            require(success);
+        }
+
+        assert(ADMIN_SLOT == bytes32(uint256(keccak256("eip1967.proxy.admin")) - 1));
+        _setAdmin(_admin);
     }
-
-    assert(ADMIN_SLOT == bytes32(uint256(keccak256('eip1967.proxy.admin')) - 1));
-    _setAdmin(_admin);
-  }
 }

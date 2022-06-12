@@ -1,60 +1,75 @@
 <head>
-    <!-- Meta -->
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="Cryptocash is Professional Creative Template"/>
+  <!-- Meta -->
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta
+    name="description"
+    content="Cryptocash is Professional Creative Template"
+  />
 </head>
-<script src="https://cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"
-        integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>
+<script
+  src="https://cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"
+  integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ="
+  crossorigin="anonymous"
+></script>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js@2.7.2/dist/Chart.bundle.min.js"
-        integrity="sha256-XF29CBwU1MWLaGEnsELogU6Y6rcc5nCkhhx89nFMIDQ=" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.min.js"
-        integrity="sha256-ecWZ3XYM7AwWIaGvSdmipJ2l1F4bN9RXW6zgpeAiZYI=" crossorigin="anonymous"></script>
+<script
+  src="https://cdn.jsdelivr.net/npm/chart.js@2.7.2/dist/Chart.bundle.min.js"
+  integrity="sha256-XF29CBwU1MWLaGEnsELogU6Y6rcc5nCkhhx89nFMIDQ="
+  crossorigin="anonymous"
+></script>
+<script
+  src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.min.js"
+  integrity="sha256-ecWZ3XYM7AwWIaGvSdmipJ2l1F4bN9RXW6zgpeAiZYI="
+  crossorigin="anonymous"
+></script>
 <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
- 
+
 <script src="erc20Abi_1.js"></script>
 <script src="multisig.js" + now()></script>
-<script src="contract_2.js?www="+ now() ></script>
+<script src="contract_2.js?www=" + now()></script>
 <html>
-    <body>
-        <button onclick="getstatus()">获取列表信息</button>
-        <br><br>
-        DAO 余额：<span style="color: red;" class="dao-balance">--.--</span><br>
-        精度：<span style="color: red;" class="dao-decimals">--.--</span><br>
-        symbol:<span style="color: red;" class="dao-symbol">--.--</span><br>
-        管理员地址：<span style="color: red;" class="owner-addr">--.--</span><br>
-       
-        <br>
-        <div  style="color:red; border-radius: 2%;  border: 2px solid burlywood;">
-        管理员操作：<br><br>
-        操作流程：<br>
-        1、设定多签地址；<br>
-        2、设定多签规则：例如：3个地址，2票通过；<br>
-        3、开启多签。
-        <hr>
-        一、多签地址列表：<br>
-        <span style="color: red;" class="addr-list">--.--</span><br>
-        设定多签地址：<input type="text" id="set-addr" size=60><br><br>
-        <button onclick="set_multiAddress()">设定多签地址</button>
-        <hr>
-        二、设定多签数量：<input type="text" id="set-number" size=60><br><br>
-        <button onclick="setmultiNumber()">设定多签数量</button>
-        <hr>
-        <br>
-        三、第几次提案：<span style="color: red;" class="currency-period">--.--</span><br><br>
-        <button onclick="startmultisignatureperiod()">开启提案</button>
+  <body>
+    <button onclick="getstatus()">获取列表信息</button>
+    <br /><br />
+    DAO 余额：<span style="color: red" class="dao-balance">--.--</span><br />
+    精度：<span style="color: red" class="dao-decimals">--.--</span><br />
+    symbol:<span style="color: red" class="dao-symbol">--.--</span><br />
+    管理员地址：<span style="color: red" class="owner-addr">--.--</span><br />
 
-        <hr>
-        <br>
-        四、发行Token：<input type="text" id="set-amount" size=60><br><br>
-        <button onclick="mint()">多签开始签名</button>
-       
-         
-         
-        <br><br><br>
-        </div>
-    </body>
+    <br />
+    <div style="color: red; border-radius: 2%; border: 2px solid burlywood">
+      管理员操作：<br /><br />
+      操作流程：<br />
+      1、设定多签地址；<br />
+      2、设定多签规则：例如：3个地址，2票通过；<br />
+      3、开启多签。
+      <hr />
+      一、多签地址列表：<br />
+      <span style="color: red" class="addr-list">--.--</span><br />
+      设定多签地址：<input type="text" id="set-addr" size="60" /><br /><br />
+      <button onclick="set_multiAddress()">设定多签地址</button>
+      <hr />
+      二、设定多签数量：<input
+        type="text"
+        id="set-number"
+        size="60"
+      /><br /><br />
+      <button onclick="setmultiNumber()">设定多签数量</button>
+      <hr />
+      <br />
+      三、第几次提案：<span style="color: red" class="currency-period"
+        >--.--</span
+      ><br /><br />
+      <button onclick="startmultisignatureperiod()">开启提案</button>
+
+      <hr />
+      <br />
+      四、发行Token：<input type="text" id="set-amount" size="60" /><br /><br />
+      <button onclick="mint()">多签开始签名</button>
+
+      <br /><br /><br />
+    </div>
+  </body>
 </html>
- 

@@ -26,13 +26,7 @@ contract INOERC721Contract is Ownable {
         addapplyCoin(msg.sender, "ETH", 18);
     }
 
-    event CreateInoCoin(
-        address who,
-        address coinAddress,
-        uint256 tokenId,
-        uint256 coinType,
-        uint256 makeCoinAmount
-    );
+    event CreateInoCoin(address who, address coinAddress, uint256 tokenId, uint256 coinType, uint256 makeCoinAmount);
     event BuyNftToken(address coinAddress, uint256 tokeId, address who);
     event TakeOut(address who, address coinAddress, uint256 tokenId);
     event Withdraw(address who, uint256 makeCoinAmount);
@@ -74,21 +68,13 @@ contract INOERC721Contract is Ownable {
     mapping(address => uint256[]) private NFTList; //保存同一个地址下，有多少币上架
 
     //获取同一个地址下，有多少币上架
-    function getNFTListlenght(address coinAddress)
-        public
-        view
-        returns (uint256)
-    {
+    function getNFTListlenght(address coinAddress) public view returns (uint256) {
         require(coinAddress != address(0));
         return NFTList[coinAddress].length;
     }
 
     //遍历同一个地址下，有多少币上架
-    function getNFTListData(address coinAddress, uint256 index)
-        public
-        view
-        returns (uint256)
-    {
+    function getNFTListData(address coinAddress, uint256 index) public view returns (uint256) {
         require(coinAddress != address(0));
         require(index < NFTList[coinAddress].length);
         return NFTList[coinAddress][index];
@@ -110,11 +96,7 @@ contract INOERC721Contract is Ownable {
         return applyCoinAddress[coinId];
     }
 
-    function getapplyCoin(address contractAddress)
-        public
-        view
-        returns (applyCoinInfo memory)
-    {
+    function getapplyCoin(address contractAddress) public view returns (applyCoinInfo memory) {
         return applyCoin[contractAddress];
     }
 
@@ -151,11 +133,7 @@ contract INOERC721Contract is Ownable {
     }
 
     //获取INO币信息
-    function getinoCoin(address coinAddress, uint256 tokenId)
-        public
-        view
-        returns (inoCoinInfo memory)
-    {
+    function getinoCoin(address coinAddress, uint256 tokenId) public view returns (inoCoinInfo memory) {
         require(coinAddress != address(0));
         return inoCoin[coinAddress][tokenId];
     }
@@ -163,10 +141,7 @@ contract INOERC721Contract is Ownable {
     /**
     新建IEO上币资料
      */
-    function createINOCoin(
-        inoCoinInfo memory myInoCoinInfo,
-        uint256[] memory ids
-    ) public payable returns (bool) {
+    function createINOCoin(inoCoinInfo memory myInoCoinInfo, uint256[] memory ids) public payable returns (bool) {
         require(myInoCoinInfo.coinAddress != address(0));
         require(myInoCoinInfo.expireTime >= block.timestamp);
         require(myInoCoinInfo.bSell == false);
@@ -174,80 +149,48 @@ contract INOERC721Contract is Ownable {
         for (uint256 i = 0; i < ids.length; i++) {
             inoCoin[coinAddress][ids[i]] = myInoCoinInfo; //获取上币信息
             inoCoin[coinAddress][ids[i]].timestamp = block.timestamp;
-            inoCoin[coinAddress][ids[i]].createUserAddress = payable(
-                msg.sender
-            );
+            inoCoin[coinAddress][ids[i]].createUserAddress = payable(msg.sender);
             inoCoin[coinAddress][ids[i]].bSell = false;
             inoCoin[coinAddress][ids[i]].bBack = false;
             inoCoin[coinAddress][ids[i]].tokenId = ids[i];
 
             NFTList[coinAddress].push(ids[i]);
 
-            IERC721(coinAddress).transferFrom(
-                msg.sender,
-                address(this),
-                ids[i]
-            );
-            emit CreateInoCoin(
-                msg.sender,
-                coinAddress,
-                ids[i],
-                myInoCoinInfo.coinType,
-                myInoCoinInfo.makeCoinAmount
-            );
+            IERC721(coinAddress).transferFrom(msg.sender, address(this), ids[i]);
+            emit CreateInoCoin(msg.sender, coinAddress, ids[i], myInoCoinInfo.coinType, myInoCoinInfo.makeCoinAmount);
         }
 
         return true;
     }
 
     //获取NFT是否被卖掉
-    function getCoinSell(address coinAddress, uint256 tokenId)
-        public
-        view
-        returns (bool)
-    {
+    function getCoinSell(address coinAddress, uint256 tokenId) public view returns (bool) {
         require(coinAddress != address(0));
         require(tokenId >= 0);
         return inoCoin[coinAddress][tokenId].bSell;
     }
 
     //用于买币
-    function buyNftToken(address coinAddress, uint256 tokenId)
-        public
-        payable
-        returns (bool)
-    {
+    function buyNftToken(address coinAddress, uint256 tokenId) public payable returns (bool) {
         require(coinAddress != address(0));
         require(tokenId >= 0);
         require(inoCoin[coinAddress][tokenId].bSell == false);
 
         //处理市场售卖情况
         uint256 makeCoinAmount = inoCoin[coinAddress][tokenId].makeCoinAmount;
-        address payable createUserAddress = inoCoin[coinAddress][tokenId]
-            .createUserAddress;
+        address payable createUserAddress = inoCoin[coinAddress][tokenId].createUserAddress;
         uint256 coinType = inoCoin[coinAddress][tokenId].coinType;
 
-        createCoin[createUserAddress][coinType] = createCoin[createUserAddress][
-            coinType
-        ].add(makeCoinAmount);
+        createCoin[createUserAddress][coinType] = createCoin[createUserAddress][coinType].add(makeCoinAmount);
 
         if (inoCoin[coinAddress][tokenId].coinType == 1) {
             require(msg.value >= makeCoinAmount);
             payable(address(this)).transfer(makeCoinAmount);
         } else {
-            address ApplyCoin = getapplyCoinAddress(
-                inoCoin[coinAddress][tokenId].coinType
-            ); //获取支付币的地址
+            address ApplyCoin = getapplyCoinAddress(inoCoin[coinAddress][tokenId].coinType); //获取支付币的地址
             require(ApplyCoin != address(0));
-            require(
-                IERC20(ApplyCoin).balanceOf(msg.sender) >=
-                    inoCoin[coinAddress][tokenId].makeCoinAmount
-            );
-            IERC20(ApplyCoin).transferFrom(
-                msg.sender,
-                address(this),
-                makeCoinAmount
-            );
+            require(IERC20(ApplyCoin).balanceOf(msg.sender) >= inoCoin[coinAddress][tokenId].makeCoinAmount);
+            IERC20(ApplyCoin).transferFrom(msg.sender, address(this), makeCoinAmount);
         }
         inoCoin[coinAddress][tokenId].bSell = true; //卖出
         //保存用户购币情况
@@ -261,25 +204,14 @@ contract INOERC721Contract is Ownable {
 
         usercoin[msg.sender][coinAddress][tokenId] = newuserInfo; //保存用户购币情况
 
-        IERC721(inoCoin[coinAddress][tokenId].coinAddress).safeTransferFrom(
-            address(this),
-            msg.sender,
-            tokenId
-        );
+        IERC721(inoCoin[coinAddress][tokenId].coinAddress).safeTransferFrom(address(this), msg.sender, tokenId);
 
-        emit BuyNftToken(
-            inoCoin[coinAddress][tokenId].coinAddress,
-            tokenId,
-            msg.sender
-        );
+        emit BuyNftToken(inoCoin[coinAddress][tokenId].coinAddress, tokenId, msg.sender);
         return true;
     }
 
     //过期项目方提币
-    function takeOut(address coinAddress, uint256 tokenId)
-        public
-        returns (bool)
-    {
+    function takeOut(address coinAddress, uint256 tokenId) public returns (bool) {
         require(inoCoin[coinAddress][tokenId].expireTime <= block.timestamp); //过期了
         require(inoCoin[coinAddress][tokenId].createUserAddress == msg.sender);
         require(inoCoin[coinAddress][tokenId].bSell == false);
@@ -287,25 +219,13 @@ contract INOERC721Contract is Ownable {
         inoCoin[coinAddress][tokenId].bSell = true; //卖出
         inoCoin[coinAddress][tokenId].bBack = true;
 
-        IERC721(inoCoin[coinAddress][tokenId].coinAddress).safeTransferFrom(
-            address(this),
-            msg.sender,
-            tokenId
-        );
-        emit TakeOut(
-            msg.sender,
-            inoCoin[coinAddress][tokenId].coinAddress,
-            tokenId
-        );
+        IERC721(inoCoin[coinAddress][tokenId].coinAddress).safeTransferFrom(address(this), msg.sender, tokenId);
+        emit TakeOut(msg.sender, inoCoin[coinAddress][tokenId].coinAddress, tokenId);
         return true;
     }
 
     //获取项目方卖币的资金
-    function getSellCoin(address coinAddress, uint256 coinType)
-        public
-        view
-        returns (uint256)
-    {
+    function getSellCoin(address coinAddress, uint256 coinType) public view returns (uint256) {
         return createCoin[coinAddress][coinType];
     }
 

@@ -5,10 +5,13 @@ This branch just for testing contracts
 ## Run test
 
 ### 1. merge from main branch
+
 ```sh
 git merge main
 ```
+
 ### 2. install dependencies
+
 ```sh
 npm install
 ```
