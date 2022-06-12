@@ -298,23 +298,10 @@ async function setUpCoin() {
         planId
     ];
     const tx = await contract.methods.createIeoCoin(idoCoinHead).send({from: coinbase})
-    const newAddress = await tx.call();
+    console.log("tx  ", tx)
+    const newAddress = tx.events.CreateIeoCoin.returnValues.newCoinAddress;
     console.log("newAddress  ", newAddress)
-
-
-    contract.events.CreateIeoCoin({
-        filter: {},
-        fromBlock: 'latest'
-    }, function (error, event) {
-    })
-        .on('data', function (event) {
-            console.log(event);
-            $('.show-new-address').html(`${event}`);
-        })
-        .on('changed', function (event) {
-            console.log('emove event from local database');
-        })
-        .on('error', console.error);
+    $('.show-new-address').html(`${newAddress}`);
 
 
 }
