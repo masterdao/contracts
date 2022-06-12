@@ -297,7 +297,8 @@ async function setUpCoin() {
         maxbundle,
         planId
     ];
-    const newAddress = await contract.methods.createIeoCoin(idoCoinHead).send({from: coinbase})
+    const tx = await contract.methods.createIeoCoin(idoCoinHead).send({from: coinbase})
+    const newAddress = await tx.call();
     console.log("newAddress  ", newAddress)
 
 
