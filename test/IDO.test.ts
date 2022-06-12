@@ -19,8 +19,9 @@ describe('ido contract', () => {
   let ido: IdoCoinContract;
   let myToken: MockToken;
   let owner: SignerWithAddress;
+  let ipoId: string;
 
-  describe('IPO base on ETH', () => {
+  describe.only('IPO base on ETH', () => {
     let token: MockToken;
     let user: SignerWithAddress;
     // 项目发起者
@@ -40,11 +41,13 @@ describe('ido contract', () => {
         },
       });
 
+      
       const setup = await fixture();
       // const setup = await loadFixture(fixture);
       ido = setup.ido as any;
       dao = setup.dao as any;
       token = setup.token as any;
+      ipoId = setup.coinAddress;
       // owner 质押/投票/让投票通过
       await makeVotePass(setup as any);
     });
@@ -57,7 +60,7 @@ describe('ido contract', () => {
       // 如果 collectType == 1, 必须传 value, 且 value >= amount
       const rec = await run(
         ido.connect(user).IPOsubscription,
-        token.address,
+        ipoId,
         amount,
         {
           value: amount,
@@ -70,8 +73,7 @@ describe('ido contract', () => {
       // user 余额减少了 1ETH + gas
       expect(afterBuyerBalance).equals(buyerBalance.sub(amount).sub(gas));
 
-      const coin = await ido.getidoCoin(token.address);
-      // console.log('idoCoin', objf(coin));
+      const coin = await ido.getidoCoin(ipoId);
       expect(coin.ipoCollectAmount).equals(amount);
       // idoAmountTotal 是可用项目币总数
     });
@@ -86,7 +88,7 @@ describe('ido contract', () => {
         amount,
         user.address,
       );
-
+      await delay(6000)
       // console.log('withdraw', {
       //   amount,
       //   wallet: user.address,
@@ -95,11 +97,14 @@ describe('ido contract', () => {
       //   makeAmount: formatEther(makeCoinAmount),
       // });
 
+      await run(ido.connect(user).settleaccounts, ipoId, winningRate, makeCoinAmount);
+      await run(ido.connect(owner).settlement, ipoId);
+      await run(ido.connect(owner).setTakeOut, ipoId);
+
       const rec = await run(
         ido.connect(user).withdraw,
-        token.address,
-        winningRate,
-        makeCoinAmount,
+        ipoId,
+        // token.address,
       );
 
       // validation
@@ -113,7 +118,7 @@ describe('ido contract', () => {
     });
 
     // 项目方提币
-    it('takeOut', async () => {
+    it.skip('takeOut', async () => {
       // 等待项目完成ipo
       await delay(8000);
       // 1. 管理员结算项目方资金
@@ -181,7 +186,7 @@ describe('ido contract', () => {
         bDAO: false,
         uDAONumber: 0,
         // 秒
-        startTime: Math.floor(Date.now() / 100),
+        startTime: Math.floor(Date.now() / 1000),
         bundle: 0,
         maxbundle: 0,
         planId: 0,
@@ -189,10 +194,14 @@ describe('ido contract', () => {
       };
       await run(dao.approve, ido.address, parseEther('1'));
       await run(myToken.approve, ido.address, parseEther('100'));
-      await run(ido.createIeoCoin, head);
+      const res = await run(ido.createIeoCoin, head);
+
+      const event = res.events.find((e: any) => e.event === 'CreateIeoCoin');
+      expect(event).not.null;
+      const id = event.args.newCoinAddress
 
       // validation
-      const idoCoin = await ido.getidoCoin(myToken.address);
+      const idoCoin = await ido.getidoCoin(id);
       expect(idoCoin).not.null;
       expect(idoCoin.idoCoinHead.coinAddress).eq(myToken.address);
     });
@@ -302,8 +311,9 @@ async function makeVotePass({
   // 使投票通过
   await run(vote.setVoteCoinEnd, token.address);
   const result = await vote.getvotecoin(token.address);
+  // console.log('mvp result', result);
   // 验证确保投票通过
-  if (result.bOpen || !result.bEnd || !result.bSuccessOrFail) {
+  if (!result.bEnd || !result.bSuccessOrFail) {
     throw 'vote not passed';
   }
 }

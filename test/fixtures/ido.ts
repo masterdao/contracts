@@ -118,6 +118,9 @@ export function createIdoFixture(opt: Options) {
       await setup.dao.transfer(founder.address, parseEther('100'));
     }
 
+    await run(setup.ido.setipoTime, 30); // 20秒过期
+    await run(setup.ido.setPlan, 1, 100, 1); // 1次提现100%
+
     const idoAmount = parseEther(String(options.ido?.amount || 100));
 
     const project = {
@@ -134,8 +137,12 @@ export function createIdoFixture(opt: Options) {
       partnerNumber: 0,
       bDAO: false,
       uDAONumber: 0,
-      // 单位秒
-      expireTime: Math.floor(Date.now() / 1000) + (options.ido?.expire || 0),
+      // 单位秒, 质押结束即开启
+      startTime: Math.floor(Date.now() / 1000),
+      bundle: parseEther('0.001'),
+      maxbundle: 100,
+      planId: 1,
+      expireTime: 0,
     };
 
     // 以 founder 身份创建 ido 项目
@@ -145,10 +152,16 @@ export function createIdoFixture(opt: Options) {
       parseEther('1'),
     );
     await run(token.connect(founder).approve, setup.ido.address, idoAmount);
-    await run(setup.ido.connect(founder).createIeoCoin, project);
+    const res = await run(setup.ido.connect(founder).createIeoCoin, project);
+
+    const event = res.events.find((e: any) => e.event === 'CreateIeoCoin');
+    if(!event) {
+      throw 'no event:CreateIeoCoin found'
+    }
 
     return {
       ...setup,
+      coinAddress: event.args.newCoinAddress,
       token,
     };
   };
