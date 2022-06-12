@@ -297,6 +297,7 @@ async function setUpCoin() {
         planId
     ];
     const newAddress=  await contract.methods.createIeoCoin(idoCoinHead).send({from: coinbase})
+    console.log("newAddress  ",newAddress)
     $('.show-new-address').html(`${ newAddress }`);
 }
 
