@@ -272,7 +272,7 @@ contract idoCoinContract is Ownable {
     }
 
     function getPlanNumber(uint256 planId) public view returns (uint256) {
-        require(planId > 0);
+        require(planId > 0, "no plan");
         return planNumber[planId];
     }
 
@@ -412,7 +412,6 @@ contract idoCoinContract is Ownable {
         });
 
         idoCoin[coinAddress] = newidoCoinInfo;
-
         idoCoin[coinAddress].idoCoinHead.expireTime = idoCoin[coinAddress].idoCoinHead.startTime.add(ipoTime); //更新IPO结束时间
 
         uint256 amount = idoCoinHead.idoAmount;
@@ -446,19 +445,20 @@ contract idoCoinContract is Ownable {
 
         require(idovoteContract.getVoteStatus(idoCoin[coinAddress].idoCoinHead.coinAddress), "proposal has not passed"); //检查是否已经投票通过
 
-        require(block.timestamp < idoCoin[coinAddress].idoCoinHead.expireTime, "ipo not expired"); //还没有到期
+        require(block.timestamp < idoCoin[coinAddress].idoCoinHead.expireTime, "ipo is expired"); //还没有到期
 
         require(
             amount <= idoCoin[coinAddress].idoCoinHead.bundle.mul(idoCoin[coinAddress].idoCoinHead.maxbundle),
             "cannot exceed the purchase scope"
         );
 
+
         address applyAddress = applyCoinAddress[idoCoin[coinAddress].idoCoinHead.collectType];
         address APPLYCOIN = applyCoin[applyAddress].contractAddress;
-        address payable thiscontract = address(uint160(address(this)));
+        // address payable thiscontract = address(uint160(address(this)));
         if (idoCoin[coinAddress].idoCoinHead.collectType == 1) {
             require(msg.value >= amount);
-            thiscontract.transfer(amount);
+            // thiscontract.transfer(amount);
         } else {
             require(IERC20(APPLYCOIN).balanceOf(msg.sender) >= amount);
             IERC20(APPLYCOIN).safeTransferFrom(msg.sender, address(this), amount);
@@ -511,15 +511,15 @@ contract idoCoinContract is Ownable {
 
     //用户提币
     function withdraw(address coinAddress) public returns (bool) {
-        require(usercoin[msg.sender][coinAddress].settle); //已经结算
-        require(usercoin[msg.sender][coinAddress].outAmount > 0);
+        require(usercoin[msg.sender][coinAddress].settle, "not settled"); //已经结算
+        require(usercoin[msg.sender][coinAddress].outAmount > 0, "no balance");
         uint256 planId = usercoin[msg.sender][coinAddress].planId;
         uint256 coinTakeOutNumber = idoCoin[coinAddress].takeOutNumber; // getPlanNumber(planId);
-        require(coinTakeOutNumber > 0);
+        require(coinTakeOutNumber > 0, "no take out");
         uint256 userTakeOutNumber = usercoin[msg.sender][coinAddress].takeOutNumber;
-        require(userTakeOutNumber < coinTakeOutNumber);
+        require(userTakeOutNumber < coinTakeOutNumber, "not enough take out balance");
         uint256 planNum = getPlanNumber(planId);
-        require(userTakeOutNumber < planNum);
+        require(userTakeOutNumber < planNum, "already take out");
         uint256 planCon;
 
         for (uint256 i = userTakeOutNumber; i < coinTakeOutNumber; i++) {
@@ -553,7 +553,7 @@ contract idoCoinContract is Ownable {
         uint256 makeCoinAmount
     ) public returns (bool) {
         require(msg.sender != address(0));
-        require(block.timestamp >= idoCoin[coinAddress].idoCoinHead.expireTime, "ipo was expired"); //还没有到期
+        require(block.timestamp >= idoCoin[coinAddress].idoCoinHead.expireTime, "ipo should be end"); //还没有到期
         require(usercoin[msg.sender][coinAddress].settle == false); //未结算
 
         require(usercoin[msg.sender][coinAddress].takeCoinAmount > 0, "zero take amout");
@@ -617,7 +617,7 @@ contract idoCoinContract is Ownable {
 
     //管理员结算项目方资金
     function settlement(address coinAddress) public onlyISMPolicy returns (bool) {
-        require(block.timestamp >= idoCoin[coinAddress].idoCoinHead.expireTime); //到期了
+        require(block.timestamp >= idoCoin[coinAddress].idoCoinHead.expireTime, "ipo should be end"); //到期了
         uint256 ipoCollectAmount = idoCoin[coinAddress].ipoCollectAmount; //ipo收到的钱
         //换算精度
         address applyAddress = applyCoinAddress[idoCoin[coinAddress].idoCoinHead.collectType];
@@ -752,14 +752,14 @@ contract idoCoinContract is Ownable {
     }
 
     function _setTakeOut(address coinAddress) private returns (bool) {
-        require(coinAddress != address(0));
-        require(idoCoin[coinAddress].allCollectAmount > 0);
+        require(coinAddress != address(0), "no zero address");
+        require(idoCoin[coinAddress].allCollectAmount > 0, "ido collect nothing");
 
-        require(idoCoin[coinAddress].idoCoinHead.expireTime <= block.timestamp);
+        require(idoCoin[coinAddress].idoCoinHead.expireTime <= block.timestamp, "ido should be end");
 
         uint256 planId = idoCoin[coinAddress].idoCoinHead.planId;
         uint256 planNum = getPlanNumber(planId);
-        require(idoCoin[coinAddress].takeOutNumber < planNum);
+        require(idoCoin[coinAddress].takeOutNumber < planNum, "take out too many times");
 
         uint256 planCon = getPlan(planId, idoCoin[coinAddress].takeOutNumber);
 
