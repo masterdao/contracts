@@ -25,7 +25,6 @@ library SafeMath {
             if (c < a) return (false, 0);
             return (true, c);
         }
-      
     }
 
     /**

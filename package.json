@@ -39,6 +39,7 @@
     "pretest": "hardhat compile",
     "test:all": "npm run test -- --parallel",
     "test": "hardhat test **/*.test.ts",
-    "dev": "hardhat node"
+    "dev": "hardhat node",
+    "format": "prettier --write ."
   }
 }

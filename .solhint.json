@@ -2,24 +2,15 @@
   "extends": "solhint:recommended",
   "rules": {
     "prettier/prettier": "error",
-    "compiler-version": [
-      "error",
-      "^0.8.0"
-    ],
+    "compiler-version": ["error", "^0.8.0"],
     "func-visibility": [
       "warn",
       {
         "ignoreConstructors": true
       }
     ],
-    "quotes": [
-      "error",
-      "double"
-    ],
-    "indent": [
-      "off",
-      4
-    ],
+    "quotes": ["error", "double"],
+    "indent": ["off", 4],
     "reason-string": [
       "warn",
       {
@@ -27,7 +18,5 @@
       }
     ]
   },
-  "plugins": [
-    "prettier"
-  ]
+  "plugins": ["prettier"]
 }

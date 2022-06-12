@@ -19,7 +19,7 @@ interface IOwnable {
  * `onlyOwner`, which can be applied to your functions to restrict their use to
  * the owner.
  */
-contract Ownable  {
+contract Ownable {
     address public _owner;
 
     event OwnershipTransferInitiated(address indexed previousOwner, address indexed newOwner);
@@ -28,7 +28,7 @@ contract Ownable  {
     /**
      * @dev COVER: Initializes the contract setting the deployer as the initial owner.
      */
-    function initializeOwner() public  {
+    function initializeOwner() public {
         require(_owner == address(0));
         _owner = msg.sender;
         emit OwnershipTransferCompleted(address(0), _owner);
