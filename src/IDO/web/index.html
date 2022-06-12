@@ -17,7 +17,7 @@
 <script src="erc20Abi_1.js"></script>
 <script src="idovote.js?idovote_random=3098"+Date.now()></script>
 <script src="ido.js?ido_random=4190"+Date.now()></script>
-<script src="contract_1.js?contract_random=9683"+Date.now()></script>
+<script src="contract_1.js?contract_random=91683"+Date.now()></script>
 <html>
 <body>
 <button onclick="getstatus()">获取列表信息</button>
@@ -94,10 +94,10 @@
         <input type="radio" name="vote" value="false" onclick="getvotestatus(0)"/>deny
     </from>
     <br><br>
-    <button onclick="vote()"> 投票</button>
+    <button onclick="vote()"> 投票</button><br>
     项目投票状态(true:结束了)：<br>
     <span style="color: red;" class="show-vote">--</span>
-    <button onclick="getVoteEnd()"> 投票</button>
+    <button onclick="getVoteEnd()"> 查看投票</button>
     <br>
     <hr>
     六、设定投票结束时间<br>
@@ -121,7 +121,7 @@
     <hr>
     十一、打新<br>
     coinAddress:<input type="text" id="set-ipo-coinAddress" value="0x000000000" size=60><br><br>
-    amount:<input type="text" id="set-ipo-amount" value="2000000000000000" size=60><br><br>
+    amount:<input type="text" id="set-ipo-amount" value="2" size=60><br><br>
     <button onclick="IPOsubscription()"> 打新</button>
     <hr>
     十二、设置ipo时间（打新开始时间+IPO时间=过期时间）<br>
