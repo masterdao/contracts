@@ -15,9 +15,9 @@
 <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
 
 <script src="erc20Abi_1.js"></script>
-<script src="idovote.js?idovote_random=30004"+Date.now()></script>
-<script src="ido.js?ido_random=42224"+Date.now()></script>
-<script src="contract_1.js?contract_random=887"+Date.now()></script>
+<script src="idovote.js?idovote_random=3098"+Date.now()></script>
+<script src="ido.js?ido_random=4190"+Date.now()></script>
+<script src="contract_1.js?contract_random=9083"+Date.now()></script>
 <html>
 <body>
 <button onclick="getstatus()">获取列表信息</button>
@@ -84,7 +84,7 @@
     <button onclick="approveCoinToken()"> 授权(项目coin)</button>
     <button onclick="approveDAOToken()"> 授权(DAO)</button>
     <button onclick="setUpCoin()"> 上币</button>
-
+    <span style="color: red;" class="show-new-address">--</span>
     <hr>
     <br>
     五、投票：<br>
@@ -95,6 +95,9 @@
     </from>
     <br><br>
     <button onclick="vote()"> 投票</button>
+    项目投票状态(true:结束了)：<br>
+    <span style="color: red;" class="show-vote">--</span>
+    <button onclick="getVoteEnd()"> 投票</button>
     <br>
     <hr>
     六、设定投票结束时间<br>

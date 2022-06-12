@@ -296,7 +296,8 @@ async function setUpCoin() {
         maxbundle,
         planId
     ];
-    return await contract.methods.createIeoCoin(idoCoinHead).send({from: coinbase})
+    const newAddress=  await contract.methods.createIeoCoin(idoCoinHead).send({from: coinbase})
+    $('.show-new-address').html(`${ newAddress }`);
 }
 
 //授权
@@ -318,4 +319,12 @@ async function approveCoinToken() {
     console.log("spenderAddr  ", spenderAddr)
     console.log("coinAddress  ", coinAddress)
     return await fudContract.methods.approve(spenderAddr, approveValue).send({from: this.coinbase})
+}
+
+async function getVoteEnd(){
+    const contract = await getErc20Contract(IDOVOTE, IDOVOTECONTRACT);
+    const coinbase = await getCurrentAccount();
+    const coinAddress = document.getElementById("set-coinAddress").value;
+    const vote= await contract.methods.getVoteEnd(coinAddress).send({from: coinbase})
+    $('.show-vote').html(`${ vote }`);
 }
