@@ -2,7 +2,7 @@ let web3;
 const DAO = "0x5e0289c130BcC61FBe5cEc5dce5fE775E50752bf"
 const OWNER = "0x4Cf2EE6f44C53931b52bdbce3A15F123bf073162"
 const IDOVOTECONTRACT = "0x43f58155C25c76521499611486BE9fD605B33107"
-const IDOCONTRACT = "0xCEaa012E72e1f5D3D2c03FE5BBC0d4600445300e"
+const IDOCONTRACT = "0xf9CEb933Bf9AeC63c432D403D12DD9B0e1bf6473"
 const ROUTER = "0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45"
 let voteStauts;
 
@@ -298,23 +298,10 @@ async function setUpCoin() {
         planId
     ];
     const tx = await contract.methods.createIeoCoin(idoCoinHead).send({from: coinbase})
-    const newAddress = await tx.call();
+    console.log("tx  ", tx)
+    const newAddress = tx.events.CreateIeoCoin.returnValues.newCoinAddress;
     console.log("newAddress  ", newAddress)
-
-
-    contract.events.CreateIeoCoin({
-        filter: {},
-        fromBlock: 'latest'
-    }, function (error, event) {
-    })
-        .on('data', function (event) {
-            console.log(event);
-            $('.show-new-address').html(`${event}`);
-        })
-        .on('changed', function (event) {
-            console.log('emove event from local database');
-        })
-        .on('error', console.error);
+    $('.show-new-address').html(`${newAddress}`);
 
 
 }
