@@ -229,7 +229,7 @@ async function IPOsubscription() {
     const coinbase = await getCurrentAccount()
     const coinAddress = document.getElementById("set-ipo-coinAddress").value
     const amount = document.getElementById("set-ipo-amount").value
-    return await contract.methods.IPOsubscription(coinAddress, amount).send({from: coinbase})
+    return await contract.methods.IPOsubscription(coinAddress, amount).send({from: coinbase,value:amount})
 
 }
 
