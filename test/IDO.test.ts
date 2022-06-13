@@ -21,7 +21,7 @@ describe('ido contract', () => {
   let owner: SignerWithAddress;
   let ipoId: string;
 
-  describe.only('IPO base on ETH', () => {
+  describe('IPO base on ETH', () => {
     let token: MockToken;
     let user: SignerWithAddress;
     // 项目发起者
@@ -78,55 +78,48 @@ describe('ido contract', () => {
       // idoAmountTotal 是可用项目币总数
     });
 
+    // TODO: settlement
+
     it('withdraw', async () => {
+      // 等待 ipo 结束
+      await delay(6000);
+      // 管理员先对项目进行结算
+      await run(ido.connect(owner).settlement, ipoId);
+
       const oldBalance = await user.getBalance();
       // 10**10 是 100%
       // const winningRate = ethers.utils.parseUnits('10', 'gwei');
       const amount = parseEther('1');
+
       const { winningRate, makeCoinAmount } = getEncryptMakeAmount(
         1,
         amount,
         user.address,
       );
-      await delay(6000)
-      // console.log('withdraw', {
-      //   amount,
-      //   wallet: user.address,
-      //   modAddress: BigNumber.from(user.address).mod(1e10).toNumber(),
-      //   amountEth: formatEther(amount),
-      //   makeAmount: formatEther(makeCoinAmount),
-      // });
 
-      await run(ido.connect(user).settleaccounts, ipoId, winningRate, makeCoinAmount);
-      await run(ido.connect(owner).settlement, ipoId);
-      await run(ido.connect(owner).setTakeOut, ipoId);
+      // 用户对自己进行结算(首次提现前)
+      const rec1 = await run(ido.connect(user).settleaccounts, ipoId, winningRate, makeCoinAmount);
 
-      const rec = await run(
+      // 用户提现 (planId: 1 只提现一次，提现全部)
+      const rec2 = await run(
         ido.connect(user).withdraw,
         ipoId,
-        // token.address,
       );
+
+      const gas = rec1.gas.add(rec2.gas);
 
       // validation
       const tokenBalance = await token.balanceOf(user.address);
       expect(tokenBalance).equals(amount);
 
       const newBalance = await user.getBalance();
-      const gas = rec.gasUsed.mul(rec.effectiveGasPrice);
-      // 旧余额 + 退回 eth - gas = 新余额
+
+      // 旧余额 + 退回 eth(当前为0) - gas = 新余额
       expect(newBalance).equals(oldBalance.add(parseEther('0')).sub(gas));
     });
 
     // 项目方提币
-    it.skip('takeOut', async () => {
-      // 等待项目完成ipo
-      await delay(8000);
-      // 1. 管理员结算项目方资金
-      await ido.settlement(token.address);
-
-      // 2. 管理员设置提币数量
-      await ido.setTakeOut(token.address);
-
+    it('takeOut', async () => {
       // 获得执行前状态
       const [oldBalance, oldTokenBalance, oldDaoBalance] = await Promise.all([
         founder.getBalance(),
@@ -134,10 +127,8 @@ describe('ido contract', () => {
         dao.balanceOf(founder.address),
       ]);
 
-      // 3. 项目方提币
-      const rec = await run(ido.connect(founder).takeOut, token.address);
-
-      const gas = rec.gasUsed.mul(rec.effectiveGasPrice);
+      // 项目方提币, planId:1 一次提取所有币
+      const rec = await run(ido.connect(founder).takeOut, ipoId);
 
       // validation
       const [balance, tokenBalance, daoBalance] = await Promise.all([
@@ -147,15 +138,16 @@ describe('ido contract', () => {
       ]);
 
       // 提了 0.3ETH
-      expect(balance).equals(oldBalance.add(parseEther('0.3')).sub(gas));
-      // 退回 500
-      expect(tokenBalance).equals(oldTokenBalance.add(parseEther('500')));
+      expect(balance).equals(oldBalance.add(parseEther('0.5')).sub(rec.gas));
+      // 退回 500 Mytoken
+      expect(tokenBalance, "should got 500 token").equals(oldTokenBalance.add(parseEther('500')));
       // 退回1注册费
-      // expect(daoBalance.sub(oldDaoBalance).eq(parseEther('1')));
+      expect(daoBalance.sub(oldDaoBalance).eq(parseEther('1')));
     });
   });
 
   describe('createIeoCoin', () => {
+
     beforeEach(async () => {
       const setup = await loadFixture(idoFixture);
       ido = setup.ido as any;
@@ -213,6 +205,7 @@ describe('ido contract', () => {
     // 项目发起者
     let founder: SignerWithAddress;
     const price = 0.001;
+    let ipoId: string
 
     before(async () => {
       [owner, user, founder] = await ethers.getSigners();
@@ -232,18 +225,21 @@ describe('ido contract', () => {
       ido = setup.ido as any;
       dao = setup.dao as any;
       token = setup.token as any;
+      ipoId = setup.coinAddress;
       // owner 质押/投票/让投票通过
       await makeVotePass(setup as any);
 
       // ipo prepurchase
       const amount = parseEther('0.001');
       // 如果 collectType == 1, 必须传 value, 且 value >= amount
-      await run(ido.connect(user).IPOsubscription, token.address, amount, {
+      await run(ido.connect(user).IPOsubscription, ipoId, amount, {
         value: amount,
       });
+      await delay(6000)
+      await run(ido.settlement, ipoId);
     });
 
-    it(``, async () => {
+    it(`rewithdraw`, async () => {
       const amount = parseEther('1');
 
       const { winningRate, makeCoinAmount } = getEncryptMakeAmount(
@@ -261,23 +257,24 @@ describe('ido contract', () => {
       await run(
         ido.connect(user).withdraw,
         token.address,
-        // winningRate,
-        // makeCoinAmount,
       );
 
       await expect(
         ido.connect(user).withdraw(token.address),
-      ).revertedWith('already withdraw');
+      ).revertedWith('already take out');
     });
   });
 });
 
+// 该过程模拟服务器计算规则
 function getEncryptMakeAmount(
+  /** 胜率 (0~1] */
   winRate: number,
   amount: BigNumber,
   walletAddress: string,
 ) {
-  if (winRate > 1) throw `winRate shouldnt great than 1`;
+  if (winRate > 1) throw `winRate should less than 1`;
+  if (winRate <=0) throw `winRate should greater than 0`;
   const winningRate = Math.floor(winRate * 1e10);
 
   const makeCoinAmount = ethers.BigNumber.from(walletAddress)

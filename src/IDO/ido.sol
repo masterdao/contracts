@@ -788,9 +788,9 @@ contract idoCoinContract is Ownable {
     //项目方提币
     function takeOut(address coinAddress) public returns (bool) {
         require(block.timestamp >= idoCoin[coinAddress].idoCoinHead.expireTime, "ipo not end"); //到期了
-        require(idoCoin[coinAddress].createUserAddress == msg.sender);
-        require(idoCoin[coinAddress].withdrawAmount > 0);
-        require(idoCoin[coinAddress].bTakeOut);
+        require(idoCoin[coinAddress].createUserAddress == msg.sender, "unauthenticated user");
+        require(idoCoin[coinAddress].withdrawAmount > 0, "zero withdraw balance");
+        require(idoCoin[coinAddress].bTakeOut, "no settled");
         idoCoin[coinAddress].bTakeOut = false;
         uint256 withdrawAmount = idoCoin[coinAddress].withdrawAmount;
 

@@ -480,13 +480,14 @@ contract DAOMintingPool is Ownable {
         uint256 amount,
         uint256 poolTypeId
     ) public payable returns (bool) {
-        require(lpToken != address(0));
-        require(amount > 0);
-        require(IERC20(lpToken).balanceOf(msg.sender) >= amount);
+        require(lpToken != address(0), "lpToken is an empty address");
+        require(amount > 0, "amout should be greater than 0");
+        require(IERC20(lpToken).balanceOf(msg.sender) >= amount, "lpToken have not enough balance");
         require(mintingPool[lpToken][poolTypeId].lpToken != address(0)); //抵押的矿池存在
         require(mintingPoolTypeList[poolTypeId].bstatus, "");
 
         //每个奖励计算一遍
+        // 永远不会执行?
         if (miner[msg.sender][lpToken][poolTypeId].lpToken == address(0)) {
             minerPoolList[msg.sender].push(mintingPool[lpToken][poolTypeId]); //保存用户抵押的矿池
         }

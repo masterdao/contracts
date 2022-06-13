@@ -38,7 +38,12 @@ export async function deploy(info: ContractInfo | string, ...args: any[]) {
 /** 包装了 transaction 调用，仅为了可读性 */
 export async function run<T extends Function>(func: T, ...args: any[]) {
   const tx = await func(...args);
-  return await tx.wait();
+  const rec =  await tx.wait();
+  return {
+    ...rec,
+    // 计算 gas 费
+    gas: rec.gasUsed.mul(rec.effectiveGasPrice)
+  }
 }
 
 export async function deployMockToken(
