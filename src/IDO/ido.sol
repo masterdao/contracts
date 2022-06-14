@@ -476,7 +476,7 @@ contract idoCoinContract is Ownable {
         usercoin[msg.sender][coinAddress] = newuserinfo;
         //计算打新总共进入多少钱
         idoCoin[coinAddress].ipoCollectAmount = idoCoin[coinAddress].ipoCollectAmount.add(amount);
-        emit IPOSUBscription(msg.sender, amount, APPLYCOIN);
+        //emit IPOSUBscription(msg.sender, amount, APPLYCOIN);
         return true;
     }
 
