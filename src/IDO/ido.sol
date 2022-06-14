@@ -454,14 +454,14 @@ contract idoCoinContract is Ownable {
             "cannot exceed the purchase scope"
         );
 
-        address applyAddress = applyCoinAddress[idoCoin[coinAddress].idoCoinHead.collectType];
-        address APPLYCOIN = applyCoin[applyAddress].contractAddress;
-        if (idoCoin[coinAddress].idoCoinHead.collectType == 1) {
-            require(msg.value >= amount);
-        } else {
-            require(IERC20(APPLYCOIN).balanceOf(msg.sender) >= amount);
-            IERC20(APPLYCOIN).safeTransferFrom(msg.sender, address(this), amount);
-        }
+//        address applyAddress = applyCoinAddress[idoCoin[coinAddress].idoCoinHead.collectType];
+//        address APPLYCOIN = applyCoin[applyAddress].contractAddress;
+//        if (idoCoin[coinAddress].idoCoinHead.collectType == 1) {
+//            require(msg.value >= amount);
+//        } else {
+//            require(IERC20(APPLYCOIN).balanceOf(msg.sender) >= amount);
+//            IERC20(APPLYCOIN).safeTransferFrom(msg.sender, address(this), amount);
+//        }
         userInfo memory newuserinfo = userInfo({
             timestamp: block.timestamp,
             coinAddress: idoCoin[coinAddress].idoCoinHead.coinAddress,
