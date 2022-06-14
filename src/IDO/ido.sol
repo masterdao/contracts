@@ -456,10 +456,8 @@ contract idoCoinContract is Ownable {
 
         address applyAddress = applyCoinAddress[idoCoin[coinAddress].idoCoinHead.collectType];
         address APPLYCOIN = applyCoin[applyAddress].contractAddress;
-        address payable thiscontract = address(uint160(address(this)));
         if (idoCoin[coinAddress].idoCoinHead.collectType == 1) {
             require(msg.value >= amount);
-            thiscontract.transfer(amount);
         } else {
             require(IERC20(APPLYCOIN).balanceOf(msg.sender) >= amount);
             IERC20(APPLYCOIN).safeTransferFrom(msg.sender, address(this), amount);
