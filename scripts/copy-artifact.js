@@ -47,7 +47,10 @@ async function main() {
 
 function copyAbiSync({ src, dest }) {
     const json = require(src);
-    fs.writeFileSync(dest, JSON.stringify(json.abi))
+    // const out = {
+    //     abi: json.abi
+    // }
+    fs.writeFileSync(dest, JSON.stringify(json))
 }
 
 function copyTypeSync({ src, dest }) {

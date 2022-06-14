@@ -1,7 +1,12 @@
 import { Fixture } from '@ethereum-waffle/provider';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
-import { ethers, waffle } from 'hardhat';
+import { BigNumber } from 'ethers';
+import { parseEther } from 'ethers/lib/utils';
+import { ethers, waffle} from 'hardhat';
 import { ERC20 } from '../types/src/token/ERC20';
+import * as _helper from '@nomicfoundation/hardhat-network-helpers';
+
+export const helper = _helper
 
 type ContractInfo = {
   name: string;
@@ -28,21 +33,23 @@ export async function deploy(info: ContractInfo | string, ...args: any[]) {
       name: info,
     };
   }
-
   const factory = await ethers.getContractFactory(info.name);
   const contract = await factory.deploy(...args);
   await contract.deployed();
   return contract;
 }
 
+export const BIG_ZERO =  BigNumber.from(0)
+
 /** 包装了 transaction 调用，仅为了可读性 */
 export async function run<T extends Function>(func: T, ...args: any[]) {
   const tx = await func(...args);
   const rec =  await tx.wait();
+  const {gasUsed=BIG_ZERO, effectiveGasPrice=1} = rec
   return {
     ...rec,
     // 计算 gas 费
-    gas: rec.gasUsed.mul(rec.effectiveGasPrice)
+    gas: gasUsed.mul(effectiveGasPrice)
   }
 }
 
