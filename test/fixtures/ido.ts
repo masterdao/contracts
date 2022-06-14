@@ -58,6 +58,8 @@ export async function idoFixture() {
     router.address,
   );
 
+  await run(vote.setidoCoinContract, ido.address);
+
   return {
     dao,
     factory,
