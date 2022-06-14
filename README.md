@@ -1,4 +1,4 @@
-# Contracts Test
+# Contracts
 
 This branch just for testing contracts
 
@@ -16,10 +16,10 @@ git merge main
 npm install
 ```
 
-### 3. run test suite
+## Test
 
 ```sh
-npm run test
+npm run test:all
 # or
 npx hardhat test test/**/*.test.ts
 ```

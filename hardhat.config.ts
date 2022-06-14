@@ -2,8 +2,8 @@ import '@nomiclabs/hardhat-etherscan';
 import '@nomiclabs/hardhat-waffle';
 import '@typechain/hardhat';
 import '@nomiclabs/hardhat-ethers';
-// import 'hardhat-deploy';
-// import 'hardhat-deploy-ethers';
+import 'hardhat-deploy';
+import 'hardhat-deploy-ethers';
 import { TASK_COMPILE_SOLIDITY_GET_SOURCE_PATHS } from 'hardhat/builtin-tasks/task-names';
 import { HardhatUserConfig, subtask } from 'hardhat/config';
 import path from 'path';
@@ -68,11 +68,18 @@ const config: HardhatUserConfig = {
       },
     },
   },
+  /** @see https://github.com/wighawag/hardhat-deploy/tree/master#1-namedaccounts-ability-to-name-addresses */
+  namedAccounts: {
+    deployer: 0,
+  },
   defaultNetwork: 'hardhat',
   networks: {
     hardhat: {
       chainId: 31337,
       allowUnlimitedContractSize: true,
+      live: false,
+      saveDeployments: true,
+      tags: ['test', 'local'],
     },
     localhost: {
       url: 'http://127.0.0.1:8545/',
@@ -81,9 +88,19 @@ const config: HardhatUserConfig = {
       blockGasLimit: 6721975,
       timeout: 40000,
       // TODO: 将开发人员不同配置移入环境变量
-      accounts: [
-        '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80',
-      ],
+      // accounts: [
+      //   '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80',
+      // ],
+      live: false,
+      saveDeployments: true,
+      tags: ['local'],
+    },
+    rinkeby: {
+      chainId: 0x4,
+      url: 'https://rinkeby.infura.io/v3/',
+      live: true,
+      saveDeployments: true,
+      tags: ['staging'],
     },
   },
   // gasReporter: {
