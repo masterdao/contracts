@@ -454,19 +454,19 @@ contract idoCoinContract is Ownable {
             "cannot exceed the purchase scope"
         );
 
-//        address applyAddress = applyCoinAddress[idoCoin[coinAddress].idoCoinHead.collectType];
-//        address APPLYCOIN = applyCoin[applyAddress].contractAddress;
+        address applyAddress = applyCoinAddress[idoCoin[coinAddress].idoCoinHead.collectType];
+        address APPLYCOIN = applyCoin[applyAddress].contractAddress;
        if (idoCoin[coinAddress].idoCoinHead.collectType == 1) {
            require(msg.value >= amount);
-//        } else {
-//            require(IERC20(APPLYCOIN).balanceOf(msg.sender) >= amount);
-//            IERC20(APPLYCOIN).safeTransferFrom(msg.sender, address(this), amount);
+        } else {
+            require(IERC20(APPLYCOIN).balanceOf(msg.sender) >= amount);
+            IERC20(APPLYCOIN).safeTransferFrom(msg.sender, address(this), amount);
         }
         userInfo memory newuserinfo = userInfo({
             timestamp: block.timestamp,
             coinAddress: idoCoin[coinAddress].idoCoinHead.coinAddress,
-            makeCoinAmount: usercoin[msg.sender][coinAddress].makeCoinAmount,
-            takeCoinAmount: amount.add(usercoin[msg.sender][coinAddress].takeCoinAmount),
+            makeCoinAmount: 0,
+            takeCoinAmount: amount,
             userAddress: msg.sender,
             outAmount: 0,
             takeOutNumber: 0,
@@ -476,7 +476,7 @@ contract idoCoinContract is Ownable {
         usercoin[msg.sender][coinAddress] = newuserinfo;
         //计算打新总共进入多少钱
         idoCoin[coinAddress].ipoCollectAmount = idoCoin[coinAddress].ipoCollectAmount.add(amount);
-        //emit IPOSUBscription(msg.sender, amount, APPLYCOIN);
+        emit IPOSUBscription(msg.sender, amount, APPLYCOIN);
         return true;
     }
 
