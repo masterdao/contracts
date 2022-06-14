@@ -72,7 +72,6 @@ describe('DAOMinitingPool contract test', () => {
     expect(info.veDao).eq(amount.mul(2).div(10));
 
     const userdao = await contract.getuserTotalDao(owner.address, lpToken);
-    console.log(userdao)
     expect(userdao).eq(amount)
   });
 

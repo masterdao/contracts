@@ -5,10 +5,13 @@ import { contracts, deployDAO, deploy, run, deployMockToken } from '../helper';
 import { poolFixture } from './pool';
 const { parseEther, formatEther } = ethers.utils;
 
+// TODO: 对 fixture 的理解还存在问题，回头研究下再做重构
 // 部署各个合约，添加默认矿池类型和矿池
 export async function idoFixture() {
   const [owner] = await ethers.getSigners();
+
   const dao = await deployDAO(100000);
+  
   const { pool } = await poolFixture({
     pools: [
       {
@@ -102,6 +105,7 @@ export function createIdoFixture(opt: Options) {
   return async function () {
     const [owner] = await ethers.getSigners();
     const founder = options.ido?.founder || owner;
+
     // this token will be used to create an ido coin, you can deploy it out of this fixture.
     const token = await deployMockToken({
       name: options.token?.name || symbol,
@@ -120,7 +124,10 @@ export function createIdoFixture(opt: Options) {
       await setup.dao.transfer(founder.address, parseEther('100'));
     }
 
-    await run(setup.ido.setipoTime, 30); // 20秒过期
+    if(options.ido?.expire) {
+      await run(setup.ido.setipoTime, options.ido?.expire); // 设置 ipo 结束过期时长
+    }
+
     await run(setup.ido.setPlan, 1, 100, 1); // 1次提现100%
 
     const idoAmount = parseEther(String(options.ido?.amount || 100));
@@ -147,12 +154,14 @@ export function createIdoFixture(opt: Options) {
       expireTime: 0,
     };
 
+
     // 以 founder 身份创建 ido 项目
     await run(
       setup.dao.connect(founder).approve,
       setup.ido.address,
       parseEther('1'),
     );
+
     await run(token.connect(founder).approve, setup.ido.address, idoAmount);
     const res = await run(setup.ido.connect(founder).createIeoCoin, project);
 
