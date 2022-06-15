@@ -40,9 +40,7 @@ const func: DeployFunction = async function ({
   //   const wei = parseEther(String(count))
   //   for (const account of whiteList) {
   //     console.log('airdrop', count, 'DAO to', account)
-  //     await run(contract.transfer, account, wei, {
-  //       from: deployer
-  //     })
+  //     await run(contract.transfer, account, wei)
   //   }
   // }
 

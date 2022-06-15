@@ -40,8 +40,11 @@ const config = {
       airdrop: {
         enabled: false,
         // 白名单账户每户空投 DAO 的数量
-        count: 1000,
-        whiteList: [],
+        count: 10000,
+        whiteList: [
+          '0x262d48605c8b6157a67AC41baDCfb20d377F7a0a',
+          '0xA6d06F387EBe64ad341BC4E512bfd60f85cBDcF5',
+        ],
       },
 
       // 4. 所有权转移 (可选)
@@ -55,7 +58,7 @@ const config = {
 
       // 2. 添加矿池类型(可选)
       addPoolTypes: {
-        enable: true,
+        enable: false,
         items: [{ length: 7 * 24 * 3600, weight: 5 }],
       },
 
