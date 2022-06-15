@@ -10,3 +10,4 @@ cmd.sh
 *.zip
 *.rar
 deployments
+*.log

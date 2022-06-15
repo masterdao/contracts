@@ -4,15 +4,11 @@ import { DeployFunction } from 'hardhat-deploy/types';
 import cfg from '../deployment.config';
 import { run } from '../utils';
 import { DAOMintingPool } from '../types/src/DAOMintingPoolV2';
-import * as hre from 'hardhat'
+import * as hre from 'hardhat';
 import { IdovoteContract } from '../types';
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
-  const {
-    deployments,
-    getNamedAccounts,
-    ethers
-  } = hre;
+  const { deployments, getNamedAccounts, ethers } = hre;
   const { deploy } = deployments;
   const { deployer } = await getNamedAccounts();
   const { contracts } = cfg;
@@ -23,5 +19,5 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   // console.log('uniswap do nothing');
 };
 
-func.tags = ['local']
+func.tags = ['local'];
 export default func;
