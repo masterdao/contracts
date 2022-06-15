@@ -6,18 +6,21 @@ import 'hardhat-deploy';
 import 'hardhat-deploy-ethers';
 import { TASK_COMPILE_SOLIDITY_GET_SOURCE_PATHS } from 'hardhat/builtin-tasks/task-names';
 import { HardhatUserConfig, subtask } from 'hardhat/config';
-import path from 'path';
+import fs from 'fs';
 // import 'hardhat-gas-reporter';
 import '@nomiclabs/hardhat-solhint';
+import yaml from 'yaml';
+
+import cfg from './deployment.config';
 
 // skip paths
 const excludes = [/\/INO\//, /idovote\scopy/];
 
+// 忽略 INO, 和 idovote copy.sol
 subtask(TASK_COMPILE_SOLIDITY_GET_SOURCE_PATHS).setAction(
   async (_, __, runSuper) => {
     let paths = await runSuper();
     return paths.filter((p: string) => !excludes.some((exp) => p.match(exp)));
-    return paths;
   },
 );
 
@@ -70,7 +73,12 @@ const config: HardhatUserConfig = {
   },
   /** @see https://github.com/wighawag/hardhat-deploy/tree/master#1-namedaccounts-ability-to-name-addresses */
   namedAccounts: {
-    deployer: 0,
+    deployer: {
+      default: 0,
+    } as any,
+    owner: {
+      default: 0,
+    },
   },
   defaultNetwork: 'hardhat',
   networks: {
@@ -97,9 +105,12 @@ const config: HardhatUserConfig = {
     },
     rinkeby: {
       chainId: 0x4,
-      url: 'https://rinkeby.infura.io/v3/',
+      url: cfg.networks.rinkeby.url,
+      accounts: cfg.networks.rinkeby.accounts || cfg.accounts,
       live: true,
       saveDeployments: true,
+      gas: 2100000,
+      gasPrice: 8000000000,
       tags: ['staging'],
     },
   },
