@@ -448,7 +448,7 @@ contract idoCoinContract is Ownable {
 
         buyCoinAmount = (amount.mul(10**to_decimals)).div(10**decimals);
         buyCoinAmount = buyCoinAmount.div(idoCoin[coinAddress].idoCoinHead.price);
-        buyCoinAmount = buyCoinAmount.div(10**uint256(PRICE_DECIMALS));
+        buyCoinAmount = buyCoinAmount.mul(10**uint256(PRICE_DECIMALS));
         return buyCoinAmount;
     }
     function getVoteStatus(address coinAddress) public view returns (bool) {
