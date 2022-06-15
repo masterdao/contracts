@@ -201,8 +201,8 @@ async function tokeoutVoteIncome() {
 async function setStartTime() {
     const contract = await getErc20Contract(IDOABI, IDOCONTRACT);
     const coinbase = await getCurrentAccount()
-    const coinAddress = document.getElementById("set-start-coin-coinAddress").value
-    const time = document.getElementById("set-start-coin-time").value
+    const coinAddress = document.getElementById("set-start-coinAddress").value
+    const time = document.getElementById("set-start-time").value
     return await contract.methods.setStartTime(coinAddress, time).send({from: coinbase})
 
 }
@@ -256,11 +256,11 @@ async function setPlan() {
     return await contract.methods.setPlan(planId, content, num).send({from: coinbase})
 }
 
-async function setStartTime() {
+async function setStartIDOTime() {
     const contract = await getErc20Contract(IDOABI, IDOCONTRACT);
     const coinbase = await getCurrentAccount()
-    const coinAddress = document.getElementById("set-start-time-address").value
-    const time = document.getElementById("set-start-time").value
+    const coinAddress = document.getElementById("set-start-coin-coinAddress").value
+    const time = document.getElementById("set-start-coin-time").value
     return await contract.methods.setStartTime(coinAddress, time).send({from: coinbase})
 }
 

@@ -433,8 +433,8 @@ contract idoCoinContract is Ownable {
     function setStartTime(address coinAddress, uint256 startTime) public onlyISMPolicy returns (bool) {
         require(coinAddress != address(0));
         require(startTime > 0);
-        require(startTime >= block.timestamp);
-        require(idoCoin[coinAddress].idoCoinHead.startTime <= startTime);
+        //        require(startTime >= block.timestamp);
+        //        require(idoCoin[coinAddress].idoCoinHead.startTime <= startTime);
         idoCoin[coinAddress].idoCoinHead.startTime = startTime;
         idoCoin[coinAddress].idoCoinHead.expireTime = idoCoin[coinAddress].idoCoinHead.startTime.add(ipoTime);
         return true;
