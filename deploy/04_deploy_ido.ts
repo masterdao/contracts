@@ -49,7 +49,4 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
 };
 
-function createContract<T>({address, abi}: any) {
-
-}
 export default func;

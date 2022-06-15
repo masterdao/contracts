@@ -35,18 +35,21 @@ const func: DeployFunction = async function ({
   }
 
   // 空投
-  if(dao.airdrop.enabled && dao.airdrop.whiteList) {
-    const {whiteList, count} = dao.airdrop
-    const wei = parseEther(String(count))
-    for (const account of whiteList) {
-      await run(contract.transfer, account, wei)
-    }
-  }
+  // if(dao.airdrop.enabled && dao.airdrop.whiteList) {
+  //   const {whiteList, count} = dao.airdrop
+  //   const wei = parseEther(String(count))
+  //   for (const account of whiteList) {
+  //     console.log('airdrop', count, 'DAO to', account)
+  //     await run(contract.transfer, account, wei, {
+  //       from: deployer
+  //     })
+  //   }
+  // }
 
   // 所有权转移
-  if(dao.owner && deployer !== dao.owner) {
-    await run(contract.transferOwnership, dao.owner)
-  }
+  // if(dao.owner && deployer !== dao.owner) {
+  //   await run(contract.transferOwnership, dao.owner)
+  // }
 };
 
 export default func;
