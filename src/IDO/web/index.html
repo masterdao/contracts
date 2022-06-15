@@ -17,7 +17,7 @@
 <script src="erc20Abi_1.js"></script>
 <script src="idovote.js?idovote_random=33098"+Date.now()></script>
 <script src="ido.js?ido_random=41910"+Date.now()></script>
-<script src="contract_1.js?contract_random=2213"+Date.now()></script>
+<script src="contract_1.js?contract_random=999999"+Date.now()></script>
 <html>
 <body>
 <button onclick="getstatus()">获取列表信息</button>
@@ -135,6 +135,12 @@
     十四、设置设置项目方启动提币<br>
     coinAddress:<input type="text" id="set-take-coinAddress" value="0x000000000" size=60><br><br>
     <button onclick="setTakeOut()"> 提币金额</button>
+    <hr>
+
+    十五、设置项目开始时间和结束时间<br>
+    coinAddress:<input type="text" id="set-start-coin-coinAddress" value="0x000000000" size=60><br><br>
+    time:<input type="text" id="set-start-coin-time" value="0" size=60><br><br>
+    <button onclick="setStartTime()"> 设置时间</button>
     <hr>
 
     <br>

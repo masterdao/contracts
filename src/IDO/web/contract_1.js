@@ -1,8 +1,8 @@
 let web3;
 const DAO = "0x5e0289c130BcC61FBe5cEc5dce5fE775E50752bf"
 const OWNER = "0x4Cf2EE6f44C53931b52bdbce3A15F123bf073162"
-const IDOVOTECONTRACT = "0xa844839ffFeaDD3A9791fC443Fc8fca2Ac47Ef30"
-const IDOCONTRACT = "0x83eCc717f9349A79c02451E6afdAf1FDcE804ED9"
+const IDOVOTECONTRACT = "0xEfee3359B6b38b0Ec2B0Be964c68Dd39Da86F903"
+const IDOCONTRACT = "0x2461aDBCa687473400E0b3b2035B5A9B27378D68"
 const ROUTER = "0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45"
 let voteStauts;
 
@@ -201,8 +201,8 @@ async function tokeoutVoteIncome() {
 async function setStartTime() {
     const contract = await getErc20Contract(IDOABI, IDOCONTRACT);
     const coinbase = await getCurrentAccount()
-    const coinAddress = document.getElementById("set-start-coinAddress").value
-    const time = document.getElementById("set-start-time").value
+    const coinAddress = document.getElementById("set-start-coin-coinAddress").value
+    const time = document.getElementById("set-start-coin-time").value
     return await contract.methods.setStartTime(coinAddress, time).send({from: coinbase})
 
 }
@@ -254,6 +254,14 @@ async function setPlan() {
     const content = document.getElementById("set-plan-content").value
     const num = document.getElementById("set-plan-num").value
     return await contract.methods.setPlan(planId, content, num).send({from: coinbase})
+}
+
+async function setStartTime() {
+    const contract = await getErc20Contract(IDOABI, IDOCONTRACT);
+    const coinbase = await getCurrentAccount()
+    const coinAddress = document.getElementById("set-start-time-address").value
+    const time = document.getElementById("set-start-time").value
+    return await contract.methods.setStartTime(coinAddress, time).send({from: coinbase})
 }
 
 async function setUpCoin() {
