@@ -445,7 +445,7 @@ contract idoCoinContract is Ownable {
         require(idoCoin[coinAddress].idoCoinHead.coinAddress != address(0), "can not zero address");
         require(idoCoin[coinAddress].idoCoinHead.startTime <= block.timestamp, "must be within the validity period");
 
-        require(idovoteContract.getVoteStatus(idoCoin[coinAddress].idoCoinHead.coinAddress), "proposal has not passed"); //检查是否已经投票通过
+//        require(idovoteContract.getVoteStatus(idoCoin[coinAddress].idoCoinHead.coinAddress), "proposal has not passed"); //检查是否已经投票通过
 
         require(block.timestamp < idoCoin[coinAddress].idoCoinHead.expireTime, "ipo not expired"); //还没有到期
 
