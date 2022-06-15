@@ -439,7 +439,8 @@ contract idoCoinContract is Ownable {
         idoCoin[coinAddress].idoCoinHead.expireTime = idoCoin[coinAddress].idoCoinHead.startTime.add(ipoTime);
         return true;
     }
-    function calculateBuyCoin(address coinAddress,uint256 amount) private view returns (uint256) {
+
+    function calculateBuyCoin(address coinAddress, uint256 amount) private view returns (uint256) {
         address applyAddress = applyCoinAddress[idoCoin[coinAddress].idoCoinHead.collectType];
         uint256 decimals = applyCoin[applyAddress].decimals;
         uint256 to_decimals = idoCoin[coinAddress].idoCoinHead.decimals;
@@ -451,9 +452,11 @@ contract idoCoinContract is Ownable {
         buyCoinAmount = buyCoinAmount.mul(10**uint256(PRICE_DECIMALS));
         return buyCoinAmount;
     }
+
     function getVoteStatus(address coinAddress) public view returns (bool) {
-       return idovoteContract.getVoteStatus(idoCoin[coinAddress].idoCoinHead.coinAddress);
+        return idovoteContract.getVoteStatus(idoCoin[coinAddress].idoCoinHead.coinAddress);
     }
+
     function IPOsubscription(address coinAddress, uint256 amount) public payable returns (bool) {
         require(amount > 0, "amount must be greater than zero");
         require(idoCoin[coinAddress].idoCoinHead.coinAddress != address(0), "can not zero address");
@@ -464,7 +467,8 @@ contract idoCoinContract is Ownable {
         require(block.timestamp < idoCoin[coinAddress].idoCoinHead.expireTime, "ipo not expired"); //还没有到期
 
         require(
-            calculateBuyCoin(idoCoin[coinAddress].idoCoinHead.coinAddress,amount) <= idoCoin[coinAddress].idoCoinHead.bundle.mul(idoCoin[coinAddress].idoCoinHead.maxbundle),
+            calculateBuyCoin(idoCoin[coinAddress].idoCoinHead.coinAddress, amount) <=
+                idoCoin[coinAddress].idoCoinHead.bundle.mul(idoCoin[coinAddress].idoCoinHead.maxbundle),
             "cannot exceed the purchase scope"
         );
 
