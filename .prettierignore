@@ -2,7 +2,6 @@ test
 artifacts
 cache
 deployments
-deploy
 scripts
 types
 src/**/*.js
