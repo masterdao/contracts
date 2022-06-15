@@ -451,6 +451,9 @@ contract idoCoinContract is Ownable {
         buyCoinAmount = buyCoinAmount.div(10**uint256(PRICE_DECIMALS));
         return buyCoinAmount;
     }
+    function getVoteStatus(address coinAddress) public view returns (bool) {
+       return idovoteContract.getVoteStatus(idoCoin[coinAddress].idoCoinHead.coinAddress);
+    }
     function IPOsubscription(address coinAddress, uint256 amount) public payable returns (bool) {
         require(amount > 0, "amount must be greater than zero");
         require(idoCoin[coinAddress].idoCoinHead.coinAddress != address(0), "can not zero address");
