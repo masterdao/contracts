@@ -46,7 +46,9 @@
     "dev": "hardhat node",
     "format": "prettier --write .",
     "prepare": "husky install",
+    "clean": "hardhat clean",
     "deploy:localhost": "hardhat deploy --network localhost",
+    "predeploy:rinkeby": "hardhat clean && hardhat compile",
     "deploy:rinkeby": "hardhat deploy --network rinkeby"
   }
 }

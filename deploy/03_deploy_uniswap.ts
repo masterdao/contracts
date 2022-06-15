@@ -20,7 +20,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   // TODO: 部署 UniswapV2Factory
   // TODO: 部署 WETH, 如果没有地址的话
   // TODO: 部署 UniswapV2Router02
-  console.log('uniswap do nothing');
+  // console.log('uniswap do nothing');
 };
 
 func.tags = ['local']
