@@ -109,7 +109,7 @@ const config: HardhatUserConfig = {
       accounts: cfg.networks.rinkeby.accounts || cfg.accounts,
       live: true,
       saveDeployments: true,
-      gas: 2100000,
+      gas: 12000000,
       gasPrice: 8000000000,
       tags: ['staging'],
     },
