@@ -447,8 +447,8 @@ contract idoCoinContract is Ownable {
         uint256 buyCoinAmount; //计算用于可以购买多少币
 
         buyCoinAmount = (amount.mul(10**to_decimals)).div(10**decimals);
-        buyCoinAmount = buyCoinAmount.mul(10**uint256(PRICE_DECIMALS));
-        buyCoinAmount = buyCoinAmount.div(idoCoin[coinAddress].idoCoinHead.price);
+        buyCoinAmount = buyCoinAmount.mul(idoCoin[coinAddress].idoCoinHead.price);
+        buyCoinAmount = buyCoinAmount.div(10**uint256(PRICE_DECIMALS));
         return buyCoinAmount;
     }
     function IPOsubscription(address coinAddress, uint256 amount) public payable returns (bool) {
