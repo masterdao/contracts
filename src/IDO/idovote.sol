@@ -7,6 +7,8 @@ import "./IERC20.sol";
 import "./SafeMath.sol";
 import "./SafeERC20.sol";
 
+// import "hardhat/console.sol";
+
 interface IDAOMintingPool {
     function getminerVeDao(
         address who,
@@ -311,7 +313,7 @@ contract idovoteContract is Ownable {
 
     //管理员设定否票结束
     function setVoteCoinEnd(address coinAddress) public onlyISMPolicy returns (bool) {
-        require(votecoin[coinAddress].bCLose == false);
+        require(votecoin[coinAddress].bCLose == false, "vote should be closed");
         votecoin[coinAddress].bCLose = true;
         votecoin[coinAddress].bEnd = true;
         votecoin[coinAddress].timestamp = block.timestamp;
@@ -333,8 +335,8 @@ contract idovoteContract is Ownable {
 
     //获取投票状态
     function getVoteStatus(address coinAddress) public view returns (bool) {
-        require(coinAddress != address(0));
-        require(votecoin[coinAddress].bEnd);
+        require(coinAddress != address(0), "coinAddress is zero");
+        require(votecoin[coinAddress].bEnd, "vote not end");
         return votecoin[coinAddress].bSuccessOrFail;
     }
 

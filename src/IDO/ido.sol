@@ -465,12 +465,18 @@ contract idoCoinContract is Ownable {
         require(idovoteContract.getVoteStatus(coinAddress), "proposal has not passed"); //检查是否已经投票通过
 
         require(block.timestamp < idoCoin[coinAddress].idoCoinHead.expireTime, "ipo not expired"); //还没有到期
-
+        // amount 已经换算过
+        // uint256 buyAmount = calculateBuyCoin(coinAddress, amount);
         require(
-            calculateBuyCoin(idoCoin[coinAddress].idoCoinHead.coinAddress, amount) <=
-                idoCoin[coinAddress].idoCoinHead.bundle.mul(idoCoin[coinAddress].idoCoinHead.maxbundle),
+            amount <= idoCoin[coinAddress].idoCoinHead.bundle.mul(idoCoin[coinAddress].idoCoinHead.maxbundle),
             "cannot exceed the purchase scope"
         );
+
+        // require(
+        //     calculateBuyCoin(idoCoin[coinAddress].idoCoinHead.coinAddress, amount) <=
+        //         idoCoin[coinAddress].idoCoinHead.bundle.mul(idoCoin[coinAddress].idoCoinHead.maxbundle),
+        //     "cannot exceed the purchase scope"
+        // );
 
         address applyAddress = applyCoinAddress[idoCoin[coinAddress].idoCoinHead.collectType];
         address APPLYCOIN = applyCoin[applyAddress].contractAddress;
