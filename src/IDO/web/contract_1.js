@@ -6,20 +6,20 @@ let IDOCONTRACT = "0x91B7253a3C9A6E7A231d6B883DaB24cf7D3f6b16"
 const ROUTER = "0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45"
 let voteStauts;
 
-if (artifact) {
-    console.log('artifact', {
-        dao: artifact.ERC20.address,
-        pool: artifact.DAOMintingPool.address,
-        vote: artifact.idovoteContract.address,
-        ido: artifact.idoCoinContract.address
-    });
-    if (artifact.idovoteContract) {
-        IDOVOTECONTRACT = artifact.idovoteContract.address
-    }
-    if (artifact.idoCoinContract) {
-        IDOCONTRACT = artifact.idoCoinContract.address
-    }
-}
+// if (artifact) {
+//     console.log('artifact', {
+//         dao: artifact.ERC20.address,
+//         pool: artifact.DAOMintingPool.address,
+//         vote: artifact.idovoteContract.address,
+//         ido: artifact.idoCoinContract.address
+//     });
+//     if (artifact.idovoteContract) {
+//         IDOVOTECONTRACT = artifact.idovoteContract.address
+//     }
+//     if (artifact.idoCoinContract) {
+//         IDOCONTRACT = artifact.idoCoinContract.address
+//     }
+// }
 
 window.onload = function () {
     console.log(IDOVOTE)
