@@ -1,4 +1,3 @@
-.env
 .vscode/
 node_modules/
 artifacts/
@@ -10,3 +9,6 @@ types/
 cmd.sh
 *.zip
 *.rar
+deployments
+*.log
+.idea

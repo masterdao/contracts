@@ -1,10 +1,25 @@
 let web3;
 const DAO = "0x5e0289c130BcC61FBe5cEc5dce5fE775E50752bf"
 const OWNER = "0x4Cf2EE6f44C53931b52bdbce3A15F123bf073162"
-const IDOVOTECONTRACT = "0xc86a4F152bb569242d7CFB27A8A2a06Ecf9613E5"
-const IDOCONTRACT = "0x2853Cc07bf33c5F24f5737c3Ae23a3616c8Fd14d"
+let IDOVOTECONTRACT = "0x60A7E291c8e58C4884480E1D318288267C27ad92"
+let IDOCONTRACT = "0x91B7253a3C9A6E7A231d6B883DaB24cf7D3f6b16"
 const ROUTER = "0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45"
 let voteStauts;
+
+// if (artifact) {
+//     console.log('artifact', {
+//         dao: artifact.ERC20.address,
+//         pool: artifact.DAOMintingPool.address,
+//         vote: artifact.idovoteContract.address,
+//         ido: artifact.idoCoinContract.address
+//     });
+//     if (artifact.idovoteContract) {
+//         IDOVOTECONTRACT = artifact.idovoteContract.address
+//     }
+//     if (artifact.idoCoinContract) {
+//         IDOCONTRACT = artifact.idoCoinContract.address
+//     }
+// }
 
 window.onload = function () {
     console.log(IDOVOTE)
@@ -59,10 +74,10 @@ async function getErc20Contract(abi, contractAddr) {
 async function getCurrentAccount() {
     try {
         if (window.web3.eth) {
-            window.ethereum.request({method: 'eth_requestAccounts'})
+            window.ethereum.request({ method: 'eth_requestAccounts' })
             this.coinbase = window.web3.eth.accounts[0] || ''
         } else {
-            const allAccounts = await window.ethereum.request({method: 'eth_accounts'});
+            const allAccounts = await window.ethereum.request({ method: 'eth_accounts' });
             this.coinbase = allAccounts[0]
         }
         return this.coinbase
@@ -84,7 +99,7 @@ async function setpassingRate() {
     const contract = await getErc20Contract(IDOVOTE, IDOVOTECONTRACT);
     const coinbase = await getCurrentAccount()
     const passingRate = document.getElementById("set-passingRate").value
-    return await contract.methods.setpassingRate(passingRate).send({from: coinbase})
+    return await contract.methods.setpassingRate(passingRate).send({ from: coinbase })
 }
 
 //获取投票率
@@ -100,7 +115,7 @@ async function setvotingRatio() {
     const contract = await getErc20Contract(IDOVOTE, IDOVOTECONTRACT);
     const coinbase = await getCurrentAccount()
     const votingRatio = document.getElementById("set-votingRatio").value
-    return await contract.methods.setvotingRatio(votingRatio).send({from: coinbase})
+    return await contract.methods.setvotingRatio(votingRatio).send({ from: coinbase })
 }
 
 //获取投票分配收益
@@ -112,7 +127,7 @@ async function setDaoVoteIncome() {
     const DaoVoteIncome = document.getElementById("set-DaoVoteIncome").value
     let amount = document.getElementById("set-amount").value
     amount = web3.utils.toWei(amount, 'ether')
-    return await contract.methods.setDaoVoteIncome(DaoVoteIncome, amount).send({from: coinbase})
+    return await contract.methods.setDaoVoteIncome(DaoVoteIncome, amount).send({ from: coinbase })
 
 }
 
@@ -144,7 +159,7 @@ async function approveToken() {
     const contract = await getErc20Contract(erc20Abi, contractAddress);
     const approveValue = web3.utils.toWei('100000000', 'ether')
     console.log("spenderAddr  ", spenderAddr)
-    return await contract.methods.approve(spenderAddr, approveValue).send({from: this.coinbase})
+    return await contract.methods.approve(spenderAddr, approveValue).send({ from: this.coinbase })
 }
 
 function getvotestatus(st) {
@@ -161,14 +176,14 @@ async function vote() {
     const contract = await getErc20Contract(IDOVOTE, IDOVOTECONTRACT);
     const coinbase = await getCurrentAccount()
     const coinAddress = document.getElementById("set-coinAddress").value
-    return await contract.methods.vote(coinAddress, true).send({from: coinbase})
+    return await contract.methods.vote(coinAddress, true).send({ from: coinbase })
 }
 
 async function setVoteTime() {
     const contract = await getErc20Contract(IDOVOTE, IDOVOTECONTRACT);
     const coinbase = await getCurrentAccount()
     const time = document.getElementById("set-time-coinAddress").value
-    return await contract.methods.setVoteTime(time).send({from: coinbase})
+    return await contract.methods.setVoteTime(time).send({ from: coinbase })
 }
 
 //设定投票结束
@@ -176,7 +191,7 @@ async function setVoteCoinEnd() {
     const contract = await getErc20Contract(IDOVOTE, IDOVOTECONTRACT);
     const coinbase = await getCurrentAccount()
     const coinAddress = document.getElementById("set-end-coinAddress").value
-    return await contract.methods.setVoteCoinEnd(coinAddress).send({from: coinbase})
+    return await contract.methods.setVoteCoinEnd(coinAddress).send({ from: coinbase })
 }
 
 //查看用户投票收益，
@@ -194,7 +209,7 @@ async function viewDaoVoteIncome() {
 async function tokeoutVoteIncome() {
     const contract = await getErc20Contract(IDOVOTE, IDOVOTECONTRACT);
     const coinbase = await getCurrentAccount()
-    return await contract.methods.tokeoutVoteIncome().send({from: coinbase})
+    return await contract.methods.tokeoutVoteIncome().send({ from: coinbase })
 
 }
 
@@ -203,7 +218,7 @@ async function setStartTime() {
     const coinbase = await getCurrentAccount()
     const coinAddress = document.getElementById("set-start-coinAddress").value
     const time = document.getElementById("set-start-time").value
-    return await contract.methods.setStartTime(coinAddress, time).send({from: coinbase})
+    return await contract.methods.setStartTime(coinAddress, time).send({ from: coinbase })
 
 }
 
@@ -220,7 +235,7 @@ async function setIpoTime() {
     const contract = await getErc20Contract(IDOABI, IDOCONTRACT);
     const coinbase = await getCurrentAccount()
     const time = document.getElementById("set-ipo-time").value
-    return await contract.methods.setipoTime(time).send({from: coinbase})
+    return await contract.methods.setipoTime(time).send({ from: coinbase })
 
 }
 
@@ -229,7 +244,7 @@ async function IPOsubscription() {
     const coinbase = await getCurrentAccount()
     const coinAddress = document.getElementById("set-ipo-coinAddress").value
     const amount = document.getElementById("set-ipo-amount").value
-    return await contract.methods.IPOsubscription(coinAddress, amount).send({from: coinbase,value:amount})
+    return await contract.methods.IPOsubscription(coinAddress, amount).send({ from: coinbase, value: amount })
 
 }
 
@@ -237,14 +252,14 @@ async function settlement() {
     const contract = await getErc20Contract(IDOABI, IDOCONTRACT);
     const coinbase = await getCurrentAccount()
     const coinAddress = document.getElementById("set-settlement-coinAddress").value
-    return await contract.methods.settlement(coinAddress).send({from: coinbase})
+    return await contract.methods.settlement(coinAddress).send({ from: coinbase })
 }
 
 async function setTakeOut() {
     const contract = await getErc20Contract(IDOABI, IDOCONTRACT);
     const coinbase = await getCurrentAccount()
     const coinAddress = document.getElementById("set-take-coinAddress").value
-    return await contract.methods.setTakeOut(coinAddress).send({from: coinbase})
+    return await contract.methods.setTakeOut(coinAddress).send({ from: coinbase })
 }
 
 async function setPlan() {
@@ -253,7 +268,15 @@ async function setPlan() {
     const planId = document.getElementById("set-plan-id").value
     const content = document.getElementById("set-plan-content").value
     const num = document.getElementById("set-plan-num").value
-    return await contract.methods.setPlan(planId, content, num).send({from: coinbase})
+    return await contract.methods.setPlan(planId, content, num).send({ from: coinbase })
+}
+
+async function setStartIDOTime() {
+    const contract = await getErc20Contract(IDOABI, IDOCONTRACT);
+    const coinbase = await getCurrentAccount()
+    const coinAddress = document.getElementById("set-start-coin-coinAddress").value
+    const time = document.getElementById("set-start-coin-time").value
+    return await contract.methods.setStartTime(coinAddress, time).send({ from: coinbase })
 }
 
 async function setUpCoin() {
@@ -297,7 +320,7 @@ async function setUpCoin() {
         maxbundle,
         planId
     ];
-    const tx = await contract.methods.createIeoCoin(idoCoinHead).send({from: coinbase})
+    const tx = await contract.methods.createIeoCoin(idoCoinHead).send({ from: coinbase })
     console.log("tx  ", tx)
     const newAddress = tx.events.CreateIeoCoin.returnValues.newCoinAddress;
     console.log("newAddress  ", newAddress)
@@ -313,7 +336,7 @@ async function approveDAOToken() {
     const contract = await getErc20Contract(erc20Abi, contractAddress);
     const approveValue = web3.utils.toWei('100000000', 'ether')
     console.log("spenderAddr  ", spenderAddr)
-    return await contract.methods.approve(spenderAddr, approveValue).send({from: this.coinbase})
+    return await contract.methods.approve(spenderAddr, approveValue).send({ from: this.coinbase })
 
 }
 
@@ -324,7 +347,7 @@ async function approveCoinToken() {
     const approveValue = web3.utils.toWei('100000000', 'ether')
     console.log("spenderAddr  ", spenderAddr)
     console.log("coinAddress  ", coinAddress)
-    return await fudContract.methods.approve(spenderAddr, approveValue).send({from: this.coinbase})
+    return await fudContract.methods.approve(spenderAddr, approveValue).send({ from: this.coinbase })
 }
 
 async function getVoteEnd() {

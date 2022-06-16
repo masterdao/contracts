@@ -160,7 +160,6 @@ describe('ido contract', () => {
     });
 
     it(`create project`, async () => {
-      // console.log('ok');
       const head: IdoCoinContract.IdoCoinInfoHeadStruct = {
         coinAddress: myToken.address,
         symbol: await myToken.symbol(),
@@ -233,10 +232,8 @@ describe('ido contract', () => {
         value: amount,
       });
 
-      console.log('ipoId', ipoId);
       await helper.time.increase(25*3600);
 
-      console.log('settlement')
       await run(ido.connect(owner).settlement, ipoId);
     });
 
@@ -290,12 +287,14 @@ function getEncryptMakeAmount(
 async function makeVotePass({
   dao,
   token,
+  coinAddress,
   vote,
   pool,
 }: {
   dao: ERC20;
   token: MockToken;
   vote: IdovoteContract;
+  coinAddress: string;
   pool: DAOMintingPool;
 }) {
   // staking
@@ -304,12 +303,12 @@ async function makeVotePass({
   await run(pool.deposit, dao.address, stakeAmount, 0);
 
   // voting
-  await run(vote.vote, token.address, true);
+  await run(vote.vote, coinAddress, true);
 
   // 使投票通过
-  await run(vote.setVoteCoinEnd, token.address);
-  const result = await vote.getvotecoin(token.address);
-  // console.log('mvp result', result);
+  await run(vote.setVoteCoinEnd, coinAddress);
+  const result = await vote.getvotecoin(coinAddress);
+  // console.log('mvp result', objf(result));
   // 验证确保投票通过
   if (!result.bEnd || !result.bSuccessOrFail) {
     throw 'vote not passed';

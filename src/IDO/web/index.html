@@ -3,142 +3,150 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="Cryptocash is Professional Creative Template"/>
+    <meta name="description" content="Cryptocash is Professional Creative Template" />
 </head>
 <script src="https://cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"
-        integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>
+    integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@2.7.2/dist/Chart.bundle.min.js"
-        integrity="sha256-XF29CBwU1MWLaGEnsELogU6Y6rcc5nCkhhx89nFMIDQ=" crossorigin="anonymous"></script>
+    integrity="sha256-XF29CBwU1MWLaGEnsELogU6Y6rcc5nCkhhx89nFMIDQ=" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.min.js"
-        integrity="sha256-ecWZ3XYM7AwWIaGvSdmipJ2l1F4bN9RXW6zgpeAiZYI=" crossorigin="anonymous"></script>
+    integrity="sha256-ecWZ3XYM7AwWIaGvSdmipJ2l1F4bN9RXW6zgpeAiZYI=" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
 
+<!-- <script src="https://app.vedao.pro/v1/public/dao/contract-address.js" crossorigin="anonymous"></script> -->
 <script src="erc20Abi_1.js"></script>
-<script src="idovote.js?idovote_random=33098"+Date.now()></script>
-<script src="ido.js?ido_random=41910"+Date.now()></script>
-<script src="contract_1.js?contract_random=200102"+Date.now()></script>
+<script src="idovote.js?idovote_random=cvxvdc"></script>
+<script src="ido.js?ido_random=455ygt"></script>
+<script src="contract_1.js?contract_random=3455543534aa"></script>
 <html>
+
 <body>
-<button onclick="getstatus()">获取列表信息</button>
-<br><br>
-<div style="color:red; border-radius: 2%;  border: 2px solid burlywood;">
-    用户操作：<br>
-    <hr>
-    用户收益：<span style="color: red;" class="vote-Income">--.--</span><br><br>
-    Address:<input type="text" id="set-dao-vote-income" value="0x000000000" size=60><br><br>
-    <button onclick="viewDaoVoteIncome()">查看收益</button>
-    <button onclick="tokeoutVoteIncome()">提取收益</button>
+    <button onclick="getstatus()">获取列表信息</button>
+    <br><br>o9
+    <div style="color:red; border-radius: 2%;  border: 2px solid burlywood;">
+        用户操作：<br>
+        <hr>
+        用户收益：<span style="color: red;" class="vote-Income">--.--</span><br><br>
+        Address:<input type="text" id="set-dao-vote-income" value="0x000000000" size=60><br><br>
+        <button onclick="viewDaoVoteIncome()">查看收益</button>
+        <button onclick="tokeoutVoteIncome()">提取收益</button>
 
-    <br>
-</div>
-<hr>
-
-<div style="color:red; border-radius: 2%;  border: 2px solid burlywood;">
-    操作流程：<br>
-    1、设定通过率;<br>
-    2、设定投票率：<br>
-    3、设定投票分配收益：<br>
-    4、投票<br>
-    5、设定投票结束：<br>
-    备注：下次投票后，结算上次投票收益。
-
-</div>
-<hr>
-<div style="color:red; border-radius: 2%;  border: 2px solid burlywood;">
-    管理员操作：<br>
-    <hr>
-    一、设定通过率：<input type="text" id="set-passingRate" size=60><br><br>
-    <button onclick="setpassingRate()">设定通过率</button>
-    <hr>
-    二、设定投票率：<input type="text" id="set-votingRatio" size=60><br><br>
-    <button onclick="setvotingRatio()">设定投票率</button>
-    <hr>
-    <br>
-    三、设定投票分配收益：<br>
-    Address:<input type="text" id="set-DaoVoteIncome" value="0x000000000" size=60><br><br>
-    Amount:<input type="text" id="set-amount" value="100" size=60><br><br>
-    <button onclick="approveToken()">授权</button>
-    <button onclick="setDaoVoteIncome()">设定投票分配收益</button>
-    <button onclick="getvotecoin()">获取币信息</button>
-    <hr>
-    <br>
-    四、上币：<br>
-    coinAddress:<input type="text" id="set-coin-coinAddress" value="0x000000000" size=60><br><br>
-    symbol:<input type="text" id="set-symbol" value="ABC" size=60><br><br>
-    decimals:<input type="text" id="set-decimals" value="18" size=60><br><br>
-    collectType:<input type="text" id="set-collect-type" value="1" size=60><br><br>
-    idoAmount:<input type="text" id="set-ido-amount" value="1000000000000000000" size=60><br><br>
-    price(兑换比例):<input type="text" id="set-ido-price" value="1000000000000000" size=60><br><br>
-    bBuyLimit(购买限制（参与者）):<input type="text" id="set-buy-limit" value="0" size=60><br><br>
-    uBuyLimitNumber(地址购买限制数量):<input type="text" id="set-buy-number" value="0" size=60><br><br>
-    bPartner(参与者是否限制持有DAO):<input type="text" id="set-partner" value="0" size=60><br><br>
-    partnerNumber(参与者持有DAO数量):<input type="text" id="set-partner-number" value="0" size=60><br><br>
-    bDAO:<input type="text" id="set-dao" value="false" size=60><br><br>
-    uDAONumber:<input type="text" id="set-dao-number" value="0" size=60><br><br>
-    startTime:<input type="text" id="set-coin-start-time" value="" size=60><br><br>
-    expireTime:<input type="text" id="set-coin-expire-time" value="" size=60><br><br>
-    bundle:<input type="text" id="set-bundle" value="1" size=60><br><br>
-    maxbundle:<input type="text" id="set-max-bundle" value="10" size=60><br><br>
-    planId:<input type="text" id="set-coin-plan-id" value="1" size=60><br><br>
-    <button onclick="approveCoinToken()"> 授权(项目coin)</button>
-    <button onclick="approveDAOToken()"> 授权(DAO)</button>
-    <button onclick="setUpCoin()"> 上币</button>
-    <span style="color: red;" class="show-new-address">--</span>
-    <hr>
-    <br>
-    五、投票：<br>
-    coinAddress:<input type="text" id="set-coinAddress" value="0x000000000" size=60><br><br>
-    <from class="status">
-        <input type="radio" name="vote" value="true" onclick="getvotestatus(1)"/>pass
-        <input type="radio" name="vote" value="false" onclick="getvotestatus(0)"/>deny
-    </from>
-    <br><br>
-    <button onclick="vote()"> 投票</button><br>
-    项目投票状态(true:结束了)：<br>
-    <span style="color: red;" class="show-vote">--</span>
-    <button onclick="getVoteEnd()"> 查看投票</button>
-    <br>
-    <hr>
-    六、设定投票结束时间<br>
-    time :<input type="text" id="set-time-coinAddress" value="86400" size=60><br><br>
-    <button onclick="setVoteTime()"> 设定投票结束时间</button>
-    <hr>
-    七、设定投票结束<br>
-    coinAddress:<input type="text" id="set-end-coinAddress" value="0x000000000" size=60><br><br>
-    <button onclick="setVoteCoinEnd()"> 设定投票结束</button>
-    <hr>
-    八、设置打新开始时间<br>
-    coinAddress:<input type="text" id="set-start-coinAddress" value="0x000000000" size=60><br><br>
-    time:<input type="text" id="set-start-time" value="" size=60><br><br>
-    <button onclick="setStartTime()"> 设定打新开始时间</button>
-    <hr>
-    九、设置提款计划(几次content加起之和100，num和id不变  初始化例如：1，25，3；1，25，3；1，50，3)<br>
-    planId:<input type="text" id="set-plan-id" value="1" size=60><br><br>
-    content:<input type="text" id="set-plan-content" value="25" size=60><br><br>
-    num:<input type="text" id="set-plan-num" value="3" size=60><br><br>
-    <button onclick="setPlan()"> 提款计划</button>
-    <hr>
-    十一、打新<br>
-    coinAddress:<input type="text" id="set-ipo-coinAddress" value="0x000000000" size=60><br><br>
-    amount:<input type="text" id="set-ipo-amount" value="2" size=60><br><br>
-    <button onclick="IPOsubscription()"> 打新</button>
-    <hr>
-    十二、设置ipo时间（打新开始时间+IPO时间=过期时间）<br>
-    time:<input type="text" id="set-ipo-time" value="86400" size=60><br><br>
-    <button onclick="setIpoTime()"> 设定IPO时间</button>
-    <hr>
-    十三、结算<br>
-    coinAddress:<input type="text" id="set-settlement-coinAddress" value="0x000000000" size=60><br><br>
-    <button onclick="settlement()"> 结算</button>
-    <hr>
-    十四、设置设置项目方启动提币<br>
-    coinAddress:<input type="text" id="set-take-coinAddress" value="0x000000000" size=60><br><br>
-    <button onclick="setTakeOut()"> 提币金额</button>
+        <br>
+    </div>
     <hr>
 
-    <br>
-</div>
+    <div style="color:red; border-radius: 2%;  border: 2px solid burlywood;">
+        操作流程：<br>
+        1、设定通过率;<br>
+        2、设定投票率：<br>
+        3、设定投票分配收益：<br>
+        4、投票<br>
+        5、设定投票结束：<br>
+        备注：下次投票后，结算上次投票收益。
+
+    </div>
+    <hr>
+    <div style="color:red; border-radius: 2%;  border: 2px solid burlywood;">
+        管理员操作：<br>
+        <hr>
+        一、设定通过率：<input type="text" id="set-passingRate" size=60><br><br>
+        <button onclick="setpassingRate()">设定通过率</button>
+        <hr>
+        二、设定投票率：<input type="text" id="set-votingRatio" size=60><br><br>
+        <button onclick="setvotingRatio()">设定投票率</button>
+        <hr>
+        <br>
+        三、设定投票分配收益：<br>
+        Address:<input type="text" id="set-DaoVoteIncome" value="0x000000000" size=60><br><br>
+        Amount:<input type="text" id="set-amount" value="100" size=60><br><br>
+        <button onclick="approveToken()">授权</button>
+        <button onclick="setDaoVoteIncome()">设定投票分配收益</button>
+        <button onclick="getvotecoin()">获取币信息</button>
+        <hr>
+        <br>
+        四、上币：<br>
+        coinAddress:<input type="text" id="set-coin-coinAddress" value="0x000000000" size=60><br><br>
+        symbol:<input type="text" id="set-symbol" value="ABC" size=60><br><br>
+        decimals:<input type="text" id="set-decimals" value="18" size=60><br><br>
+        collectType:<input type="text" id="set-collect-type" value="1" size=60><br><br>
+        idoAmount:<input type="text" id="set-ido-amount" value="1000000000000000000" size=60><br><br>
+        price(兑换比例):<input type="text" id="set-ido-price" value="1000000000000000" size=60><br><br>
+        bBuyLimit(购买限制（参与者）):<input type="text" id="set-buy-limit" value="0" size=60><br><br>
+        uBuyLimitNumber(地址购买限制数量):<input type="text" id="set-buy-number" value="0" size=60><br><br>
+        bPartner(参与者是否限制持有DAO):<input type="text" id="set-partner" value="0" size=60><br><br>
+        partnerNumber(参与者持有DAO数量):<input type="text" id="set-partner-number" value="0" size=60><br><br>
+        bDAO:<input type="text" id="set-dao" value="false" size=60><br><br>
+        uDAONumber:<input type="text" id="set-dao-number" value="0" size=60><br><br>
+        startTime:<input type="text" id="set-coin-start-time" value="" size=60><br><br>
+        expireTime:<input type="text" id="set-coin-expire-time" value="" size=60><br><br>
+        bundle:<input type="text" id="set-bundle" value="1" size=60><br><br>
+        maxbundle:<input type="text" id="set-max-bundle" value="10" size=60><br><br>
+        planId:<input type="text" id="set-coin-plan-id" value="1" size=60><br><br>
+        <button onclick="approveCoinToken()"> 授权(项目coin)</button>
+        <button onclick="approveDAOToken()"> 授权(DAO)</button>
+        <button onclick="setUpCoin()"> 上币</button>
+        <span style="color: red;" class="show-new-address">--</span>
+        <hr>
+        <br>
+        五、投票：<br>
+        coinAddress:<input type="text" id="set-coinAddress" value="0x000000000" size=60><br><br>
+        <from class="status">
+            <input type="radio" name="vote" value="true" onclick="getvotestatus(1)" />pass
+            <input type="radio" name="vote" value="false" onclick="getvotestatus(0)" />deny
+        </from>
+        <br><br>
+        <button onclick="vote()"> 投票</button><br>
+        项目投票状态(true:结束了)：<br>
+        <span style="color: red;" class="show-vote">--</span>
+        <button onclick="getVoteEnd()"> 查看投票</button>
+        <br>
+        <hr>
+        六、设定投票结束时间<br>
+        time :<input type="text" id="set-time-coinAddress" value="86400" size=60><br><br>
+        <button onclick="setVoteTime()"> 设定投票结束时间</button>
+        <hr>
+        七、设定投票结束<br>
+        coinAddress:<input type="text" id="set-end-coinAddress" value="0x000000000" size=60><br><br>
+        <button onclick="setVoteCoinEnd()"> 设定投票结束</button>
+        <hr>
+        八、设置打新开始时间<br>
+        coinAddress:<input type="text" id="set-start-coinAddress" value="0x000000000" size=60><br><br>
+        time:<input type="text" id="set-start-time" value="" size=60><br><br>
+        <button onclick="setStartTime()"> 设定打新开始时间</button>
+        <hr>
+        九、设置提款计划(几次content加起之和100，num和id不变 初始化例如：1，25，3；1，25，3；1，50，3)<br>
+        planId:<input type="text" id="set-plan-id" value="1" size=60><br><br>
+        content:<input type="text" id="set-plan-content" value="25" size=60><br><br>
+        num:<input type="text" id="set-plan-num" value="3" size=60><br><br>
+        <button onclick="setPlan()"> 提款计划</button>
+        <hr>
+        十一、打新<br>
+        coinAddress:<input type="text" id="set-ipo-coinAddress" value="0x000000000" size=60><br><br>
+        amount:<input type="text" id="set-ipo-amount" value="2" size=60><br><br>
+        <button onclick="IPOsubscription()"> 打新</button>
+        <hr>
+        十二、设置ipo时间（打新开始时间+IPO时间=过期时间）<br>
+        time:<input type="text" id="set-ipo-time" value="86400" size=60><br><br>
+        <button onclick="setIpoTime()"> 设定IPO时间</button>
+        <hr>
+        十三、结算<br>
+        coinAddress:<input type="text" id="set-settlement-coinAddress" value="0x000000000" size=60><br><br>
+        <button onclick="settlement()"> 结算</button>
+        <hr>
+        十四、设置设置项目方启动提币<br>
+        coinAddress:<input type="text" id="set-take-coinAddress" value="0x000000000" size=60><br><br>
+        <button onclick="setTakeOut()"> 提币金额</button>
+        <hr>
+
+        十五、设置项目开始时间和结束时间<br>
+        coinAddress:<input type="text" id="set-start-coin-coinAddress" value="0x000000000" size=60><br><br>
+        time:<input type="text" id="set-start-coin-time" value="0" size=60><br><br>
+        <button onclick="setStartIDOTime()"> 设置时间</button>
+        <hr>
+
+        <br>
+    </div>
 </body>
+
 </html>
- 
