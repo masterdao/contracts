@@ -690,9 +690,15 @@ contract idoCoinContract is Ownable {
         //ETH
         if (idoCoin[coinAddress].idoCoinHead.collectType == 1) {
             pair_ = IUniswapFactory(factory).getPair(IUniswapRouter02(router).WETH(), address(DAOToken));
+            (reserve0, reserve1, ) = IUniswapPair(pair_).getReserves();
+            //计算本次购买数量
+            amountOut = IUniswapRouter02(router).getAmountOut(swapBuyDao[coinAddress], resere0, revserve1);
             autoSwapEthToTokens(address(DAOToken), swapBuyDao[coinAddress], address(this));
         } else {
             pair_ = IUniswapFactory(factory).getPair(tokenB, address(DAOToken));
+            (reserve0, reserve1, ) = IUniswapPair(pair_).getReserves();
+            //计算本次购买数量
+            amountOut = IUniswapRouter02(router).getAmountOut(swapBuyDao[coinAddress], resere0, revserve1);
             autoSwapTokens(tokenB, address(DAOToken), swapBuyDao[coinAddress], address(this));
         }
 
