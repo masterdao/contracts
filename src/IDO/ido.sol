@@ -693,10 +693,6 @@ contract idoCoinContract is Ownable {
         address pair_;
         address tokenB = applyCoinAddress[idoCoin[coinAddress].idoCoinHead.collectType];
         factory = IUniswapRouter02(router).factory();
-        //获取储量
-        (reserve0, reserve1, ) = IUniswapPair(pair_).getReserves();
-        //计算本次购买数量
-        amountOut = IUniswapRouter02(router).getAmountOut(swapBuyDao[coinAddress], resere0, revserve1);
         //ETH
         if (idoCoin[coinAddress].idoCoinHead.collectType == 1) {
             pair_ = IUniswapFactory(factory).getPair(IUniswapRouter02(router).WETH(), address(DAOToken));
