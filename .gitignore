@@ -11,3 +11,4 @@ cmd.sh
 *.rar
 deployments
 *.log
+.idea
