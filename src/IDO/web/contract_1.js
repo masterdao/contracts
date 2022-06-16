@@ -14,10 +14,10 @@ if (artifact) {
         ido: artifact.idoCoinContract.address
     });
     if (artifact.idovoteContract) {
-        IDOVOTECONTRACT = artifact.idovoteContract
+        IDOVOTECONTRACT = artifact.idovoteContract.address
     }
     if (artifact.idoCoinContract) {
-        IDOCONTRACT = artifact.idoCoinContract
+        IDOCONTRACT = artifact.idoCoinContract.address
     }
 }
 
