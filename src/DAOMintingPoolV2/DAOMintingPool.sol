@@ -568,7 +568,7 @@ contract DAOMintingPool is Ownable {
 
         //检查是否到期，如果没有到期，只允许支取利息，到期后，可以取本息
         if (
-            miner[msg.sender][lpToken][poolTypeId].timestamps.add(mintingPoolTypeList[poolTypeId].poolLength) >=
+            miner[msg.sender][lpToken][poolTypeId].timestamps.add(mintingPoolTypeList[poolTypeId].poolLength) <=
             block.timestamp
         ) {
             miner[msg.sender][lpToken][poolTypeId].amount = (miner[msg.sender][lpToken][poolTypeId].amount).sub(amount);
