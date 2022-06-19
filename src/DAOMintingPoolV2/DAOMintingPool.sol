@@ -295,6 +295,7 @@ contract DAOMintingPool is Ownable {
         uint256 poolTypeId
     ) public payable onlyMonetaryPolicy returns (bool) {
         require(lpToken != address(0));
+        require(poolTypeId >= 0);
         require(mintingPool[lpToken][poolTypeId].lpToken == address(0));
 
         mintingPoolInfo memory newmintingPoolInfo = mintingPoolInfo({
