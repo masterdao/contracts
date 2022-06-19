@@ -385,7 +385,7 @@ contract idoCoinContract is Ownable {
      */
     function createIeoCoin(idoCoinInfoHead memory idoCoinHead) public payable returns (address) {
         require(idoCoinHead.coinAddress != address(0));
-        require(idoCoinHead.startTime >= block.timestamp,"strattime must be greater than the current time.");
+        require(idoCoinHead.startTime >= block.timestamp, "strattime must be greater than the current time.");
         require(idoCoinHead.idoAmount > 0);
         //新获取一个地址
         address coinAddress = getAddress(IERC20(idoCoinHead.coinAddress).symbol());
@@ -397,7 +397,7 @@ contract idoCoinContract is Ownable {
             timestamp: block.timestamp,
             coinAddress: idoCoinHead.coinAddress,
             idoAmountTotal: (idoCoin[coinAddress].idoAmountTotal).add(idoCoinHead.idoAmount),
-            registerAmount: msg.value,
+            registerAmount: registerAmount,
             collectAmount: 0,
             withdrawAmount: 0,
             allCollectAmount: 0,
