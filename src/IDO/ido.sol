@@ -385,7 +385,7 @@ contract idoCoinContract is Ownable {
      */
     function createIeoCoin(idoCoinInfoHead memory idoCoinHead) public payable returns (address) {
         require(idoCoinHead.coinAddress != address(0));
-
+        require(idoCoinHead.startTime >= block.timestamp,"strattime must be greater than the current time.");
         require(idoCoinHead.idoAmount > 0);
         //新获取一个地址
         address coinAddress = getAddress(IERC20(idoCoinHead.coinAddress).symbol());
@@ -614,7 +614,8 @@ contract idoCoinContract is Ownable {
             idoCoin[coinAddress].ipoCollectAmount = idoCoin[coinAddress].ipoCollectAmount.sub(takeBalance);
             //address payable sender = address(uint160(msg.sender));
             if (idoCoin[coinAddress].idoCoinHead.collectType == 1) {
-                address(uint160(msg.sender)).transfer(takeBalance);
+                address payable myaddr = address(uint160(msg.sender));
+                myaddr.transfer(takeBalance);
             } else {
                 IERC20(APPLYCOIN).safeTransfer(msg.sender, takeBalance);
             }
@@ -698,13 +699,13 @@ contract idoCoinContract is Ownable {
             pair_ = IUniswapFactory(factory).getPair(IUniswapRouter02(router).WETH(), address(DAOToken));
             (reserve0, reserve1, ) = IUniswapPair(pair_).getReserves();
             //计算本次购买数量
-            amountOut = IUniswapRouter02(router).getAmountOut(swapBuyDao[coinAddress], resere0, revserve1);
+            amountOut = IUniswapRouter02(router).getAmountOut(swapBuyDao[coinAddress], reserve0, reserve1);
             autoSwapEthToTokens(address(DAOToken), swapBuyDao[coinAddress], address(this));
         } else {
             pair_ = IUniswapFactory(factory).getPair(tokenB, address(DAOToken));
             (reserve0, reserve1, ) = IUniswapPair(pair_).getReserves();
             //计算本次购买数量
-            amountOut = IUniswapRouter02(router).getAmountOut(swapBuyDao[coinAddress], resere0, revserve1);
+            amountOut = IUniswapRouter02(router).getAmountOut(swapBuyDao[coinAddress], reserve0, reserve1);
             autoSwapTokens(tokenB, address(DAOToken), swapBuyDao[coinAddress], address(this));
         }
 
