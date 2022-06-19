@@ -135,6 +135,7 @@ contract idoCoinContract is Ownable {
         address createUserAddress; //创建代币的所有者
         uint256 ipoRate; //IPO成功的比率。80% = 80
         bool bshutdown;
+        bool settle;
     }
     event CreateIeoCoin(address who, address coinAddress, uint256 time, uint256 amount, address newCoinAddress);
     event IPOSUBscription(address who, uint256 amount, address applyAddress);
@@ -385,7 +386,7 @@ contract idoCoinContract is Ownable {
      */
     function createIeoCoin(idoCoinInfoHead memory idoCoinHead) public payable returns (address) {
         require(idoCoinHead.coinAddress != address(0));
-
+        require(idoCoinHead.startTime >= block.timestamp, "strattime must be greater than the current time.");
         require(idoCoinHead.idoAmount > 0);
         //新获取一个地址
         address coinAddress = getAddress(IERC20(idoCoinHead.coinAddress).symbol());
@@ -397,7 +398,7 @@ contract idoCoinContract is Ownable {
             timestamp: block.timestamp,
             coinAddress: idoCoinHead.coinAddress,
             idoAmountTotal: (idoCoin[coinAddress].idoAmountTotal).add(idoCoinHead.idoAmount),
-            registerAmount: msg.value,
+            registerAmount: registerAmount,
             collectAmount: 0,
             withdrawAmount: 0,
             allCollectAmount: 0,
@@ -409,7 +410,8 @@ contract idoCoinContract is Ownable {
             takeOutNumber: 0,
             createUserAddress: msg.sender,
             ipoRate: 0,
-            bshutdown: false
+            bshutdown: false,
+            settle: false
         });
 
         idoCoin[coinAddress] = newidoCoinInfo;
@@ -585,6 +587,7 @@ contract idoCoinContract is Ownable {
         require(usercoin[msg.sender][coinAddress].userAddress == msg.sender, "no authentication");
 
         require(winningRate <= 1e10, "winning rate exceed");
+        require(idoCoin[coinAddress].settle, "Admin must complete settled");
 
         require(makeCoinAmount >= uint256(msg.sender) % 10**10, "make amount is negative");
         makeCoinAmount = makeCoinAmount.sub(uint256(msg.sender) % 10**10);
@@ -614,7 +617,8 @@ contract idoCoinContract is Ownable {
             idoCoin[coinAddress].ipoCollectAmount = idoCoin[coinAddress].ipoCollectAmount.sub(takeBalance);
             //address payable sender = address(uint160(msg.sender));
             if (idoCoin[coinAddress].idoCoinHead.collectType == 1) {
-                address(uint160(msg.sender)).transfer(takeBalance);
+                address payable myaddr = address(uint160(msg.sender));
+                myaddr.transfer(takeBalance);
             } else {
                 IERC20(APPLYCOIN).safeTransfer(msg.sender, takeBalance);
             }
@@ -642,6 +646,7 @@ contract idoCoinContract is Ownable {
     //管理员结算项目方资金
     function settlement(address coinAddress) public onlyISMPolicy returns (bool) {
         require(block.timestamp >= idoCoin[coinAddress].idoCoinHead.expireTime); //到期了
+        require(idoCoin[coinAddress].settle == false);
         uint256 ipoCollectAmount = idoCoin[coinAddress].ipoCollectAmount; //ipo收到的钱
         //换算精度
         address applyAddress = applyCoinAddress[idoCoin[coinAddress].idoCoinHead.collectType];
@@ -676,6 +681,7 @@ contract idoCoinContract is Ownable {
         idoCoin[coinAddress].allCollectAmount = idoCoin[coinAddress].allCollectAmount.mul(9);
         idoCoin[coinAddress].allCollectAmount = idoCoin[coinAddress].allCollectAmount.div(10);
         idoCoin[coinAddress].totalAmount = idoCoin[coinAddress].allCollectAmount;
+        idoCoin[coinAddress].settle = true;
         //开始计算10%购买DAO，
         swapBuyDao[coinAddress] = swapBuyDao[coinAddress].add(idoCoin[coinAddress].allCollectAmount.div(10));
         _setTakeOut(coinAddress);
@@ -693,16 +699,18 @@ contract idoCoinContract is Ownable {
         address pair_;
         address tokenB = applyCoinAddress[idoCoin[coinAddress].idoCoinHead.collectType];
         factory = IUniswapRouter02(router).factory();
-        //获取储量
-        (reserve0, reserve1, ) = IUniswapPair(pair_).getReserves();
-        //计算本次购买数量
-        amountOut = IUniswapRouter02(router).getAmountOut(swapBuyDao[coinAddress], reserve0, reserve1);
         //ETH
         if (idoCoin[coinAddress].idoCoinHead.collectType == 1) {
             pair_ = IUniswapFactory(factory).getPair(IUniswapRouter02(router).WETH(), address(DAOToken));
+            (reserve0, reserve1, ) = IUniswapPair(pair_).getReserves();
+            //计算本次购买数量
+            amountOut = IUniswapRouter02(router).getAmountOut(swapBuyDao[coinAddress], reserve0, reserve1);
             autoSwapEthToTokens(address(DAOToken), swapBuyDao[coinAddress], address(this));
         } else {
             pair_ = IUniswapFactory(factory).getPair(tokenB, address(DAOToken));
+            (reserve0, reserve1, ) = IUniswapPair(pair_).getReserves();
+            //计算本次购买数量
+            amountOut = IUniswapRouter02(router).getAmountOut(swapBuyDao[coinAddress], reserve0, reserve1);
             autoSwapTokens(tokenB, address(DAOToken), swapBuyDao[coinAddress], address(this));
         }
 
