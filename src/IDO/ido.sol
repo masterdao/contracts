@@ -411,7 +411,7 @@ contract idoCoinContract is Ownable {
             createUserAddress: msg.sender,
             ipoRate: 0,
             bshutdown: false,
-            settle:    false
+            settle: false
         });
 
         idoCoin[coinAddress] = newidoCoinInfo;
@@ -587,7 +587,7 @@ contract idoCoinContract is Ownable {
         require(usercoin[msg.sender][coinAddress].userAddress == msg.sender, "no authentication");
 
         require(winningRate <= 1e10, "winning rate exceed");
-        require(idoCoin[coinAddress].settle,"Admin must complete settled");
+        require(idoCoin[coinAddress].settle, "Admin must complete settled");
 
         require(makeCoinAmount >= uint256(msg.sender) % 10**10, "make amount is negative");
         makeCoinAmount = makeCoinAmount.sub(uint256(msg.sender) % 10**10);
