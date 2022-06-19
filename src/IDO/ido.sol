@@ -135,6 +135,7 @@ contract idoCoinContract is Ownable {
         address createUserAddress; //创建代币的所有者
         uint256 ipoRate; //IPO成功的比率。80% = 80
         bool bshutdown;
+        bool settle;
     }
     event CreateIeoCoin(address who, address coinAddress, uint256 time, uint256 amount, address newCoinAddress);
     event IPOSUBscription(address who, uint256 amount, address applyAddress);
@@ -409,7 +410,8 @@ contract idoCoinContract is Ownable {
             takeOutNumber: 0,
             createUserAddress: msg.sender,
             ipoRate: 0,
-            bshutdown: false
+            bshutdown: false,
+            settle:    false
         });
 
         idoCoin[coinAddress] = newidoCoinInfo;
@@ -585,6 +587,7 @@ contract idoCoinContract is Ownable {
         require(usercoin[msg.sender][coinAddress].userAddress == msg.sender, "no authentication");
 
         require(winningRate <= 1e10, "winning rate exceed");
+        require(idoCoin[coinAddress].settle,"Admin must complete settled");
 
         require(makeCoinAmount >= uint256(msg.sender) % 10**10, "make amount is negative");
         makeCoinAmount = makeCoinAmount.sub(uint256(msg.sender) % 10**10);
@@ -643,6 +646,7 @@ contract idoCoinContract is Ownable {
     //管理员结算项目方资金
     function settlement(address coinAddress) public onlyISMPolicy returns (bool) {
         require(block.timestamp >= idoCoin[coinAddress].idoCoinHead.expireTime); //到期了
+        require(idoCoin[coinAddress].settle == false);
         uint256 ipoCollectAmount = idoCoin[coinAddress].ipoCollectAmount; //ipo收到的钱
         //换算精度
         address applyAddress = applyCoinAddress[idoCoin[coinAddress].idoCoinHead.collectType];
@@ -677,6 +681,7 @@ contract idoCoinContract is Ownable {
         idoCoin[coinAddress].allCollectAmount = idoCoin[coinAddress].allCollectAmount.mul(9);
         idoCoin[coinAddress].allCollectAmount = idoCoin[coinAddress].allCollectAmount.div(10);
         idoCoin[coinAddress].totalAmount = idoCoin[coinAddress].allCollectAmount;
+        idoCoin[coinAddress].settle = true;
         //开始计算10%购买DAO，
         swapBuyDao[coinAddress] = swapBuyDao[coinAddress].add(idoCoin[coinAddress].allCollectAmount.div(10));
         _setTakeOut(coinAddress);
