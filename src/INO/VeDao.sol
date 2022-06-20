@@ -1,66 +1,86 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.11;
 
+import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/utils/Counters.sol";
 
-contract Vedao is ERC721Enumerable, Ownable {
-    bool public saleIsActive = false;
+contract Vedao is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable {
+    string private _baseURIextended;
 
-    uint256 public constant MINT_PRICE = 0.1 ether;
-    uint256 public constant MAX_PUBLIC_MINT = 5;
-    uint256 public constant MAX_SUPPLY = 10000;
-
-    mapping(address => bool) public allowList;
-
-    constructor() ERC721("Vedao", "Dao") {}
-
-    function mintAllowList() external payable{
-        uint256 ts = totalSupply();
-        require(allowList[msg.sender], "Not in whitelist");
-        require(ts + 1 <= MAX_SUPPLY, "Purchase would exceed max tokens");
-        // start minting
-        allowList[msg.sender] = false;
-        uint256 currentSupply = totalSupply();
-        _safeMint(msg.sender, currentSupply + 1);
+    struct User {
+        address entry;
+        string uri;
+        bool status;
     }
 
-    function mint(uint256 numberOfTokens) external payable {
-        uint256 ts = totalSupply();
-        require(numberOfTokens <= MAX_PUBLIC_MINT, "Exceeded max token purchase");
-        require(saleIsActive, "Sale must be active to mint tokens");
-        require(msg.value == numberOfTokens * MINT_PRICE, "Ether send below price");
-        require(ts + numberOfTokens <= MAX_SUPPLY, "Purchase would exceed max tokens");
-        // start minting
-        uint256 currentSupply = totalSupply();
-        for (uint256 i = 1; i <= numberOfTokens; i++) {
-            _safeMint(msg.sender, currentSupply + i);
-        }
+    mapping(address => User) public allowList;
+
+    constructor() ERC721("Vedao104", "Dao104") {}
+
+    function _beforeTokenTransfer(
+        address from,
+        address to,
+        uint256 tokenId
+    ) internal override(ERC721, ERC721Enumerable) {
+        super._beforeTokenTransfer(from, to, tokenId);
     }
 
-    function addAllowList(address _newEntry) external onlyOwner {
-        allowList[_newEntry] = true;
+    function supportsInterface(bytes4 interfaceId)
+        public
+        view
+        virtual
+        override(ERC721, ERC721Enumerable)
+        returns (bool)
+    {
+        return super.supportsInterface(interfaceId);
+    }
+
+    function _burn(uint256 tokenId) internal override(ERC721, ERC721URIStorage) {
+        super._burn(tokenId);
+    }
+
+    function setBaseURI(string memory baseURI_) external onlyOwner {
+        _baseURIextended = baseURI_;
+    }
+
+    function _baseURI() internal view virtual override returns (string memory) {
+        return _baseURIextended;
+    }
+
+    function setTokenURI(uint256 tokenId, string memory uri) public onlyOwner {
+        _setTokenURI(tokenId, uri);
+    }
+
+    function mintAllowList() external payable {
+        require(allowList[msg.sender].entry != address(0), "Not in whitelist");
+        require(allowList[msg.sender].status == true, "Not in whitelist");
+        // start minting
+        allowList[msg.sender].status = false;
+        uint256 nextSupply = totalSupply() + 1;
+        _safeMint(msg.sender, nextSupply);
+        _setTokenURI(nextSupply, allowList[msg.sender].uri);
+    }
+
+    function addAllowList(address _newEntry, string memory uri) external onlyOwner {
+        allowList[_newEntry].entry = _newEntry;
+        allowList[_newEntry].uri = uri;
+        allowList[_newEntry].status = true;
     }
 
     function removeAllowList(address _newEntry) external onlyOwner {
-        require(allowList[_newEntry], "Previous not in whitelist");
-        allowList[_newEntry] = false;
+        require(allowList[_newEntry].entry != address(0), "Not in whitelist");
+        require(allowList[_newEntry].status, "Previous not in whitelist");
+        allowList[_newEntry].status = false;
     }
 
-    function withdraw() public onlyOwner {
-        uint256 balance = address(this).balance;
-        payable(msg.sender).transfer(balance);
+    function getAllowList(address _newEntry) public view returns (User memory) {
+        return allowList[_newEntry];
     }
 
-    function reserve(uint256 n) public onlyOwner {
-        uint256 supply = totalSupply();
-        uint256 i;
-        for (i = 0; i < n; i++) {
-            _safeMint(msg.sender, supply + i);
-        }
-    }
-
-    function setSaleState(bool newState) public onlyOwner {
-        saleIsActive = newState;
+    function tokenURI(uint256 tokenId) public view override(ERC721, ERC721URIStorage) returns (string memory) {
+        return super.tokenURI(tokenId);
     }
 }
