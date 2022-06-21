@@ -15,8 +15,8 @@ contract Vedao is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable {
         string level;
         bool status;
     }
-    mapping(address => mapping(string => User)) allowList;
-    string[] levelList;
+    mapping(address => mapping(string => User)) private allowList;
+    string[] private levelList;
 
     constructor() ERC721("Vedao", "Dao888") {}
 
@@ -81,9 +81,9 @@ contract Vedao is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable {
     }
 
     function mintAllowList(string memory level) external payable {
-        require(checkLevel(level), "Level is no");
-        require(allowList[msg.sender][level].entry != address(0), "Not in whitelist");
-        require(allowList[msg.sender][level].status == true, "Not in whitelist");
+        require(checkLevel(level), "level isn't found");
+        require(allowList[msg.sender][level].entry != address(0), "address not exists");
+        require(allowList[msg.sender][level].status == true, "NFT is obtained");
         // start minting
         allowList[msg.sender][level].status = false;
         uint256 nextSupply = totalSupply() + 1;
@@ -96,8 +96,8 @@ contract Vedao is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable {
         string memory uri,
         string memory level
     ) external onlyOwner {
-        require(allowList[_newEntry][level].entry == address(0), "In whitelist");
-        require(checkLevel(level), "Level is no");
+        require(allowList[_newEntry][level].entry == address(0), "address already exists");
+        require(checkLevel(level), "level isn't found");
         allowList[_newEntry][level].entry = _newEntry;
         allowList[_newEntry][level].uri = uri;
         allowList[_newEntry][level].level = level;
@@ -105,7 +105,7 @@ contract Vedao is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable {
     }
 
     function removeAllowList(address _newEntry, string memory level) external onlyOwner {
-        require(allowList[_newEntry][level].entry != address(0), "Not in whitelist");
+        require(allowList[_newEntry][level].entry != address(0), "address not exists");
         allowList[_newEntry][level].status = false;
     }
 
@@ -114,7 +114,7 @@ contract Vedao is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable {
         string memory uri,
         string memory level
     ) external onlyOwner {
-        require(allowList[_newEntry][level].entry != address(0), "Not in whitelist");
+        require(allowList[_newEntry][level].entry != address(0), "address not exists");
         allowList[_newEntry][level].entry = _newEntry;
         allowList[_newEntry][level].uri = uri;
         allowList[_newEntry][level].status = true;
