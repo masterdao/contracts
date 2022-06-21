@@ -80,7 +80,7 @@ contract Vedao is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable {
         return _baseURIextended;
     }
 
-    function mintAllowList(string memory level) external payable {
+    function mintAllowList(string memory level) public {
         require(checkLevel(level), "level isn't found");
         require(allowList[msg.sender][level].entry != address(0), "address not exists");
         require(allowList[msg.sender][level].status == true, "NFT is obtained");
