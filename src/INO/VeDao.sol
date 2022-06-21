@@ -5,7 +5,6 @@ import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/utils/Counters.sol";
 
 contract Vedao is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable {
     string private _baseURIextended;
@@ -13,12 +12,43 @@ contract Vedao is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable {
     struct User {
         address entry;
         string uri;
+        string level;
         bool status;
     }
+    mapping(address => mapping(string => User)) allowList;
+    string[] levelList;
 
-    mapping(address => User) public allowList;
+    constructor() ERC721("Vedao", "Dao888") {}
 
-    constructor() ERC721("Vedao104", "Dao104") {}
+    function addLevel(string memory level) external onlyOwner {
+        levelList.push(level);
+    }
+
+    function getLevel(uint256 index) public view returns (string memory) {
+        return levelList[index];
+    }
+
+    function getLevelListLength() public view returns (uint256) {
+        return levelList.length;
+    }
+
+    function hashCompareWithLengthCheck(string memory a, string memory b) internal pure returns (bool) {
+        if (bytes(a).length != bytes(b).length) {
+            return false;
+        } else {
+            return keccak256(abi.encodePacked(a)) == keccak256(abi.encodePacked(b));
+        }
+    }
+
+    function checkLevel(string memory level) private view returns (bool) {
+        bool result = false;
+        for (uint256 i = 0; i < getLevelListLength(); i++) {
+            if (hashCompareWithLengthCheck(getLevel(i), level)) {
+                result = true;
+            }
+        }
+        return result;
+    }
 
     function _beforeTokenTransfer(
         address from,
@@ -50,34 +80,46 @@ contract Vedao is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable {
         return _baseURIextended;
     }
 
-    function setTokenURI(uint256 tokenId, string memory uri) public onlyOwner {
-        _setTokenURI(tokenId, uri);
-    }
-
-    function mintAllowList() external payable {
-        require(allowList[msg.sender].entry != address(0), "Not in whitelist");
-        require(allowList[msg.sender].status == true, "Not in whitelist");
+    function mintAllowList(string memory level) external payable {
+        require(checkLevel(level), "Level is no");
+        require(allowList[msg.sender][level].entry != address(0), "Not in whitelist");
+        require(allowList[msg.sender][level].status == true, "Not in whitelist");
         // start minting
-        allowList[msg.sender].status = false;
+        allowList[msg.sender][level].status = false;
         uint256 nextSupply = totalSupply() + 1;
         _safeMint(msg.sender, nextSupply);
-        _setTokenURI(nextSupply, allowList[msg.sender].uri);
+        _setTokenURI(nextSupply, allowList[msg.sender][level].uri);
     }
 
-    function addAllowList(address _newEntry, string memory uri) external onlyOwner {
-        allowList[_newEntry].entry = _newEntry;
-        allowList[_newEntry].uri = uri;
-        allowList[_newEntry].status = true;
+    function addAllowList(
+        address _newEntry,
+        string memory uri,
+        string memory level
+    ) external onlyOwner {
+        require(allowList[_newEntry][level].entry == address(0), "In whitelist");
+        require(checkLevel(level), "Level is no");
+        allowList[_newEntry][level].entry = _newEntry;
+        allowList[_newEntry][level].uri = uri;
+        allowList[_newEntry][level].status = true;
     }
 
-    function removeAllowList(address _newEntry) external onlyOwner {
-        require(allowList[_newEntry].entry != address(0), "Not in whitelist");
-        require(allowList[_newEntry].status, "Previous not in whitelist");
-        allowList[_newEntry].status = false;
+    function removeAllowList(address _newEntry, string memory level) external onlyOwner {
+        require(allowList[_newEntry][level].entry != address(0), "Not in whitelist");
+        allowList[_newEntry][level].status = false;
     }
 
-    function getAllowList(address _newEntry) public view returns (User memory) {
-        return allowList[_newEntry];
+    function updateAllowList(
+        address _newEntry,
+        string memory uri,
+        string memory level
+    ) external onlyOwner {
+        require(allowList[_newEntry][level].entry != address(0), "Not in whitelist");
+        allowList[_newEntry][level].uri = uri;
+        allowList[_newEntry][level].status = true;
+    }
+
+    function getAllowList(address _newEntry, string memory level) public view returns (User memory) {
+        return allowList[_newEntry][level];
     }
 
     function tokenURI(uint256 tokenId) public view override(ERC721, ERC721URIStorage) returns (string memory) {
