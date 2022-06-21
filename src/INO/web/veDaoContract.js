@@ -1,5 +1,5 @@
 let web3;
-const VeDao = "0x3E6e60B5b557CA8Ee7e9921E50D4ad50dFCe8Be2"
+const VeDao = "0xd61a6FA99f04C1A9537eF72Ef5d5b2af320B6f78"
 
 const miniDecimals = 1000000000000000000;
 const ethDecimals = 1000000000000000000;
