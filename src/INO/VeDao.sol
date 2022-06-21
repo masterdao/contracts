@@ -117,6 +117,7 @@ contract Vedao is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable {
         require(allowList[_newEntry][level].entry != address(0), "address not exists");
         allowList[_newEntry][level].entry = _newEntry;
         allowList[_newEntry][level].uri = uri;
+        allowList[_newEntry][level].level=level;
         allowList[_newEntry][level].status = true;
     }
 
