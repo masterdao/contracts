@@ -114,6 +114,7 @@ contract Vedao is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable {
         string memory level
     ) external onlyOwner {
         require(allowList[_newEntry][level].entry != address(0), "Not in whitelist");
+        allowList[_newEntry][level].entry = _newEntry;
         allowList[_newEntry][level].uri = uri;
         allowList[_newEntry][level].status = true;
     }
