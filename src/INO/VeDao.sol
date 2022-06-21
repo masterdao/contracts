@@ -100,6 +100,7 @@ contract Vedao is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable {
         require(checkLevel(level), "Level is no");
         allowList[_newEntry][level].entry = _newEntry;
         allowList[_newEntry][level].uri = uri;
+        allowList[_newEntry][level].level = level;
         allowList[_newEntry][level].status = true;
     }
 
