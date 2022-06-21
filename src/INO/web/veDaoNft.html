@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+  
+<head>
+    <!-- Meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Cryptocash is Professional Creative Template"/>
+</head>
+<script src="https://cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"
+        integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@2.7.2/dist/Chart.bundle.min.js"
+        integrity="sha256-XF29CBwU1MWLaGEnsELogU6Y6rcc5nCkhhx89nFMIDQ=" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.min.js"
+        integrity="sha256-ecWZ3XYM7AwWIaGvSdmipJ2l1F4bN9RXW6zgpeAiZYI=" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/decimal.js/9.0.0/decimal.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/buffer-from@1.1.1/index.js"></script>
+
+
+
+<script src="erc20Abi_1.js"></script>
+<script src="erc721abi.js?url="+Randmo()></script>
+<script src="ino.js?url2ww="+Randmo()></script>
+<script src="contract_1.js?ueupwww2rel="+Randmo()></script> 
+
+
+<body>
+    <html>
+
+    <button onclick="getstatus()">获取列表信息</button>
+    <br><br>
+
+ 
+    当前区块 block number: <span class="block-number" style="color:red">--.--</span><br><br>
+    管理员地址: <span class="owner-addr" style="color:red">--.--</span><br><br>
+    
+    <div  style="color:red; border-radius: 2%;  border: 2px solid burlywood;">
+    操作流程：<br>
+    1、添加支付币；<br>
+    2、授权ERC721给合约；<br>
+    3、新建INO（ERC721）给合约上架；<br>
+    4、用户授权ERC20（支付币）给合约；<br>
+    5、用户通过ERC20购买ERC721；<br>
+    6、创建者提取卖币资金；<br>
+    7、创建者到期提取没有卖掉的ERC721。   <br>
+    </div>  
+    <br>
+    <div  style="color:red; border-radius: 2%;  border: 2px solid burlywood;">
+         
+    <br>
+    合约DAO余额：<span class="token-balance" style="color: red;">--.--</span><br><br>
+    <button onclick="approveInoToken()">授权/授权全部币到合约</button> &nbsp;&nbsp; <span class="IEO-isApprove" style="color:red">--.--</span><br>
+    <br><br>
+    INO Token：<input type="text" id="ino-address" size="60" value="0xA83871295d20CA17ce778077a1c5F71F4e829b5a" ><br><br>
+    tokenId: <input type="text" id="ino-tokenId" value="5">
+    <button onclick="getERC721Info()">检查ERC721</button> 
+    <span class="ino-erc721" style="color: red;">--.--</span><br>
+    <br>
+     <button onclick="pushInoCoin()">新建INO</button><br><br>
+    <hr>
+     <span class="Ino-coinlist" style="color: red;">--.--</span><br>
+
+
+    </div>
+    <div  style="color:red; border-radius: 2%;  border: 2px solid burlywood;">
+        <br><br>
+        
+        <button onclick="getUserInfo()">获取我的购买信息</button><br><br>
+        <button onclick="withdraw()">提取我购买的币</button> 
+
+        <br><br>
+    </div>
+
+    <br>
+    <div  style="color:red; border-radius: 2%;  border: 2px solid burlywood;">
+    <br>管理员操作:<br>
+    支付币列表:<span class="apply-coin" style="color: red;">--.--</span><br><br>
+
+    
+     地址：<input type="text" id="coin-address" size="60"><br>
+     名称：<input type="text" id="coin-symbol" size="60" disabled='disabled'><br>
+     精度：<input type="text" id="coin-decimals" size="60" disabled='disabled'><br><br>
+     <button onclick="geterc20infoApply()">获取信息</button><br><br>
+     <button onclick="addapplyCoin()">添加币种</button> 
+     <hr>
+ 
+     <br>创建者操作：<br>
+     支付币列表:<span class="SellCoin-amount" style="color: red;">--.--</span><br><br> 
+
+     <button onclick="#">创建者提取NFT代币</button>
+     <br> 
+ 
+    </div>
+
+
+    <br>
+    <br>
+
+
+
+    </p>
+</html></body>
