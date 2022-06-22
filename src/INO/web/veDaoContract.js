@@ -1,5 +1,9 @@
 let web3;
-const VeDao = "0xd61a6FA99f04C1A9537eF72Ef5d5b2af320B6f78"
+//Rinkeby
+//const VeDao = "0xd61a6FA99f04C1A9537eF72Ef5d5b2af320B6f78"
+//BNB-TEST
+const VeDao = "0xD97c5E903819D56209Ac7eFf304F3DFE2eeb931b"
+
 
 const miniDecimals = 1000000000000000000;
 const ethDecimals = 1000000000000000000;
