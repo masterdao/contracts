@@ -139,12 +139,13 @@ contract INOERC721Contract is Ownable {
     }
 
     /**
-    新建IEO上币资料
+    新建INO上币资料
      */
     function createINOCoin(inoCoinInfo memory myInoCoinInfo, uint256[] memory ids) public payable returns (bool) {
         require(myInoCoinInfo.coinAddress != address(0));
         require(myInoCoinInfo.expireTime >= block.timestamp);
         require(myInoCoinInfo.bSell == false);
+        require(ids.length <= 50);
         address coinAddress = myInoCoinInfo.coinAddress;
         for (uint256 i = 0; i < ids.length; i++) {
             inoCoin[coinAddress][ids[i]] = myInoCoinInfo; //获取上币信息

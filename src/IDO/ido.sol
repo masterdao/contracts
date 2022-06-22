@@ -157,7 +157,7 @@ contract idoCoinContract is Ownable {
     }
     event CreateIeoCoin(address who, address coinAddress, uint256 time, uint256 amount, address newCoinAddress);
     event IPOSUBscription(address who, uint256 amount, address applyAddress);
-    event TakeOut(address who, uint256 amount, uint256 collectType);
+    event TakeOut(address who, uint256 amount, address tokenAddr);
     event Withdraw(address who, uint256 planCon, address coinAddress, uint256 amount);
     event Settleaccounts(address who, IERC20 COIN, uint256 amount, address coinAddress, uint256 takeBalance);
     event LogISMPolicyUpdated(address ISMPolicy);
@@ -740,30 +740,30 @@ contract idoCoinContract is Ownable {
         IERC20(DAOToken).safeTransferFrom(address(this), msg.sender, statAddrAmount);
         statAddrAmount = statAddrAmount.sub(_statAddrAmount);
     }
-
+    //产品决定去掉这个功能  
     //紧急停止IPO扣取注册费，返还币
-    function shutdownIpo(address coinAddress) public onlyISMPolicy returns (bool) {
-        require(coinAddress != address(0));
-        require(idoCoin[coinAddress].bshutdown == false);
-        require(block.timestamp > idoCoin[coinAddress].timestamp);
-        require(block.timestamp >= idoCoin[coinAddress].idoCoinHead.startTime); //开始之前
-        uint256 idoAmount = idoCoin[coinAddress].idoCoinHead.idoAmount;
-        if (idoAmount > 0) {
-            COIN = IERC20(idoCoin[coinAddress].idoCoinHead.coinAddress);
-            COIN.safeTransfer(idoCoin[coinAddress].createUserAddress, idoAmount);
-            idoCoin[coinAddress].idoCoinHead.idoAmount = 0;
-            idoCoin[coinAddress].idoAmountTotal = 0;
-        }
+    // function shutdownIpo(address coinAddress) public onlyISMPolicy returns (bool) {
+    //     require(coinAddress != address(0));
+    //     require(idoCoin[coinAddress].bshutdown == false);
+    //     require(block.timestamp > idoCoin[coinAddress].timestamp);
+    //     require(block.timestamp >= idoCoin[coinAddress].idoCoinHead.startTime); //开始之前
+    //     uint256 idoAmount = idoCoin[coinAddress].idoCoinHead.idoAmount;
+    //     if (idoAmount > 0) {
+    //         COIN = IERC20(idoCoin[coinAddress].idoCoinHead.coinAddress);
+    //         COIN.safeTransfer(idoCoin[coinAddress].createUserAddress, idoAmount);
+    //         idoCoin[coinAddress].idoCoinHead.idoAmount = 0;
+    //         idoCoin[coinAddress].idoAmountTotal = 0;
+    //     }
 
-        //deductAmount
-        //退注册费用 registerAmount - deductAmount(扣掉的)
-        if (registerAmount.sub(deductAmount) > 0) {
-            DAOToken.safeTransfer(idoCoin[coinAddress].createUserAddress, registerAmount.sub(deductAmount));
-        }
-        idoCoin[coinAddress].bshutdown = true; //紧急关停
-        emit ShutdownIpo(idoCoin[coinAddress].createUserAddress, idoAmount);
-        return true;
-    }
+    //     //deductAmount
+    //     //退注册费用 registerAmount - deductAmount(扣掉的)
+    //     if (registerAmount.sub(deductAmount) > 0) {
+    //         DAOToken.safeTransfer(idoCoin[coinAddress].createUserAddress, registerAmount.sub(deductAmount));
+    //     }
+    //     idoCoin[coinAddress].bshutdown = true; //紧急关停
+    //     emit ShutdownIpo(idoCoin[coinAddress].createUserAddress, idoAmount);
+    //     return true;
+    // }
 
     function _setTakeOut(address coinAddress) private returns (bool) {
         require(coinAddress != address(0));
@@ -802,32 +802,43 @@ contract idoCoinContract is Ownable {
     function takeOut(address coinAddress) public returns (bool) {
         require(block.timestamp >= idoCoin[coinAddress].idoCoinHead.expireTime, "ipo not end"); //到期了
         require(idoCoin[coinAddress].createUserAddress == msg.sender, "unauthenticated user");
-        require(idoCoin[coinAddress].withdrawAmount > 0, "zero withdraw balance");
-        require(idoCoin[coinAddress].bTakeOut, "no settled");
-        idoCoin[coinAddress].bTakeOut = false;
-        uint256 withdrawAmount = idoCoin[coinAddress].withdrawAmount;
+        //如果投票没有通过，扣取一部分DAO，
+        if(idovoteContract.getVoteStatus(coinAddress) ==  false) {
+             //退注册费用 registerAmount - deductAmount(扣掉的)
+            if (registerAmount.sub(deductAmount) > 0) {
+                DAOToken.safeTransfer(idoCoin[coinAddress].createUserAddress, registerAmount.sub(deductAmount));
+                emit TakeOut(msg.sender, registerAmount.sub(deductAmount), address(DAOToken));
+            }    
+        }else{
+            require(idoCoin[coinAddress].withdrawAmount > 0, "zero withdraw balance");
+            require(idoCoin[coinAddress].bTakeOut, "no settled");
+            idoCoin[coinAddress].bTakeOut = false;
+            uint256 withdrawAmount = idoCoin[coinAddress].withdrawAmount;
 
-        address applyAddress = applyCoinAddress[idoCoin[coinAddress].idoCoinHead.collectType];
-        address APPLYCOIN = applyCoin[applyAddress].contractAddress;
-        //将项目方要去的钱送出去
-        if (idoCoin[coinAddress].idoCoinHead.collectType == 1) {
-            address payable createUserAddress = address(uint160(idoCoin[coinAddress].createUserAddress));
-            createUserAddress.transfer(withdrawAmount);
-        } else {
-            IERC20(APPLYCOIN).safeTransfer(msg.sender, withdrawAmount);
+            address applyAddress = applyCoinAddress[idoCoin[coinAddress].idoCoinHead.collectType];
+            address APPLYCOIN = applyCoin[applyAddress].contractAddress;
+            //将项目方要去的钱送出去
+            if (idoCoin[coinAddress].idoCoinHead.collectType == 1) {
+                address payable createUserAddress = address(uint160(idoCoin[coinAddress].createUserAddress));
+                createUserAddress.transfer(withdrawAmount);
+            } else {
+                IERC20(APPLYCOIN).safeTransfer(msg.sender, withdrawAmount);
+            }
+            uint256 amountBalance = idoCoin[coinAddress].idoCoinHead.idoAmount.sub(idoCoin[coinAddress].ipoAmount);
+            idoCoin[coinAddress].idoCoinHead.idoAmount = idoCoin[coinAddress].ipoAmount;
+            if (amountBalance > 0) {
+                COIN = IERC20(idoCoin[coinAddress].idoCoinHead.coinAddress);
+                COIN.safeTransfer(msg.sender, amountBalance);
+            }
+            if (idoCoin[coinAddress].registerAmount > 0) {
+                DAOToken.safeTransfer(msg.sender, idoCoin[coinAddress].registerAmount); //返还注册费
+                idoCoin[coinAddress].registerAmount = 0;
+            }
+            idoCoin[coinAddress].withdrawAmount = 0;
+            emit TakeOut(msg.sender, withdrawAmount, applyAddress);
         }
-        uint256 amountBalance = idoCoin[coinAddress].idoCoinHead.idoAmount.sub(idoCoin[coinAddress].ipoAmount);
-        idoCoin[coinAddress].idoCoinHead.idoAmount = idoCoin[coinAddress].ipoAmount;
-        if (amountBalance > 0) {
-            COIN = IERC20(idoCoin[coinAddress].idoCoinHead.coinAddress);
-            COIN.safeTransfer(msg.sender, amountBalance);
-        }
-        if (idoCoin[coinAddress].registerAmount > 0) {
-            DAOToken.safeTransfer(msg.sender, idoCoin[coinAddress].registerAmount); //返还注册费
-            idoCoin[coinAddress].registerAmount = 0;
-        }
-        idoCoin[coinAddress].withdrawAmount = 0;
-        emit TakeOut(msg.sender, withdrawAmount, idoCoin[coinAddress].idoCoinHead.collectType);
+
+        
         return true;
     }
 }
