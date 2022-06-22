@@ -270,7 +270,7 @@ contract DAOMintingPool is Ownable {
         return listmintingPool[index];
     }
 
-    function checklistmintingPool(uint256 poolTypeId) public view retunrns(bool) {
+    function checklistmintingPool(uint256 poolTypeId) public view returns (bool) {
         require(poolTypeId >= 0);
         bool bcheck = false;
         if (listmintingPool.length == 0) {
