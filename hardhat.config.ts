@@ -14,7 +14,7 @@ import yaml from 'yaml';
 import cfg from './deployment.config';
 
 // skip paths
-const excludes = [/\/INO\//, /idovote\scopy/];
+const excludes = [/\/INO\-ERC\//, /idovote\scopy/];
 
 // 忽略 INO, 和 idovote copy.sol
 subtask(TASK_COMPILE_SOLIDITY_GET_SOURCE_PATHS).setAction(
@@ -28,7 +28,7 @@ const config: HardhatUserConfig = {
   solidity: {
     compilers: [
       {
-        version: '0.8.9',
+        version: '0.8.11',
         settings: {
           optimizer: {
             enabled: true,

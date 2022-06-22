@@ -15,7 +15,7 @@ contract Vedao is ERC721Enumerable, Ownable {
 
     constructor() ERC721("Vedao", "Dao") {}
 
-    function mintAllowList() external payable{
+    function mintAllowList() external payable {
         uint256 ts = totalSupply();
         require(allowList[msg.sender], "Not in whitelist");
         require(ts + 1 <= MAX_SUPPLY, "Purchase would exceed max tokens");
