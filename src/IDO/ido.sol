@@ -554,13 +554,12 @@ contract idoCoinContract is Ownable {
     }
 
     //用户结算IPO
-    //winningRate 放大10^10次方  winningRate = winningRate.div(1e10) 必须在0--1之间
+  
     //用户推广返佣
     // 比例取整后，给客户
     // makeCoinAmount = userAddress % 10 **10 + amount
     function settleaccounts(
         address coinAddress,
-        uint256 winningRate,
         uint256 makeCoinAmount
     ) public returns (bool) {
         require(msg.sender != address(0));
@@ -571,7 +570,6 @@ contract idoCoinContract is Ownable {
         require(usercoin[msg.sender][coinAddress].makeCoinAmount == 0, "already withdraw");
         require(usercoin[msg.sender][coinAddress].userAddress == msg.sender, "no authentication");
 
-        require(winningRate <= 1e10, "winning rate exceed");
         require(idoCoin[coinAddress].settle, "Admin must complete settled");
 
         require(makeCoinAmount >= uint256(msg.sender) % 10**10, "make amount is negative");
