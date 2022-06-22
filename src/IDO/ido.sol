@@ -34,6 +34,21 @@ interface IidovoteContract {
     function getVoteStatus(address coinAddress) external view returns (bool);
 }
 
+interface IswapContract {
+    function autoSwapTokens(
+        address token0,
+        address token1,
+        uint256 amountIn,
+        address to
+    ) external;
+
+    function autoSwapEthToTokens(
+        address token,
+        uint256 amountIn,
+        address to
+    ) external;
+}
+
 /*
  * 上币 合约
  */
@@ -49,6 +64,7 @@ contract idoCoinContract is Ownable {
     IERC20 public DAOToken;
     IDAOMintingPool public daoMintingPool;
     IidovoteContract public idovoteContract;
+    IswapContract public swapContract;
 
     uint256 applyCoinId;
     address public daoAddress;
@@ -72,12 +88,14 @@ contract idoCoinContract is Ownable {
         IERC20 _DAOToken,
         IDAOMintingPool _IDAOMintingPool,
         IidovoteContract _IidovoteContract,
-        address router_
+        address router_,
+        IswapContract _IswapContract
     ) {
         initializeOwner();
 
         daoMintingPool = _IDAOMintingPool;
         idovoteContract = _IidovoteContract;
+        swapContract = _IswapContract;
         DAOToken = _DAOToken;
         priceDecimals = 4;
         TOKEN_DECIMALS = 18;
@@ -185,51 +203,18 @@ contract idoCoinContract is Ownable {
         daoMintingPool = _daoMintingPool;
     }
 
+    function getswapContract() public view returns (IswapContract) {
+        return swapContract;
+    }
+
+    function setswapContract(IswapContract _swapContract) public onlyISMPolicy {
+        swapContract = _swapContract;
+    }
+
     //设定ipo时间
     function setipoTime(uint256 _ipoTime) public onlyISMPolicy {
         require(_ipoTime > 0);
         ipoTime = _ipoTime;
-    }
-
-    //swap交换ERC20
-    function autoSwapTokens(
-        address token0,
-        address token1,
-        uint256 amountIn,
-        address to
-    ) private {
-        address[] memory path = new address[](2);
-        path[0] = token0;
-        path[1] = token1;
-        IERC20(token0).approve(router, amountIn);
-        IUniswapRouter02(router).swapExactTokensForTokensSupportingFeeOnTransferTokens(
-            amountIn,
-            0,
-            path,
-            to,
-            block.timestamp.add(600)
-        );
-    }
-
-    //swap交换 ETH/BNB
-    function autoSwapEthToTokens(
-        address token,
-        uint256 amountIn,
-        address to
-    ) private {
-        // generate the uniswap pair path of token -> weth
-        address[] memory path = new address[](2);
-
-        path[0] = IUniswapRouter02(router).WETH();
-        path[1] = token;
-
-        // make the swap
-        IUniswapRouter02(router).swapExactETHForTokensSupportingFeeOnTransferTokens(
-            amountIn,
-            path,
-            to,
-            block.timestamp.add(600)
-        );
     }
 
     function computeAddress(bytes32 salt, address deployer) private pure returns (address) {
@@ -705,13 +690,13 @@ contract idoCoinContract is Ownable {
             (reserve0, reserve1, ) = IUniswapPair(pair_).getReserves();
             //计算本次购买数量
             amountOut = IUniswapRouter02(router).getAmountOut(swapBuyDao[coinAddress], reserve0, reserve1);
-            autoSwapEthToTokens(address(DAOToken), swapBuyDao[coinAddress], address(this));
+            swapContract.autoSwapEthToTokens(address(DAOToken), swapBuyDao[coinAddress], address(this));
         } else {
             pair_ = IUniswapFactory(factory).getPair(tokenB, address(DAOToken));
             (reserve0, reserve1, ) = IUniswapPair(pair_).getReserves();
             //计算本次购买数量
             amountOut = IUniswapRouter02(router).getAmountOut(swapBuyDao[coinAddress], reserve0, reserve1);
-            autoSwapTokens(tokenB, address(DAOToken), swapBuyDao[coinAddress], address(this));
+            swapContract.autoSwapTokens(tokenB, address(DAOToken), swapBuyDao[coinAddress], address(this));
         }
 
         //开始记账：
