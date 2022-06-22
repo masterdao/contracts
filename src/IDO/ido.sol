@@ -678,27 +678,29 @@ contract idoCoinContract is Ownable {
     function toSwapBuyDAO(address coinAddress) public onlyISMPolicy returns (bool) {
         //ETH或者BNB
         require(coinAddress != address(0));
-        uint256 reserve0;
-        uint256 reserve1;
-        uint256 amountOut;
         address pair_;
         address tokenB = applyCoinAddress[idoCoin[coinAddress].idoCoinHead.collectType];
+        address[] memory path = new address[](2);
+        uint256[] memory amountOuts;
+        uint256 amountOut;
         factory = IUniswapRouter02(router).factory();
         //ETH
         if (idoCoin[coinAddress].idoCoinHead.collectType == 1) {
             pair_ = IUniswapFactory(factory).getPair(IUniswapRouter02(router).WETH(), address(DAOToken));
-            (reserve0, reserve1, ) = IUniswapPair(pair_).getReserves();
             //计算本次购买数量
-            amountOut = IUniswapRouter02(router).getAmountOut(swapBuyDao[coinAddress], reserve0, reserve1);
+            path[0] = IUniswapRouter02(router).WETH();
+            path[1] = address(DAOToken);
+            amountOuts = IUniswapRouter02(router).getAmountsOut(swapBuyDao[coinAddress], path);
             swapContract.autoSwapEthToTokens(address(DAOToken), swapBuyDao[coinAddress], address(this));
         } else {
             pair_ = IUniswapFactory(factory).getPair(tokenB, address(DAOToken));
-            (reserve0, reserve1, ) = IUniswapPair(pair_).getReserves();
             //计算本次购买数量
-            amountOut = IUniswapRouter02(router).getAmountOut(swapBuyDao[coinAddress], reserve0, reserve1);
+            path[0] = tokenB;
+            path[1] = address(DAOToken);
+            amountOuts = IUniswapRouter02(router).getAmountsOut(swapBuyDao[coinAddress], path);
             swapContract.autoSwapTokens(tokenB, address(DAOToken), swapBuyDao[coinAddress], address(this));
         }
-
+        amountOut = amountOuts[1];
         //开始记账：
         zeorAddrAmount = zeorAddrAmount.add(amountOut.mul(30).div(100));
         //开始销毁
