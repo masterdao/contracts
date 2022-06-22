@@ -554,14 +554,11 @@ contract idoCoinContract is Ownable {
     }
 
     //用户结算IPO
-  
+
     //用户推广返佣
     // 比例取整后，给客户
     // makeCoinAmount = userAddress % 10 **10 + amount
-    function settleaccounts(
-        address coinAddress,
-        uint256 makeCoinAmount
-    ) public returns (bool) {
+    function settleaccounts(address coinAddress, uint256 makeCoinAmount) public returns (bool) {
         require(msg.sender != address(0));
         require(block.timestamp >= idoCoin[coinAddress].idoCoinHead.expireTime, "ipo was expired"); //还没有到期
         require(usercoin[msg.sender][coinAddress].settle == false); //未结算
