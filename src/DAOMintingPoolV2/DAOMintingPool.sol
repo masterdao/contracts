@@ -270,6 +270,20 @@ contract DAOMintingPool is Ownable {
         return listmintingPool[index];
     }
 
+    function checklistmintingPool(uint256 poolTypeId) public view retunrns(bool) {
+        require(poolTypeId >= 0);
+        bool bcheck = false;
+        if (listmintingPool.length == 0) {
+            return bcheck;
+        }
+        for (uint256 i = 0; i < listmintingPool.length; i++) {
+            if (listmintingPool[i].poolTypeId == poolTypeId) {
+                bcheck = true;
+            }
+        }
+        return bcheck;
+    }
+
     function getBonusToken(address lpToken) public view returns (BonusTokenInfo memory) {
         require(lpToken != address(0));
         return BonusToken[lpToken];
@@ -295,7 +309,9 @@ contract DAOMintingPool is Ownable {
         uint256 poolTypeId
     ) public payable onlyMonetaryPolicy returns (bool) {
         require(lpToken != address(0));
-        require(poolTypeId >= 0);
+
+        require(checklistmintingPool(poolTypeId) == false, "poolTypeId cannot be repeated.");
+
         require(mintingPool[lpToken][poolTypeId].lpToken == address(0));
 
         mintingPoolInfo memory newmintingPoolInfo = mintingPoolInfo({
