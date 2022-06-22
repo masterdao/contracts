@@ -810,6 +810,13 @@ contract idoCoinContract is Ownable {
                 DAOToken.safeTransfer(idoCoin[coinAddress].createUserAddress, registerAmount.sub(deductAmount));
                 emit TakeOut(msg.sender, registerAmount.sub(deductAmount), address(DAOToken));
             }
+            uint256 idoAmount = idoCoin[coinAddress].idoCoinHead.idoAmount;
+            if(idoAmount>0){
+                COIN = IERC20(idoCoin[coinAddress].idoCoinHead.coinAddress);
+                COIN.safeTransfer(msg.sender, idoAmount);
+                idoCoin[coinAddress].idoCoinHead.idoAmount = 0 ;
+                emit TakeOut(msg.sender, idoAmount, idoCoin[coinAddress].idoCoinHead.coinAddress);
+            }
         } else {
             require(idoCoin[coinAddress].withdrawAmount > 0, "zero withdraw balance");
             require(idoCoin[coinAddress].bTakeOut, "no settled");
