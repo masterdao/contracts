@@ -1,66 +1,131 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.11;
 
+import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract Vedao is ERC721Enumerable, Ownable {
-    bool public saleIsActive = false;
+contract Vedao is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable {
+    string private _baseURIextended;
 
-    uint256 public constant MINT_PRICE = 0.1 ether;
-    uint256 public constant MAX_PUBLIC_MINT = 5;
-    uint256 public constant MAX_SUPPLY = 10000;
+    struct User {
+        address entry;
+        string uri;
+        string level;
+        bool status;
+    }
+    mapping(address => mapping(string => User)) private allowList;
+    string[] private levelList;
 
-    mapping(address => bool) public allowList;
+    constructor() ERC721("Vedao", "Dao888") {}
 
-    constructor() ERC721("Vedao", "Dao") {}
-
-    function mintAllowList() external payable {
-        uint256 ts = totalSupply();
-        require(allowList[msg.sender], "Not in whitelist");
-        require(ts + 1 <= MAX_SUPPLY, "Purchase would exceed max tokens");
-        // start minting
-        allowList[msg.sender] = false;
-        uint256 currentSupply = totalSupply();
-        _safeMint(msg.sender, currentSupply + 1);
+    function addLevel(string memory level) external onlyOwner {
+        levelList.push(level);
     }
 
-    function mint(uint256 numberOfTokens) external payable {
-        uint256 ts = totalSupply();
-        require(numberOfTokens <= MAX_PUBLIC_MINT, "Exceeded max token purchase");
-        require(saleIsActive, "Sale must be active to mint tokens");
-        require(msg.value == numberOfTokens * MINT_PRICE, "Ether send below price");
-        require(ts + numberOfTokens <= MAX_SUPPLY, "Purchase would exceed max tokens");
-        // start minting
-        uint256 currentSupply = totalSupply();
-        for (uint256 i = 1; i <= numberOfTokens; i++) {
-            _safeMint(msg.sender, currentSupply + i);
+    function getLevel(uint256 index) public view returns (string memory) {
+        return levelList[index];
+    }
+
+    function getLevelListLength() public view returns (uint256) {
+        return levelList.length;
+    }
+
+    function hashCompareWithLengthCheck(string memory a, string memory b) internal pure returns (bool) {
+        if (bytes(a).length != bytes(b).length) {
+            return false;
+        } else {
+            return keccak256(abi.encodePacked(a)) == keccak256(abi.encodePacked(b));
         }
     }
 
-    function addAllowList(address _newEntry) external onlyOwner {
-        allowList[_newEntry] = true;
-    }
-
-    function removeAllowList(address _newEntry) external onlyOwner {
-        require(allowList[_newEntry], "Previous not in whitelist");
-        allowList[_newEntry] = false;
-    }
-
-    function withdraw() public onlyOwner {
-        uint256 balance = address(this).balance;
-        payable(msg.sender).transfer(balance);
-    }
-
-    function reserve(uint256 n) public onlyOwner {
-        uint256 supply = totalSupply();
-        uint256 i;
-        for (i = 0; i < n; i++) {
-            _safeMint(msg.sender, supply + i);
+    function checkLevel(string memory level) private view returns (bool) {
+        bool result = false;
+        for (uint256 i = 0; i < getLevelListLength(); i++) {
+            if (hashCompareWithLengthCheck(getLevel(i), level)) {
+                result = true;
+            }
         }
+        return result;
     }
 
-    function setSaleState(bool newState) public onlyOwner {
-        saleIsActive = newState;
+    function _beforeTokenTransfer(
+        address from,
+        address to,
+        uint256 tokenId
+    ) internal override(ERC721, ERC721Enumerable) {
+        super._beforeTokenTransfer(from, to, tokenId);
+    }
+
+    function supportsInterface(bytes4 interfaceId)
+        public
+        view
+        virtual
+        override(ERC721, ERC721Enumerable)
+        returns (bool)
+    {
+        return super.supportsInterface(interfaceId);
+    }
+
+    function _burn(uint256 tokenId) internal override(ERC721, ERC721URIStorage) {
+        super._burn(tokenId);
+    }
+
+    function setBaseURI(string memory baseURI_) external onlyOwner {
+        _baseURIextended = baseURI_;
+    }
+
+    function _baseURI() internal view virtual override returns (string memory) {
+        return _baseURIextended;
+    }
+
+    function mintAllowList(string memory level) public {
+        require(checkLevel(level), "level isn't found");
+        require(allowList[msg.sender][level].entry != address(0), "address not exists");
+        require(allowList[msg.sender][level].status == true, "NFT is obtained");
+        // start minting
+        allowList[msg.sender][level].status = false;
+        uint256 nextSupply = totalSupply() + 1;
+        _safeMint(msg.sender, nextSupply);
+        _setTokenURI(nextSupply, allowList[msg.sender][level].uri);
+    }
+
+    function addAllowList(
+        address _newEntry,
+        string memory uri,
+        string memory level
+    ) external onlyOwner {
+        require(allowList[_newEntry][level].entry == address(0), "address already exists");
+        require(checkLevel(level), "level isn't found");
+        allowList[_newEntry][level].entry = _newEntry;
+        allowList[_newEntry][level].uri = uri;
+        allowList[_newEntry][level].level = level;
+        allowList[_newEntry][level].status = true;
+    }
+
+    function removeAllowList(address _newEntry, string memory level) external onlyOwner {
+        require(allowList[_newEntry][level].entry != address(0), "address not exists");
+        allowList[_newEntry][level].status = false;
+    }
+
+    function updateAllowList(
+        address _newEntry,
+        string memory uri,
+        string memory level
+    ) external onlyOwner {
+        require(allowList[_newEntry][level].entry != address(0), "address not exists");
+        allowList[_newEntry][level].entry = _newEntry;
+        allowList[_newEntry][level].uri = uri;
+        allowList[_newEntry][level].level = level;
+        allowList[_newEntry][level].status = true;
+    }
+
+    function getAllowList(address _newEntry, string memory level) public view returns (User memory) {
+        return allowList[_newEntry][level];
+    }
+
+    function tokenURI(uint256 tokenId) public view override(ERC721, ERC721URIStorage) returns (string memory) {
+        return super.tokenURI(tokenId);
     }
 }

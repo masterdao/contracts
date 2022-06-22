@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- Meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Cryptocash is Professional Creative Template"/>
+</head>
+<script src="https://cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"
+        integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@2.7.2/dist/Chart.bundle.min.js"
+        integrity="sha256-XF29CBwU1MWLaGEnsELogU6Y6rcc5nCkhhx89nFMIDQ=" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.min.js"
+        integrity="sha256-ecWZ3XYM7AwWIaGvSdmipJ2l1F4bN9RXW6zgpeAiZYI=" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/decimal.js/9.0.0/decimal.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/buffer-from@1.1.1/index.js"></script>
+
+
+<script src="veDaoAbi.js?vedao=" +Randmo()></script>
+<script src="veDaoContract.js?daoContract=5233" +Randmo()></script>
+
+
+<body>
+<html>
+<br>
+
+
+<br>
+<div style="color:red; border-radius: 2%;  border: 2px solid burlywood;">
+    <br>管理员操作:<br>
+    级别列表:<span class="nft-levelList" style="color: red;">--.--</span><br>
+
+    <br>查看白名单：<br>
+    用户地址：<input type="text" id="user-address" size="60"><br>
+    级别：<input type="text" id="user-level" size="60"><br>
+    <button onclick="getAllowList()">查看白名单信息</button>
+    <span class="coin-allow" style="color: red;">--.--</span><br>
+    <hr>
+    <br>添加白名单：<br>
+    用户地址：<input type="text" id="user-add-address" size="60"><br>
+    URI：<input type="text" id="coin-add-uri" size="60"><br>
+    级别：<input type="text" id="coin-add-level" size="60"><br>
+    <button onclick="addAllowList()">添加白名单</button>
+    <hr>
+    <br>测试mint：<br>
+    级别：<input type="text" id="coin-mint-level" size="60"><br>
+    <button onclick="mintAllowList()">测试mint</button>
+    <br>
+
+</div>
+
+
+<br>
+<br>
+
+
+</p>
+</html>
+</body>
