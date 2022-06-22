@@ -115,7 +115,7 @@ contract DAOMintingPool is Ownable {
     获取用户抵押的VeDao
      */
     function getuserTotalVeDao(address who) public view returns (uint256) {
-        require(who != address(0));
+        require(who != address(0), "User address cannot be zero address.");
         return userTotalVeDao[who];
     }
 
@@ -127,8 +127,8 @@ contract DAOMintingPool is Ownable {
         address lpToken,
         uint256 poolTypeId
     ) public view returns (uint256) {
-        require(who != address(0));
-        require(lpToken != address(0));
+        require(who != address(0), "uUser address cannot be zero address.");
+        require(lpToken != address(0), "lptoken address can not zero address.");
         return miner[who][lpToken][poolTypeId].veDao;
     }
 
@@ -136,8 +136,8 @@ contract DAOMintingPool is Ownable {
     获取用户抵押的
      */
     function getuserTotalDao(address who, address lpToken) public view returns (uint256) {
-        require(who != address(0));
-        require(lpToken != address(0));
+        require(who != address(0), "User address cannot be zero address.");
+        require(lpToken != address(0), "lptoken address can not zero address.");
         return userTotalDao[msg.sender][lpToken];
     }
 
@@ -145,7 +145,7 @@ contract DAOMintingPool is Ownable {
     获取矿池总抵押dao
      */
     function getpoolStakingTotal(address lpToken) public view returns (uint256) {
-        require(lpToken != address(0));
+        require(lpToken != address(0), "lptoken address can not zero address.");
         return poolStakingTotal[lpToken];
     }
 
@@ -160,8 +160,8 @@ contract DAOMintingPool is Ownable {
     获取奖金币地址
      */
     function getbonusListAddr(uint256 index) public view returns (address) {
-        require(index >= 0);
-        require(index < bonusList.length);
+        require(index >= 0, "index must be greater than zero.");
+        require(index < bonusList.length, "index must be less than the maximum length.");
         return bonusList[index];
     }
 
@@ -182,8 +182,8 @@ contract DAOMintingPool is Ownable {
     新增矿池类型
     */
     function addmintingPoolType(uint256 poolLength, uint256 weight) public onlyOwner returns (bool) {
-        require(poolLength >= 0);
-        require(weight >= 0);
+        require(poolLength >= 0, "poolLength must be greater than or equal to zero.");
+        require(weight >= 0, "weight must be greater zero.");
         require(checkpooltype(poolLength) == false, "poolLength duplicate"); //矿池 重复
 
         mintingPoolType memory newmintingPoolType = mintingPoolType({
@@ -209,7 +209,7 @@ contract DAOMintingPool is Ownable {
     获取矿池类型信息
      */
     function getmintingPoolType(uint256 id) public view returns (mintingPoolType memory) {
-        require(id >= 0);
+        require(id >= 0, "id must be greater than or equal to zero.");
         require(mintingPoolTypeList[id].bstatus);
         return mintingPoolTypeList[id];
     }
@@ -224,8 +224,8 @@ contract DAOMintingPool is Ownable {
         uint256 poolLength,
         uint256 weight
     ) public onlyOwner returns (mintingPoolType memory) {
-        require(id >= 0);
-        require(mintingPoolTypeList[id].bstatus);
+        require(id >= 0, "id must be greater zero.");
+        require(mintingPoolTypeList[id].bstatus, "bstatus must be true.");
         mintingPoolTypeList[id].poolLength = poolLength;
         mintingPoolTypeList[id].weight = weight;
         return mintingPoolTypeList[id];
@@ -248,7 +248,7 @@ contract DAOMintingPool is Ownable {
     获取用户抵押的矿池数量
      */
     function getminerPoolList(address who) public view returns (uint256) {
-        require(who != address(0));
+        require(who != address(0), "User address cannot be zero address.");
         return minerPoolList[who].length;
     }
 
@@ -501,7 +501,7 @@ contract DAOMintingPool is Ownable {
         require(amount > 0, "amout should be greater than 0");
         require(IERC20(lpToken).balanceOf(msg.sender) >= amount, "lpToken have not enough balance");
         require(mintingPool[lpToken][poolTypeId].lpToken != address(0)); //抵押的矿池存在
-        require(mintingPoolTypeList[poolTypeId].bstatus, "");
+        require(mintingPoolTypeList[poolTypeId].bstatus, "bstatus must be true");
 
         //每个奖励计算一遍
         // 永远不会执行?
@@ -557,8 +557,8 @@ contract DAOMintingPool is Ownable {
     }
 
     function withdraw(address lpToken, uint256 poolTypeId) public returns (bool) {
-        require(lpToken != address(0));
-        require(mintingPool[lpToken][poolTypeId].lpToken != address(0)); //抵押的矿池存在
+        require(lpToken != address(0), "lptoken address cannot be zero address");
+        require(mintingPool[lpToken][poolTypeId].lpToken != address(0), "mintingpool's lptoken cannot be zero address"); //抵押的矿池存在
         require(miner[msg.sender][lpToken][poolTypeId].veDao >= 0);
         uint256 amount = miner[msg.sender][lpToken][poolTypeId].amount;
 
@@ -634,7 +634,7 @@ contract DAOMintingPool is Ownable {
         address bsToken,
         uint256 poolTypeId
     ) public view returns (uint256) {
-        require(lpToken != address(0));
+        require(lpToken != address(0), "lptoken address cannot be zero address");
         uint256 bonus = 0;
         uint256 accBonusPerShare = BonusToken[bsToken].accBonusPerShare;
         if (miner[who][lpToken][poolTypeId].veDao > 0) {
