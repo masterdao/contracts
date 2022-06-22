@@ -740,7 +740,8 @@ contract idoCoinContract is Ownable {
         IERC20(DAOToken).safeTransferFrom(address(this), msg.sender, statAddrAmount);
         statAddrAmount = statAddrAmount.sub(_statAddrAmount);
     }
-    //产品决定去掉这个功能  
+
+    //产品决定去掉这个功能
     //紧急停止IPO扣取注册费，返还币
     // function shutdownIpo(address coinAddress) public onlyISMPolicy returns (bool) {
     //     require(coinAddress != address(0));
@@ -803,13 +804,13 @@ contract idoCoinContract is Ownable {
         require(block.timestamp >= idoCoin[coinAddress].idoCoinHead.expireTime, "ipo not end"); //到期了
         require(idoCoin[coinAddress].createUserAddress == msg.sender, "unauthenticated user");
         //如果投票没有通过，扣取一部分DAO，
-        if(idovoteContract.getVoteStatus(coinAddress) ==  false) {
-             //退注册费用 registerAmount - deductAmount(扣掉的)
+        if (idovoteContract.getVoteStatus(coinAddress) == false) {
+            //退注册费用 registerAmount - deductAmount(扣掉的)
             if (registerAmount.sub(deductAmount) > 0) {
                 DAOToken.safeTransfer(idoCoin[coinAddress].createUserAddress, registerAmount.sub(deductAmount));
                 emit TakeOut(msg.sender, registerAmount.sub(deductAmount), address(DAOToken));
-            }    
-        }else{
+            }
+        } else {
             require(idoCoin[coinAddress].withdrawAmount > 0, "zero withdraw balance");
             require(idoCoin[coinAddress].bTakeOut, "no settled");
             idoCoin[coinAddress].bTakeOut = false;
@@ -838,7 +839,6 @@ contract idoCoinContract is Ownable {
             emit TakeOut(msg.sender, withdrawAmount, applyAddress);
         }
 
-        
         return true;
     }
 }
