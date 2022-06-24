@@ -88,6 +88,7 @@ const config = {
     },
 
     ido: {
+      skip: true,
       name: 'idoCoinContract',
 
       // 1. 部署任务
