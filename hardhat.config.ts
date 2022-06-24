@@ -14,7 +14,7 @@ import yaml from 'yaml';
 import cfg from './deployment.config';
 
 // skip paths
-const excludes =[/\/INO\//, /idovote\scopy/, /\/IDO\//];
+const excludes = [/\/INO\//, /idovote\scopy/, /\/IDO\//];
 
 // 忽略 INO, 和 idovote copy.sol
 subtask(TASK_COMPILE_SOLIDITY_GET_SOURCE_PATHS).setAction(
