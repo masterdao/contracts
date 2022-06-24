@@ -20,7 +20,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
   const { ido } = contracts;
 
-  if((ido as any).skip){
+  if ((ido as any).skip) {
     return;
   }
   // 部署合约
