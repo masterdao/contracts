@@ -1,8 +1,8 @@
 let web3;
 //Rinkeby
 //const VeDao = "0xd61a6FA99f04C1A9537eF72Ef5d5b2af320B6f78"
-//BNB-TEST
-const VeDao = "0xD97c5E903819D56209Ac7eFf304F3DFE2eeb931b"
+//BNB
+const VeDao = "0x24732239Ecd74a9d7e861302d877E17Fe43b52D5"
 
 
 const miniDecimals = 1000000000000000000;
