@@ -69,14 +69,14 @@ contract INOERC721Contract is Ownable {
 
     //获取同一个地址下，有多少币上架
     function getNFTListlenght(address coinAddress) public view returns (uint256) {
-        require(coinAddress != address(0),"coinAddress can not be zeor address.");
+        require(coinAddress != address(0), "coinAddress can not be zeor address.");
         return NFTList[coinAddress].length;
     }
 
     //遍历同一个地址下，有多少币上架
     function getNFTListData(address coinAddress, uint256 index) public view returns (uint256) {
         require(coinAddress != address(0), "coinAddress can not be zeor address.");
-        require(index < NFTList[coinAddress].length,"index must be less than BNFTList's length.");
+        require(index < NFTList[coinAddress].length, "index must be less than BNFTList's length.");
         return NFTList[coinAddress][index];
     }
 
@@ -127,7 +127,7 @@ contract INOERC721Contract is Ownable {
         address coinAddress,
         uint256 tokenId
     ) public view returns (userInfo memory) {
-         require(userAddress != address(0), "user's address can not be zeor address.");
+        require(userAddress != address(0), "user's address can not be zeor address.");
         require(coinAddress != address(0), "coinAddress can not be zeor address.");
         require(tokenId >= 0, "tokenid must be greater than or equal to zero.");
         return usercoin[userAddress][coinAddress][tokenId];
@@ -182,8 +182,11 @@ contract INOERC721Contract is Ownable {
         require(tokenId >= 0, "tokenid must be greater than or equal to zero.");
         require(inoCoin[coinAddress][tokenId].bSell == false, "sell's status must be false.");
 
-        require(userMaxAmount[msg.sender] < coinMaxAmount[coinAddress],"use's max amount must be less than coin max amount.");
-        require(inoCoin[coinAddress][tokenId].expireTime >= block.timestamp,"not expired"); //未过期
+        require(
+            userMaxAmount[msg.sender] < coinMaxAmount[coinAddress],
+            "use's max amount must be less than coin max amount."
+        );
+        require(inoCoin[coinAddress][tokenId].expireTime >= block.timestamp, "not expired"); //未过期
         //处理市场售卖情况
         uint256 makeCoinAmount = inoCoin[coinAddress][tokenId].makeCoinAmount;
         address payable createUserAddress = inoCoin[coinAddress][tokenId].createUserAddress;
