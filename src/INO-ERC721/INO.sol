@@ -69,14 +69,14 @@ contract INOERC721Contract is Ownable {
 
     //获取同一个地址下，有多少币上架
     function getNFTListlenght(address coinAddress) public view returns (uint256) {
-        require(coinAddress != address(0));
+        require(coinAddress != address(0),"coinAddress can not be zeor address.");
         return NFTList[coinAddress].length;
     }
 
     //遍历同一个地址下，有多少币上架
     function getNFTListData(address coinAddress, uint256 index) public view returns (uint256) {
-        require(coinAddress != address(0));
-        require(index < NFTList[coinAddress].length);
+        require(coinAddress != address(0), "coinAddress can not be zeor address.");
+        require(index < NFTList[coinAddress].length,"index must be less than BNFTList's length.");
         return NFTList[coinAddress][index];
     }
 
@@ -87,7 +87,7 @@ contract INOERC721Contract is Ownable {
 
     //获取支付币地址
     function getapplyCoinListData(uint256 index) public view returns (uint256) {
-        require(applyCoinList.length > index);
+        require(applyCoinList.length > index, "applylsit's length must be greater than index.");
         return applyCoinList[index];
     }
 
@@ -97,6 +97,7 @@ contract INOERC721Contract is Ownable {
     }
 
     function getapplyCoin(address contractAddress) public view returns (applyCoinInfo memory) {
+        require(contractAddress != address(0), "contractAddress can not be zeor address.");
         return applyCoin[contractAddress];
     }
 
@@ -106,7 +107,7 @@ contract INOERC721Contract is Ownable {
         string memory symbol,
         uint256 decimals
     ) public onlyOwner returns (bool) {
-        require(applyCoin[contractAddress].contractAddress == address(0));
+        require(applyCoin[contractAddress].contractAddress == address(0), "contractAddress must be zero address.");
         applyCoinInfo memory newapplyCoinInfo = applyCoinInfo({
             timestamp: block.timestamp,
             contractAddress: contractAddress,
@@ -126,15 +127,15 @@ contract INOERC721Contract is Ownable {
         address coinAddress,
         uint256 tokenId
     ) public view returns (userInfo memory) {
-        require(userAddress != address(0));
-        require(coinAddress != address(0));
-        require(tokenId >= 0);
+         require(userAddress != address(0), "user's address can not be zeor address.");
+        require(coinAddress != address(0), "coinAddress can not be zeor address.");
+        require(tokenId >= 0, "tokenid must be greater than or equal to zero.");
         return usercoin[userAddress][coinAddress][tokenId];
     }
 
     //获取INO币信息
     function getinoCoin(address coinAddress, uint256 tokenId) public view returns (inoCoinInfo memory) {
-        require(coinAddress != address(0));
+        require(coinAddress != address(0), "coinAddress can not be zeor address.");
         return inoCoin[coinAddress][tokenId];
     }
 
@@ -142,9 +143,10 @@ contract INOERC721Contract is Ownable {
     新建IEO上币资料
      */
     function createINOCoin(inoCoinInfo memory myInoCoinInfo, uint256[] memory ids) public payable returns (bool) {
-        require(myInoCoinInfo.coinAddress != address(0));
-        require(myInoCoinInfo.expireTime >= block.timestamp);
-        require(myInoCoinInfo.bSell == false);
+        require(myInoCoinInfo.coinAddress != address(0), "coinAddress can not be zeor address.");
+        require(myInoCoinInfo.expireTime >= block.timestamp, "not expired.");
+        require(myInoCoinInfo.bSell == false, "sell's status must be false.");
+        require(ids.length <= 50, "Quantity is less than 50.");
         address coinAddress = myInoCoinInfo.coinAddress;
         coinMaxAmount[coinAddress] = myInoCoinInfo.maxAmount;
         for (uint256 i = 0; i < ids.length; i++) {
@@ -166,8 +168,8 @@ contract INOERC721Contract is Ownable {
 
     //获取NFT是否被卖掉
     function getCoinSell(address coinAddress, uint256 tokenId) public view returns (bool) {
-        require(coinAddress != address(0));
-        require(tokenId >= 0);
+        require(coinAddress != address(0), "coinAddress can not be zeor address.");
+        require(tokenId >= 0, "tokenid must be greater than or equal to zero.");
         return inoCoin[coinAddress][tokenId].bSell;
     }
 
@@ -176,10 +178,13 @@ contract INOERC721Contract is Ownable {
 
     //用于买币
     function buyNftToken(address coinAddress, uint256 tokenId) public payable returns (bool) {
-        require(coinAddress != address(0));
-        require(tokenId >= 0);
-        require(inoCoin[coinAddress][tokenId].bSell == false);
-        require(userMaxAmount[msg.sender] < coinMaxAmount[coinAddress]);
+        require(coinAddress != address(0), "coinAddress can not be zeor address.");
+        require(tokenId >= 0, "tokenid must be greater than or equal to zero.");
+        require(inoCoin[coinAddress][tokenId].bSell == false, "sell's status must be false.");
+
+        require(userMaxAmount[msg.sender] < coinMaxAmount[coinAddress],"use's max amount must be less than coin max amount.");
+        require(inoCoin[coinAddress][tokenId].expireTime >= block.timestamp,"not expired"); //未过期
+        
         //处理市场售卖情况
         uint256 makeCoinAmount = inoCoin[coinAddress][tokenId].makeCoinAmount;
         address payable createUserAddress = inoCoin[coinAddress][tokenId].createUserAddress;
@@ -216,10 +221,10 @@ contract INOERC721Contract is Ownable {
 
     //过期项目方提币
     function takeOut(address coinAddress, uint256 tokenId) public returns (bool) {
-        require(inoCoin[coinAddress][tokenId].expireTime <= block.timestamp); //过期了
-        require(inoCoin[coinAddress][tokenId].createUserAddress == msg.sender);
-        require(inoCoin[coinAddress][tokenId].bSell == false);
-        require(inoCoin[coinAddress][tokenId].bBack == false);
+        require(inoCoin[coinAddress][tokenId].expireTime <= block.timestamp, "expired."); //过期了
+        require(inoCoin[coinAddress][tokenId].createUserAddress == msg.sender, "not yourself.");
+        require(inoCoin[coinAddress][tokenId].bSell == false, "sell's status must be false.");
+        require(inoCoin[coinAddress][tokenId].bBack == false, "back's status must be false.");
         inoCoin[coinAddress][tokenId].bSell = true; //卖出
         inoCoin[coinAddress][tokenId].bBack = true;
 
@@ -235,7 +240,7 @@ contract INOERC721Contract is Ownable {
 
     //项目方提取卖币的资金
     function withdraw(uint256 coinType) public returns (bool) {
-        require(createCoin[msg.sender][coinType] > 0);
+        require(createCoin[msg.sender][coinType] > 0, "mintpool must be greater than zero.");
         address ApplyCoin = getapplyCoinAddress(coinType); //获取支付币的地址
         uint256 makeCoinAmount = createCoin[msg.sender][coinType];
         createCoin[msg.sender][coinType] = 0;
