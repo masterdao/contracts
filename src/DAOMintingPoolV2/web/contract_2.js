@@ -1,8 +1,15 @@
  
 let web3;
-const DAO="0x5e0289c130BcC61FBe5cEc5dce5fE775E50752bf"
+var DAO="0x5e0289c130BcC61FBe5cEc5dce5fE775E50752bf"
 
-const DAOPOOLCONTRACT ="0xD106450F5FDed8998a1E7928094C6fd6A9697B8F"
+var DAOPOOLCONTRACT ="0xD106450F5FDed8998a1E7928094C6fd6A9697B8F"
+
+fetch('https://app.vedao.pro/v1/dao/public/contract-address')
+    .then(resp => resp.json())
+    .then(data => {
+        DAO = data.tokenAddress;
+        DAOPOOLCONTRACT = data.poolAddress;
+    })
 
 window.onload = function () {
     console.log(DAOPOOLABI)

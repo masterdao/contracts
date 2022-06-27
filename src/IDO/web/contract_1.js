@@ -1,25 +1,20 @@
 let web3;
-const DAO = "0x5e0289c130BcC61FBe5cEc5dce5fE775E50752bf"
-const OWNER = "0x4Cf2EE6f44C53931b52bdbce3A15F123bf073162"
-let IDOVOTECONTRACT = "0x60A7E291c8e58C4884480E1D318288267C27ad92"
-let IDOCONTRACT = "0x91B7253a3C9A6E7A231d6B883DaB24cf7D3f6b16"
-const ROUTER = "0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45"
+var DAO = "0x5e0289c130BcC61FBe5cEc5dce5fE775E50752bf"
+var OWNER = "0x4Cf2EE6f44C53931b52bdbce3A15F123bf073162"
+var IDOVOTECONTRACT = "0x60A7E291c8e58C4884480E1D318288267C27ad92"
+var IDOCONTRACT = "0x91B7253a3C9A6E7A231d6B883DaB24cf7D3f6b16"
+var ROUTER = "0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45"
 let voteStauts;
 
-// if (artifact) {
-//     console.log('artifact', {
-//         dao: artifact.ERC20.address,
-//         pool: artifact.DAOMintingPool.address,
-//         vote: artifact.idovoteContract.address,
-//         ido: artifact.idoCoinContract.address
-//     });
-//     if (artifact.idovoteContract) {
-//         IDOVOTECONTRACT = artifact.idovoteContract.address
-//     }
-//     if (artifact.idoCoinContract) {
-//         IDOCONTRACT = artifact.idoCoinContract.address
-//     }
-// }
+fetch('https://app.vedao.pro/v1/dao/public/contract-address')
+    .then(resp => resp.json())
+    .then(data => {
+        DAO = data.tokenAddress;
+        OWNER = data.ownerAddress;
+        IDOVOTECONTRACT = data.voteAddress;
+        IDOCONTRACT = data.idoAddress;
+        ROUTER = data.routerAddress
+    })
 
 window.onload = function () {
     console.log(IDOVOTE)
