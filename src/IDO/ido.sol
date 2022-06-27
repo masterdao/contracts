@@ -13,13 +13,13 @@ import "./IUniswapPair.sol";
 import "./IUniswapRouter02.sol";
 
 interface IDAOMintingPool {
-    function getuserTotalVeDao(address who) external view returns (uint256);  
+    function getuserTotalVeDao(address who) external view returns (uint256);
 
-    function getcalculatestakingAmount() external view returns (uint256);  
+    function getcalculatestakingAmount() external view returns (uint256);
 
-    function getuserTotalDao(address who, address lpToken) external view returns (uint256);  
+    function getuserTotalDao(address who, address lpToken) external view returns (uint256);
 
-    function getpoolStakingTotal(address lpToken) external view returns (uint256);  
+    function getpoolStakingTotal(address lpToken) external view returns (uint256);
 
     function addBonusToken_vote(
         address bsToken,
@@ -446,7 +446,7 @@ contract idoCoinContract is Ownable {
         require(idovoteContract.getVoteStatus(coinAddress)); //检查是否已经投票通过
 
         require(block.timestamp < idoCoin[coinAddress].idoCoinHead.expireTime); //还没有到期
-  
+
         require(
             amount <= idoCoin[coinAddress].idoCoinHead.bundle.mul(idoCoin[coinAddress].idoCoinHead.maxbundle),
             "cannot exceed the purchase scope"
@@ -538,7 +538,7 @@ contract idoCoinContract is Ownable {
         emit Withdraw(msg.sender, planCon, coinAddress, amount);
         return true;
     }
- 
+
     function settleaccounts(address coinAddress, uint256 makeCoinAmount) public returns (bool) {
         require(msg.sender != address(0));
         require(block.timestamp >= idoCoin[coinAddress].idoCoinHead.expireTime); //还没有到期
@@ -565,7 +565,6 @@ contract idoCoinContract is Ownable {
         usercoin[msg.sender][coinAddress].makeCoinAmount = makeCoinAmount;
         usercoin[msg.sender][coinAddress].outAmount = makeCoinAmount;
         usercoin[msg.sender][coinAddress].settle = true; //已经结算完成
- 
 
         //统计卖掉的币
         idoCoin[coinAddress].idoAmountComplete = makeCoinAmount.add(idoCoin[coinAddress].idoAmountComplete);
@@ -646,6 +645,7 @@ contract idoCoinContract is Ownable {
         _setTakeOut(coinAddress);
         return true;
     }
+
     function toSwapBuyDAO(address coinAddress) public onlyISMPolicy returns (bool) {
         //ETH或者BNB
         require(coinAddress != address(0));
@@ -742,10 +742,11 @@ contract idoCoinContract is Ownable {
         idoCoin[coinAddress].takeOutNumber++;
         return true;
     }
- 
+
     function setTakeOut(address coinAddress) public onlyISMPolicy returns (bool) {
         return _setTakeOut(coinAddress);
     }
+
     function takeOut(address coinAddress) public returns (bool) {
         require(block.timestamp >= idoCoin[coinAddress].idoCoinHead.expireTime, "ipo not end"); //到期了
         require(idoCoin[coinAddress].createUserAddress == msg.sender, "unauthenticated user");
@@ -787,7 +788,6 @@ contract idoCoinContract is Ownable {
                 DAOToken.safeTransfer(msg.sender, idoCoin[coinAddress].registerAmount); //返还注册费
                 registeFee = registeFee.sub(idoCoin[coinAddress].registerAmount);
                 idoCoin[coinAddress].registerAmount = 0;
-                
             }
             idoCoin[coinAddress].withdrawAmount = 0;
             emit TakeOut(msg.sender, withdrawAmount, applyAddress);
