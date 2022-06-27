@@ -2,7 +2,7 @@ let web3;
 //Rinkeby
 //const VeDao = "0xd61a6FA99f04C1A9537eF72Ef5d5b2af320B6f78"
 //BNB
-const VeDao = "0x24732239Ecd74a9d7e861302d877E17Fe43b52D5"
+const VeDao = "0x8dCBb97D8Bc2ffa618dc741b0659f0a4eBd8a92C"
 
 
 const miniDecimals = 1000000000000000000;
