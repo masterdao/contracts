@@ -190,7 +190,7 @@ contract INOERC721Contract is Ownable {
 
         if (inoCoin[coinAddress][tokenId].coinType == 1) {
             require(msg.value >= makeCoinAmount);
-            payable(address(this)).transfer(makeCoinAmount);
+            //payable(address(this)).transfer(makeCoinAmount);
         } else {
             address ApplyCoin = getapplyCoinAddress(inoCoin[coinAddress][tokenId].coinType); //获取支付币的地址
             require(ApplyCoin != address(0));
