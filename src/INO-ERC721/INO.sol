@@ -243,7 +243,7 @@ contract INOERC721Contract is Ownable {
         if (coinType == 1) {
             payable(address(msg.sender)).transfer(makeCoinAmount);
         } else {
-            IERC20(ApplyCoin).transfer(msg.sender, makeCoinAmount);
+            IERC20(ApplyCoin).safeTransfer(msg.sender, makeCoinAmount);
         }
         emit Withdraw(msg.sender, makeCoinAmount);
         return true;
