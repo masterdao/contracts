@@ -752,7 +752,7 @@ contract idoCoinContract is Ownable {
         if (idovoteContract.getVoteStatus(coinAddress) == false) {
             if (registerAmount.sub(deductAmount) > 0) {
                 DAOToken.safeTransfer(idoCoin[coinAddress].createUserAddress, registerAmount.sub(deductAmount));
-           
+                registeFee = registeFee.sub(registerAmount.sub(deductAmount));
                 emit TakeOut(msg.sender, registerAmount.sub(deductAmount), address(DAOToken));
             }
             uint256 idoAmount = idoCoin[coinAddress].idoCoinHead.idoAmount;
@@ -785,8 +785,9 @@ contract idoCoinContract is Ownable {
             }
             if (idoCoin[coinAddress].registerAmount > 0) {
                 DAOToken.safeTransfer(msg.sender, idoCoin[coinAddress].registerAmount); //返还注册费
+                registeFee = registeFee.sub(idoCoin[coinAddress].registerAmount);
                 idoCoin[coinAddress].registerAmount = 0;
-           
+                
             }
             idoCoin[coinAddress].withdrawAmount = 0;
             emit TakeOut(msg.sender, withdrawAmount, applyAddress);
