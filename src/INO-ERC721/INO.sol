@@ -37,7 +37,6 @@ contract INOERC721Contract is Ownable {
         uint256 tokenId;
         uint256 coinType; //1:ETH  2:USDT  3:DAOToken
         uint256 makeCoinAmount; //募集到 1:ETH  2:USDT  3:DAOToken 数量
-        uint256 openTime; //开始时间，将天设置为秒 1天=86400
         uint256 expireTime; //到期日期
         bool bSell;
         bool bBack;
