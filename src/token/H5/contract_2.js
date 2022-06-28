@@ -1,7 +1,7 @@
  
 let web3;
-const DAO = "0xDDd4A9D50a43B426F59F371B79975fE0e86e7D68" 
-const OWNER = "0x005d73Fa417A83F334E21a5F0577e0Aa8d82Fb75"
+const DAO = "0x74d6A01b882A03dAe08E36d3aD0BF779dAffc4BC"
+const OWNER = "0x4Cf2EE6f44C53931b52bdbce3A15F123bf073162"
 
 window.onload = function () {
     console.log(MULTISIG)
