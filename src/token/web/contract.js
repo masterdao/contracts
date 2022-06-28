@@ -1,10 +1,18 @@
 let account
-  let provider
-  let signer
-  const DAO = "0x5f37D4295eBeCf8f6092B58751df36b5b50145E8"
-  const OWNER = "0x005d73Fa417A83F334E21a5F0577e0Aa8d82Fb75"
+let provider
+let signer
+var DAO = "0x5f37D4295eBeCf8f6092B58751df36b5b50145E8"
+var OWNER = "0x005d73Fa417A83F334E21a5F0577e0Aa8d82Fb75"
+  
+fetch('https://app.vedao.pro/v1/dao/public/contract-address')
+.then(resp => resp.json())
+.then(data => {
+    DAO = data.tokenAddress;
+    OWNER = data.ownerAddress;
+});
+
   window.onload = () => {
-    initWeb3().then()
+    initWeb3().then() // ? why then() ?
     init()
 
   }

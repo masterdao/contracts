@@ -18,6 +18,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const depVeDAO = await deployments.get(contracts.vedao.name);
 
   const { voting } = contracts;
+  if ((voting as any).skip) return;
   // 部署
   const artifact = await deploy(voting.name, {
     from: deployer,
