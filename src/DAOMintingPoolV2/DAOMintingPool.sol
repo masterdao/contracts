@@ -603,9 +603,6 @@ contract DAOMintingPool is Ownable {
 
             poolStakingTotal[lpToken] = poolStakingTotal[lpToken].sub(amount);
 
-            //单个矿池抵押量
-            mintingPool[lpToken][poolTypeId].stakingTotal = (mintingPool[lpToken][poolTypeId].stakingTotal).sub(amount);
-
             if (amount > 0) {
                 IERC20(lpToken).safeTransfer(msg.sender, amount);
                 emit Withdraw(msg.sender, lpToken, amount);
