@@ -208,6 +208,10 @@ async function tokeoutVoteIncome() {
 
 }
 
+function setIpoStartTime(ts) {
+    document.getElementById('set-start-time').value = ts
+}
+
 async function setStartTime() {
     const contract = await getErc20Contract(IDOABI, IDOCONTRACT);
     const coinbase = await getCurrentAccount()
