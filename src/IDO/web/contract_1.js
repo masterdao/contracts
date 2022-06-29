@@ -17,8 +17,8 @@ fetch('https://app.vedao.pro/v1/dao/public/contract-address')
     })
 
 window.onload = function () {
-    console.log(IDOVOTE)
-    console.log(erc20Abi)
+    console.log('IDOVOTE',IDOVOTE)
+    console.log('erc20Abi',erc20Abi)
     initWeb3()
 
     init()
@@ -41,6 +41,7 @@ function initWeb3() {
 
         return true
     } catch (e) {
+        alert('no MetaMask installed')
         console.log(e.message)
         return false
     }
@@ -351,8 +352,9 @@ async function approveCoinToken() {
 
 async function getVoteEnd() {
     const contract = await getErc20Contract(IDOVOTE, IDOVOTECONTRACT);
+    console.log('mthd',contract.methods.getVoteEnd)
     const coinbase = await getCurrentAccount();
     const coinAddress = document.getElementById("set-coinAddress").value;
-    const vote = await contract.methods.getVoteEnd(coinAddress).call()
+    const vote = await contract.methods.getVoteEnd(coinAddress).call();
     $('.show-vote').html(`${vote}`);
 }

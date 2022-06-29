@@ -18,7 +18,7 @@
 <script src="erc20Abi_1.js"></script>
 <script src="idovote.js?idovote_random=cvxvdc"></script>
 <script src="ido.js?ido_random=455ygt"></script>
-<script src="contract_1.js?contract_random=Date.now()"></script>
+<script src="contract_1.js?contract_random="></script>
 <html>
 
 <body>
@@ -114,6 +114,7 @@
         coinAddress:<input type="text" id="set-start-coinAddress" value="0x000000000" size=60><br><br>
         time:<input type="text" id="set-start-time" value="" size=60><br><br>
         <button onclick="setStartTime()"> 设定打新开始时间</button> <button onclick="setIpoStartTime(Math.floor(Date.now() / 1000) - 5*24*3600)">5天前</button>
+        <button onclick="setIpoStartTime(Math.floor(Date.now()/1000))">现在</button>
         <hr>
         九、设置提款计划(几次content加起之和100，num和id不变 初始化例如：1，25，3；1，25，3；1，50，3)<br>
         planId:<input type="text" id="set-plan-id" value="1" size=60><br><br>
