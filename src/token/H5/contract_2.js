@@ -1,14 +1,14 @@
- 
+
 let web3;
-var DAO = "0xDDd4A9D50a43B426F59F371B79975fE0e86e7D68" 
-var OWNER = "0x005d73Fa417A83F334E21a5F0577e0Aa8d82Fb75"
+var DAO = "0x74d6A01b882A03dAe08E36d3aD0BF779dAffc4BC"
+var OWNER = "0x4Cf2EE6f44C53931b52bdbce3A15F123bf073162"
 
 fetch('https://app.vedao.pro/v1/dao/public/contract-address')
     .then(resp => resp.json())
-    .then(data => {
+    .then(({data}) => {
         DAO = data.tokenAddress;
         OWNER = data.ownerAddress;
-    })
+    });
 
 window.onload = function () {
     console.log(MULTISIG)
@@ -24,13 +24,13 @@ function init(){
         }
     },1000);
 }
- 
+
 function initWeb3() {
     try {
         web3 = window.web3
         window.ethereum.enable()
         web3 = new Web3(web3.currentProvider)
- 
+
         return true
     } catch (e) {
         console.log(e.message)
@@ -44,20 +44,20 @@ async function getstatus(){
     getmultiNumber();//获取多签数量
     getcurrency_period();
 
- 
+
 }
 // 通用ERC20Abi
 async function getErc20Contract (abi,contractAddr) {
     try {
        const _contract = new web3.eth.Contract(abi, contractAddr)
-       //web3.eth.net.givenProvider.chainId = 0x22b8 
-       web3.eth.net.givenProvider.chainId = 0x03 
+       //web3.eth.net.givenProvider.chainId = 0x22b8
+       web3.eth.net.givenProvider.chainId = 0x03
         return  _contract;
     } catch (e) {
         console.log('get contract error: ', e)
     }
 }
- 
+
 async function getCurrentAccount() {
     try {
         if(window.web3.eth) {
@@ -74,27 +74,27 @@ async function getCurrentAccount() {
 }
 //获取DAO余额
 async function getDAOBalance(){
-     
+
     const contract = await getErc20Contract(MULTISIG,DAO);
     let balance = await contract.methods.balanceOf(  OWNER ).call()
-    
+
     balance = web3.utils.fromWei(balance,'ether')
-    $('.dao-balance').html(`${balance }`); 
+    $('.dao-balance').html(`${balance }`);
 
     const decimals = await contract.methods.decimals().call();
-    $('.dao-decimals').html(`${decimals }`); 
+    $('.dao-decimals').html(`${decimals }`);
 
     const symbol = await contract.methods.symbol().call();
-    $('.dao-symbol').html(`${symbol }`); 
+    $('.dao-symbol').html(`${symbol }`);
 
-} 
+}
 //获取管理员地址
- 
+
 async function getowneraddr(){
     const contract = await getErc20Contract(MULTISIG,DAO);
     let owner_addr = await contract.methods.owner(  ).call()
-    $('.owner-addr').html(`${owner_addr }`); 
-} 
+    $('.owner-addr').html(`${owner_addr }`);
+}
 //设定多签地址
 async function set_multiAddress(){
     const contract = await getErc20Contract(MULTISIG,DAO);
@@ -105,7 +105,7 @@ async function set_multiAddress(){
 //获取多签地址列表
 async function getmultiAddresslist(){
     const contract = await getErc20Contract(MULTISIG,DAO);
-    
+
     let list_len = await contract.methods.getmultiAddresslength( ).call()
     console.log(list_len)
 
@@ -114,7 +114,7 @@ async function getmultiAddresslist(){
         let addr = await contract.methods.getmultiAddressinfo(i).call();
         str = str +"addrsss:"+ addr +"<br>"
     }
-    $('.addr-list').html(`${str }`); 
+    $('.addr-list').html(`${str }`);
 }
 //获取多签数量
 async function getmultiNumber(){
@@ -136,8 +136,8 @@ async function getcurrency_period(){
     let issueAmount = await contract.methods.issuedAmount(period).call();
     issueAmount = web3.utils.fromWei(issueAmount,'ether')
     console.log("issueAmount " +  issueAmount)
-    document.getElementById("set-amount").value = issueAmount 
-    $('.currency-period').html(`${ period }`); 
+    document.getElementById("set-amount").value = issueAmount
+    $('.currency-period').html(`${ period }`);
 }
 //开启多签
 async function startmultisignatureperiod(){

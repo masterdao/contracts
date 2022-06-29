@@ -6,7 +6,7 @@ var OWNER = "0x005d73Fa417A83F334E21a5F0577e0Aa8d82Fb75"
   
 fetch('https://app.vedao.pro/v1/dao/public/contract-address')
 .then(resp => resp.json())
-.then(data => {
+.then(({data}) => {
     DAO = data.tokenAddress;
     OWNER = data.ownerAddress;
 });
