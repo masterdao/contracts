@@ -8,7 +8,7 @@ let voteStauts;
 
 fetch('https://app.vedao.pro/v1/dao/public/contract-address')
     .then(resp => resp.json())
-    .then(data => {
+    .then(({data}) => {
         DAO = data.tokenAddress;
         OWNER = data.ownerAddress;
         IDOVOTECONTRACT = data.voteAddress;
