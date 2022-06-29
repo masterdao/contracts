@@ -750,6 +750,7 @@ contract idoCoinContract is Ownable {
     function setUnpass(address coinAddress) public onlyISMPolicy {
         require(coinAddress != address(0));
         idoCoin[coinAddress].bUnpass = true;
+        
     }
 
     function takeOut(address coinAddress) public returns (bool) {
