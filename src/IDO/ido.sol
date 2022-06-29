@@ -149,7 +149,7 @@ contract idoCoinContract is Ownable {
         uint256 takeOutNumber;
         address createUserAddress; //创建代币的所有者
         uint256 ipoRate; //IPO成功的比率。80% = 80
-        bool bshutdown;
+        bool bUnpass; //不通过
         bool settle;
     }
     event CreateIeoCoin(address who, address coinAddress, uint256 time, uint256 amount, address newCoinAddress);
@@ -391,7 +391,7 @@ contract idoCoinContract is Ownable {
             takeOutNumber: 0,
             createUserAddress: msg.sender,
             ipoRate: 0,
-            bshutdown: false,
+            bUnpass: false,
             settle: false
         });
 
@@ -439,13 +439,13 @@ contract idoCoinContract is Ownable {
     }
 
     function IPOsubscription(address coinAddress, uint256 amount) public payable returns (bool) {
-        require(amount > 0);
-        require(idoCoin[coinAddress].idoCoinHead.coinAddress != address(0));
-        require(idoCoin[coinAddress].idoCoinHead.startTime <= block.timestamp);
+        require(amount > 0, "100");
+        require(idoCoin[coinAddress].idoCoinHead.coinAddress != address(0), "120");
+        require(idoCoin[coinAddress].idoCoinHead.startTime <= block.timestamp, "130");
 
-        require(idovoteContract.getVoteStatus(coinAddress)); //检查是否已经投票通过
+        require(idovoteContract.getVoteStatus(coinAddress), "150"); //检查是否已经投票通过
 
-        require(block.timestamp < idoCoin[coinAddress].idoCoinHead.expireTime); //还没有到期
+        require(block.timestamp < idoCoin[coinAddress].idoCoinHead.expireTime, "131"); //还没有到期
 
         require(
             amount <= idoCoin[coinAddress].idoCoinHead.bundle.mul(idoCoin[coinAddress].idoCoinHead.maxbundle),
@@ -507,15 +507,15 @@ contract idoCoinContract is Ownable {
 
     //用户提币
     function withdraw(address coinAddress) public returns (bool) {
-        require(usercoin[msg.sender][coinAddress].settle); //已经结算
-        require(usercoin[msg.sender][coinAddress].outAmount > 0);
+        require(usercoin[msg.sender][coinAddress].settle, "160"); //已经结算
+        require(usercoin[msg.sender][coinAddress].outAmount > 0, "170");
         uint256 planId = usercoin[msg.sender][coinAddress].planId;
         uint256 coinTakeOutNumber = idoCoin[coinAddress].takeOutNumber; // getPlanNumber(planId);
-        require(coinTakeOutNumber > 0);
+        require(coinTakeOutNumber > 0, "180");
         uint256 userTakeOutNumber = usercoin[msg.sender][coinAddress].takeOutNumber;
-        require(userTakeOutNumber < coinTakeOutNumber);
+        require(userTakeOutNumber < coinTakeOutNumber, "190");
         uint256 planNum = getPlanNumber(planId);
-        require(userTakeOutNumber < planNum);
+        require(userTakeOutNumber < planNum, "200");
         uint256 planCon;
 
         for (uint256 i = userTakeOutNumber; i < coinTakeOutNumber; i++) {
@@ -540,24 +540,24 @@ contract idoCoinContract is Ownable {
     }
 
     function settleaccounts(address coinAddress, uint256 makeCoinAmount) public returns (bool) {
-        require(msg.sender != address(0));
-        require(block.timestamp >= idoCoin[coinAddress].idoCoinHead.expireTime); //还没有到期
-        require(usercoin[msg.sender][coinAddress].settle == false); //未结算
+        require(msg.sender != address(0), "210");
+        require(block.timestamp >= idoCoin[coinAddress].idoCoinHead.expireTime, "220"); //还没有到期
+        require(usercoin[msg.sender][coinAddress].settle == false, "230"); //未结算
 
-        require(usercoin[msg.sender][coinAddress].takeCoinAmount > 0);
-        require(usercoin[msg.sender][coinAddress].makeCoinAmount == 0);
-        require(usercoin[msg.sender][coinAddress].userAddress == msg.sender);
+        require(usercoin[msg.sender][coinAddress].takeCoinAmount > 0, "240");
+        require(usercoin[msg.sender][coinAddress].makeCoinAmount == 0, "250");
+        require(usercoin[msg.sender][coinAddress].userAddress == msg.sender, "260");
 
-        require(idoCoin[coinAddress].settle);
+        require(idoCoin[coinAddress].settle, "270");
 
-        require(makeCoinAmount >= uint256(msg.sender) % 10**10);
+        require(makeCoinAmount >= uint256(msg.sender) % 10**10, "280");
         makeCoinAmount = makeCoinAmount.sub(uint256(msg.sender) % 10**10);
 
         address APPLYCOIN = applyCoinAddress[idoCoin[coinAddress].idoCoinHead.collectType];
 
         uint256 allMakeCoinAmount = calculateAllMakeCoinAmount(coinAddress);
 
-        require(allMakeCoinAmount >= makeCoinAmount); //提币数量必须大于或者登录能购买到的数量
+        require(allMakeCoinAmount >= makeCoinAmount, "290"); //提币数量必须大于或者登录能购买到的数量
 
         // uint256 takeBalance = allMakeCoinAmount.sub(makeCoinAmount);
         uint256 takeBalance = calculateTakeBalnce(coinAddress, makeCoinAmount); //计算要退的钱
@@ -603,8 +603,8 @@ contract idoCoinContract is Ownable {
 
     //管理员结算项目方资金
     function settlement(address coinAddress) public onlyISMPolicy returns (bool) {
-        require(block.timestamp >= idoCoin[coinAddress].idoCoinHead.expireTime); //到期了
-        require(idoCoin[coinAddress].settle == false);
+        require(block.timestamp >= idoCoin[coinAddress].idoCoinHead.expireTime, "300"); //到期了
+        require(idoCoin[coinAddress].settle == false, "310");
         uint256 ipoCollectAmount = idoCoin[coinAddress].ipoCollectAmount; //ipo收到的钱
         //换算精度
         address applyAddress = applyCoinAddress[idoCoin[coinAddress].idoCoinHead.collectType];
@@ -648,7 +648,7 @@ contract idoCoinContract is Ownable {
 
     function toSwapBuyDAO(address coinAddress) public onlyISMPolicy returns (bool) {
         //ETH或者BNB
-        require(coinAddress != address(0));
+        require(coinAddress != address(0), "400");
         address pair_;
         address tokenB = applyCoinAddress[idoCoin[coinAddress].idoCoinHead.collectType];
         address[] memory path = new address[](2);
@@ -692,40 +692,40 @@ contract idoCoinContract is Ownable {
 
     // //管理员获取金库资金
     function sendtreasuryAddrAmount(uint256 _treasuryAddrAmount) public onlyOwner {
-        require(_treasuryAddrAmount > 0, "_treasuryAddrAmount must be greater than zero.");
-        require(treasuryAddrAmount > 0, "treasuryAddrAmount must be greater than zero");
-        require(treasuryAddrAmount.sub(_treasuryAddrAmount) > 0, "balance must be greater than zero");
+        require(_treasuryAddrAmount > 0, "500");
+        require(treasuryAddrAmount > 0, "510");
+        require(treasuryAddrAmount.sub(_treasuryAddrAmount) > 0, "520");
         IERC20(DAOToken).safeTransferFrom(address(this), msg.sender, treasuryAddrAmount);
         treasuryAddrAmount = treasuryAddrAmount.sub(_treasuryAddrAmount);
     }
 
     //管理员获取业务资金
     function sendbusinessAddrAmount(uint256 _businessAddrAmount) public onlyOwner {
-        require(_businessAddrAmount > 0, "_businessAddrAmount must be greater than zero.");
-        require(businessAddrAmount > 0, "businessAddrAmount must be greater than zero.");
-        require(businessAddrAmount.sub(_businessAddrAmount) > 0, "balance must be greater than zero.");
+        require(_businessAddrAmount > 0);
+        require(businessAddrAmount > 0);
+        require(businessAddrAmount.sub(_businessAddrAmount) > 0);
         IERC20(DAOToken).safeTransferFrom(address(this), msg.sender, businessAddrAmount);
         businessAddrAmount = businessAddrAmount.sub(_businessAddrAmount);
     }
 
     //管理员获取星探资金
     function sendstatAddrAmount(uint256 _statAddrAmount) public onlyOwner {
-        require(_statAddrAmount > 0, "_statAddrAmount must be greater than zero.");
-        require(statAddrAmount > 0, "statAddrAmount must be greater than zero.");
-        require(statAddrAmount.sub(_statAddrAmount) > 0, "balance  must be greater than zero.");
+        require(_statAddrAmount > 0);
+        require(statAddrAmount > 0);
+        require(statAddrAmount.sub(_statAddrAmount) > 0);
         IERC20(DAOToken).safeTransferFrom(address(this), msg.sender, statAddrAmount);
         statAddrAmount = statAddrAmount.sub(_statAddrAmount);
     }
 
     function _setTakeOut(address coinAddress) private returns (bool) {
-        require(coinAddress != address(0), "coinAddress can not bo zeor address.");
-        require(idoCoin[coinAddress].allCollectAmount > 0, "allCollectAmount must be greater than zero.");
+        require(coinAddress != address(0));
+        require(idoCoin[coinAddress].allCollectAmount > 0);
 
-        require(idoCoin[coinAddress].idoCoinHead.expireTime <= block.timestamp, "not expired.");
+        require(idoCoin[coinAddress].idoCoinHead.expireTime <= block.timestamp);
 
         uint256 planId = idoCoin[coinAddress].idoCoinHead.planId;
         uint256 planNum = getPlanNumber(planId);
-        require(idoCoin[coinAddress].takeOutNumber < planNum, "takeOutNumber must be less than planNum");
+        require(idoCoin[coinAddress].takeOutNumber < planNum);
 
         uint256 planCon = getPlan(planId, idoCoin[coinAddress].takeOutNumber);
 
@@ -747,11 +747,16 @@ contract idoCoinContract is Ownable {
         return _setTakeOut(coinAddress);
     }
 
+    function setUnpass(address coinAddress) public onlyISMPolicy {
+        require(coinAddress != address(0));
+        idoCoin[coinAddress].bUnpass = true;
+    }
+
     function takeOut(address coinAddress) public returns (bool) {
         require(block.timestamp >= idoCoin[coinAddress].idoCoinHead.expireTime, "ipo not end"); //到期了
         require(idoCoin[coinAddress].createUserAddress == msg.sender, "unauthenticated user");
         if (idovoteContract.getVoteStatus(coinAddress) == false) {
-            if (registerAmount.sub(deductAmount) > 0) {
+            if (registerAmount.sub(deductAmount) > 0 || idoCoin[coinAddress].bUnpass) {
                 DAOToken.safeTransfer(idoCoin[coinAddress].createUserAddress, registerAmount.sub(deductAmount));
                 registeFee = registeFee.sub(registerAmount.sub(deductAmount));
                 emit TakeOut(msg.sender, registerAmount.sub(deductAmount), address(DAOToken));
