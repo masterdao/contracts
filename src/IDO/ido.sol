@@ -746,10 +746,12 @@ contract idoCoinContract is Ownable {
     function setTakeOut(address coinAddress) public onlyISMPolicy returns (bool) {
         return _setTakeOut(coinAddress);
     }
+
     function setUnpass(address coinAddress) public onlyISMPolicy {
         require(coinAddress != address(0));
         idoCoin[coinAddress].bUnpass = true;
     }
+
     function takeOut(address coinAddress) public returns (bool) {
         require(block.timestamp >= idoCoin[coinAddress].idoCoinHead.expireTime, "ipo not end"); //到期了
         require(idoCoin[coinAddress].createUserAddress == msg.sender, "unauthenticated user");
