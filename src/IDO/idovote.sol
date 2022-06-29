@@ -7,8 +7,6 @@ import "./IERC20.sol";
 import "./SafeMath.sol";
 import "./SafeERC20.sol";
 
-// import "hardhat/console.sol";
-
 interface IDAOMintingPool {
     function getminerVeDao(
         address who,
@@ -112,7 +110,7 @@ contract idovoteContract is Ownable {
 
     //设定IDO合约地址
     function setidoCoinContract(address _idoCoinContract) public onlyOwner {
-        require(_idoCoinContract != address(0), "_idoCoinContract can not be zero address.");
+        require(_idoCoinContract != address(0));
         idoCoinContract = IidoCoinContract(_idoCoinContract);
     }
 
@@ -123,7 +121,7 @@ contract idovoteContract is Ownable {
 
     //设定矿池合约地址
     function setdaoMintingPool(address poolAddr) public onlyISMPolicy {
-        require(poolAddr != address(0), "poolAddr can not be zero address.");
+        require(poolAddr != address(0));
         daoMintingPool = IDAOMintingPool(poolAddr);
     }
 
@@ -134,7 +132,7 @@ contract idovoteContract is Ownable {
 
     //管理员设定IPO通过率
     function setpassRate(uint256 _passRate) public onlyISMPolicy {
-        require(_passRate > 0, "_paddRate must be greater than zero.");
+        require(_passRate > 0);
         passRate = _passRate;
     }
 
@@ -145,7 +143,7 @@ contract idovoteContract is Ownable {
 
     //管理员设定投票时间
     function setVoteTime(uint256 _voteTime) public onlyISMPolicy {
-        require(_voteTime > 0, "_voteTime must be greater than zero.");
+        require(_voteTime > 0);
         voteTime = _voteTime;
     }
 
@@ -155,7 +153,7 @@ contract idovoteContract is Ownable {
 
     //设定通过率
     function setpassingRate(uint256 _passingRate) public onlyISMPolicy returns (uint256) {
-        require(_passingRate > 0, "_passingRate must be greater than zero");
+        require(_passingRate > 0);
         passingRate = _passingRate;
         emit SetpassingRate(msg.sender, _passingRate);
         return _passingRate;
@@ -168,7 +166,7 @@ contract idovoteContract is Ownable {
 
     //设定投票率
     function setvotingRatio(uint256 _votingRatio) public onlyISMPolicy returns (uint256) {
-        require(_votingRatio > 0, "_votingRatio must be greater than zero.");
+        require(_votingRatio > 0);
         votingRatio = _votingRatio;
         emit SetvotingRatio(msg.sender, _votingRatio);
         return _votingRatio;
@@ -181,25 +179,25 @@ contract idovoteContract is Ownable {
 
     //获取币投票信息
     function getvotecoin(address coinAddress) public view returns (vcoinInfo memory) {
-        require(coinAddress != address(0), "coinAddress can not be zero address.");
+        require(coinAddress != address(0));
         return votecoin[coinAddress];
     }
 
     //获取用户投票权重
     function getVoetPeoperWeight(address who) public view returns (uint256) {
-        require(who != address(0), "user's address can not be zero address.");
+        require(who != address(0));
         return voet_p_weight[who].weight;
     }
 
     function getVotePeoperInfoSize(address who) public view returns (uint256) {
-        require(who != address(0), "user's address can not be zero address.");
+        require(who != address(0));
         uint256 count = vote_p_list[who].length;
         return count;
     }
 
     function getVotePeoperInfo(address who, uint256 index) public view returns (vcoinInfo memory) {
-        require(who != address(0), "user's address can not be zero address.");
-        require(index >= 0, "index must be greater than or equal to zero.");
+        require(who != address(0));
+        require(index >= 0);
         uint256 count = getVotePeoperInfoSize(who);
         require(count >= 1, "vote is empty");
         return votecoin[vote_p_list[who][index]];
@@ -207,7 +205,7 @@ contract idovoteContract is Ownable {
 
     // 获取当前用户指定项目投票记录
     function getVoteRecord(address coinAddress) public view returns (peopleInfo memory) {
-        require(coinAddress != address(0), "coinaddress can not be zero address.");
+        require(coinAddress != address(0));
         return votePeople[msg.sender][coinAddress];
     }
 
@@ -230,8 +228,8 @@ contract idovoteContract is Ownable {
     //投票
     function vote(address coinAddress, bool bStatus) public returns (bool) {
         require(coinAddress != address(0), "coinAddress can not be zero address.");
-        require(daoMintingPool.getuserTotalVeDao(msg.sender) > 0, "veDao must be greater than zero.");
-        require(votePeople[msg.sender][coinAddress].bVoted == false, "vote's status must be false."); //投过后，就不允许再次投票
+        require(daoMintingPool.getuserTotalVeDao(msg.sender) > 0, "veDao must be greater than 0.");
+        require(votePeople[msg.sender][coinAddress].bVoted == false, "you have be voted."); //投过后，就不允许再次投票
 
         peopleInfo memory newpeopleInfo = peopleInfo({
             timestamp: block.timestamp,
@@ -313,7 +311,7 @@ contract idovoteContract is Ownable {
 
     //管理员设定否票结束
     function setVoteCoinEnd(address coinAddress) public onlyISMPolicy returns (bool) {
-        require(votecoin[coinAddress].bCLose == false, "vote should be closed");
+        require(votecoin[coinAddress].bCLose == false, "vote have not end.");
         votecoin[coinAddress].bCLose = true;
         votecoin[coinAddress].bEnd = true;
         votecoin[coinAddress].timestamp = block.timestamp;
@@ -329,14 +327,14 @@ contract idovoteContract is Ownable {
 
     // 获取投票是否结束
     function getVoteEnd(address coinAddress) public view returns (bool) {
-        require(coinAddress != address(0), "coinAddress can not be zero address.");
+        require(coinAddress != address(0), "coinAddress can not be zero address. ");
         return votecoin[coinAddress].bEnd;
     }
 
     //获取投票状态
     function getVoteStatus(address coinAddress) public view returns (bool) {
-        require(coinAddress != address(0), "coinAddress is zero");
-        require(votecoin[coinAddress].bEnd, "vote not end");
+        require(coinAddress != address(0), "coinAddress can not be zero address. ");
+        require(votecoin[coinAddress].bEnd, "vote status must be end.");
         return votecoin[coinAddress].bSuccessOrFail;
     }
 
@@ -347,8 +345,8 @@ contract idovoteContract is Ownable {
         onlyISMPolicy
         returns (address, uint256)
     {
-        require(coinAddress != address(0), "coinAddress can not be zero address.");
-        require(votecoin[coinAddress].timestamp != 0, "timestamp can not be zero.");
+        require(coinAddress != address(0), "coinAddress can not be zero address. ");
+        require(votecoin[coinAddress].timestamp != 0, "time can not be zero.");
         require(amount > 0, "amount must be greater than zero.");
         votecoin[coinAddress].daoVoteIncome = amount;
         DAOToken.safeTransferFrom(msg.sender, address(this), amount);
@@ -358,10 +356,10 @@ contract idovoteContract is Ownable {
 
     //查看用户投票收益，
     function viewDaoVoteIncome(address coinAddress) public view returns (uint256) {
-        require(coinAddress != address(0), "coinAddress can not be zero address.");
-        require(votecoin[coinAddress].timestamp != 0, "timestamp can not be zero.");
-        require(votePeople[msg.sender][coinAddress].timestamp != 0, "user's timestamps can not be zero.");
-        require(votecoin[coinAddress].bEnd, "end'status must be true."); //该币已经投票结束
+        require(coinAddress != address(0), "coinAddress can not be zero address. ");
+        require(votecoin[coinAddress].timestamp != 0, "time can not be zero.");
+        require(votePeople[msg.sender][coinAddress].timestamp != 0, "time can not be zero.");
+        require(votecoin[coinAddress].bEnd, "vote status must be end."); //该币已经投票结束
         if (votePeople[msg.sender][coinAddress].withdrawIncome) {
             return 0;
         }
@@ -401,10 +399,10 @@ contract idovoteContract is Ownable {
 
     //提取用户投票收益
     function tokeoutVoteIncome(address coinAddress) public returns (uint256) {
-        require(coinAddress != address(0), "coinAddress can not be zero address.");
-        require(votecoin[coinAddress].timestamp != 0, "timestamp can not be zeor.");
-        require(votePeople[msg.sender][coinAddress].timestamp != 0, "user's timestamps can not be zero.");
-        require(votecoin[coinAddress].bEnd, "end's status must be true."); //该币已经投票结束
+        require(coinAddress != address(0), "coinAddress can not be zero address. ");
+        require(votecoin[coinAddress].timestamp != 0, "time can not be zero.");
+        require(votePeople[msg.sender][coinAddress].timestamp != 0, "time can not be zero.");
+        require(votecoin[coinAddress].bEnd, "vote status must be end."); //该币已经投票结束
         require(votePeople[msg.sender][coinAddress].withdrawIncome == false, "withdrawIncome's status must be false.");
         //更新weight
         for (uint256 i = 0; i < vote_p_list[msg.sender].length; i++) {
