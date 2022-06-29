@@ -1,8 +1,7 @@
  
 let web3;
-var DAO="0x5e0289c130BcC61FBe5cEc5dce5fE775E50752bf"
-
-var DAOPOOLCONTRACT ="0xD106450F5FDed8998a1E7928094C6fd6A9697B8F"
+var DAO="0x74d6A01b882A03dAe08E36d3aD0BF779dAffc4BC"
+var DAOPOOLCONTRACT ="0x3fb8584e960167C63f2a9633daCD3b21dA189aDe"
 
 fetch('https://app.vedao.pro/v1/dao/public/contract-address')
     .then(resp => resp.json())
