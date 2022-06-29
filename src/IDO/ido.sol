@@ -149,7 +149,7 @@ contract idoCoinContract is Ownable {
         uint256 takeOutNumber;
         address createUserAddress; //创建代币的所有者
         uint256 ipoRate; //IPO成功的比率。80% = 80
-        bool bshutdown;
+        bool bUnpass; //不通过
         bool settle;
     }
     event CreateIeoCoin(address who, address coinAddress, uint256 time, uint256 amount, address newCoinAddress);
@@ -391,7 +391,7 @@ contract idoCoinContract is Ownable {
             takeOutNumber: 0,
             createUserAddress: msg.sender,
             ipoRate: 0,
-            bshutdown: false,
+            bUnpass: false,
             settle: false
         });
 
@@ -746,12 +746,15 @@ contract idoCoinContract is Ownable {
     function setTakeOut(address coinAddress) public onlyISMPolicy returns (bool) {
         return _setTakeOut(coinAddress);
     }
-
+    function setUnpass(address coinAddress) public onlyISMPolicy {
+        require(coinAddress != address(0));
+        idoCoin[coinAddress].bUnpass = true;
+    }
     function takeOut(address coinAddress) public returns (bool) {
         require(block.timestamp >= idoCoin[coinAddress].idoCoinHead.expireTime, "ipo not end"); //到期了
         require(idoCoin[coinAddress].createUserAddress == msg.sender, "unauthenticated user");
         if (idovoteContract.getVoteStatus(coinAddress) == false) {
-            if (registerAmount.sub(deductAmount) > 0) {
+            if (registerAmount.sub(deductAmount) > 0 || idoCoin[coinAddress].bUnpass) {
                 DAOToken.safeTransfer(idoCoin[coinAddress].createUserAddress, registerAmount.sub(deductAmount));
                 registeFee = registeFee.sub(registerAmount.sub(deductAmount));
                 emit TakeOut(msg.sender, registerAmount.sub(deductAmount), address(DAOToken));
