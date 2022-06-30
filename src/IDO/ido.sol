@@ -317,10 +317,10 @@ contract idoCoinContract is Ownable {
     ) public onlyISMPolicy returns (bool) {
         require(applyCoin[contractAddress].contractAddress == address(0));
         applyCoinInfo memory newapplyCoinInfo = applyCoinInfo({
-            timestamp: block.timestamp,
-            contractAddress: contractAddress,
-            symbol: symbol,
-            decimals: decimals
+        timestamp: block.timestamp,
+        contractAddress: contractAddress,
+        symbol: symbol,
+        decimals: decimals
         });
         applyCoin[contractAddress] = newapplyCoinInfo;
         applyCoinList.push(applyCoinId);
@@ -375,24 +375,24 @@ contract idoCoinContract is Ownable {
         require(DAOToken.balanceOf(msg.sender) >= registerAmount); //收取一定数量DAO
 
         idoCoinInfo memory newidoCoinInfo = idoCoinInfo({
-            idoCoinHead: idoCoinHead,
-            timestamp: block.timestamp,
-            coinAddress: idoCoinHead.coinAddress,
-            idoAmountTotal: (idoCoin[coinAddress].idoAmountTotal).add(idoCoinHead.idoAmount),
-            registerAmount: registerAmount,
-            collectAmount: 0,
-            withdrawAmount: 0,
-            allCollectAmount: 0,
-            totalAmount: 0,
-            ipoCollectAmount: 0,
-            idoAmountComplete: 0,
-            ipoAmount: 0,
-            bTakeOut: false,
-            takeOutNumber: 0,
-            createUserAddress: msg.sender,
-            ipoRate: 0,
-            bUnpass: false,
-            settle: false
+        idoCoinHead: idoCoinHead,
+        timestamp: block.timestamp,
+        coinAddress: idoCoinHead.coinAddress,
+        idoAmountTotal: (idoCoin[coinAddress].idoAmountTotal).add(idoCoinHead.idoAmount),
+        registerAmount: registerAmount,
+        collectAmount: 0,
+        withdrawAmount: 0,
+        allCollectAmount: 0,
+        totalAmount: 0,
+        ipoCollectAmount: 0,
+        idoAmountComplete: 0,
+        ipoAmount: 0,
+        bTakeOut: false,
+        takeOutNumber: 0,
+        createUserAddress: msg.sender,
+        ipoRate: 0,
+        bUnpass: false,
+        settle: false
         });
 
         idoCoin[coinAddress] = newidoCoinInfo;
@@ -460,15 +460,15 @@ contract idoCoinContract is Ownable {
             IERC20(APPLYCOIN).safeTransferFrom(msg.sender, address(this), amount);
         }
         userInfo memory newuserinfo = userInfo({
-            timestamp: block.timestamp,
-            coinAddress: idoCoin[coinAddress].idoCoinHead.coinAddress,
-            makeCoinAmount: usercoin[msg.sender][coinAddress].makeCoinAmount,
-            takeCoinAmount: amount.add(usercoin[msg.sender][coinAddress].takeCoinAmount),
-            userAddress: msg.sender,
-            outAmount: 0,
-            takeOutNumber: 0,
-            planId: idoCoin[coinAddress].idoCoinHead.planId,
-            settle: false
+        timestamp: block.timestamp,
+        coinAddress: idoCoin[coinAddress].idoCoinHead.coinAddress,
+        makeCoinAmount: usercoin[msg.sender][coinAddress].makeCoinAmount,
+        takeCoinAmount: amount.add(usercoin[msg.sender][coinAddress].takeCoinAmount),
+        userAddress: msg.sender,
+        outAmount: 0,
+        takeOutNumber: 0,
+        planId: idoCoin[coinAddress].idoCoinHead.planId,
+        settle: false
         });
         usercoin[msg.sender][coinAddress] = newuserinfo;
         //计算打新总共进入多少钱
