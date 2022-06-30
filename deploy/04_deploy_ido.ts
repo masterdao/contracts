@@ -138,12 +138,15 @@ async function printGlobalSettings(ido: IdoCoinContract) {
     colWidths: [15, 46],
   });
 
-  const [registerAmount] = await Promise.all([
+  const [registerAmount, ipoTime] = await Promise.all([
     ido.getregisterAmount(),
-    // ido.ipoTime()
+    ido.ipoTime(),
   ]);
 
-  table.push(['registerAmount', formatEther(registerAmount)], ['ipoTime', 0]);
+  table.push(
+    ['registerAmount', formatEther(registerAmount)],
+    ['ipoTime', ipoTime.toNumber()],
+  );
   console.log('\nIDO Global Settings:');
   console.log(table.toString(), '\n');
 }
