@@ -1,30 +1,34 @@
 // 部署配置文件
 require('dotenv').config();
 
-type Networks = {
-  [name: string]: { url: string; accounts?: string[] };
-};
-
 const config = {
   accounts: [
     // 部署账号 私钥, 必填
     process.env.DEPLOYER_PRIVATE_KEY,
-  ] as string[],
+  ],
   // 网络配置
   networks: {
     rinkeby: {
       url: 'https://rinkeby.infura.io/v3/7ef77c7be8e64f2f9272d68d4ce8deeb',
       // accounts: []
+      // no use
+      overrides: {
+        dao: {
+          address: '0x74d6A01b882A03dAe08E36d3aD0BF779dAffc4BC',
+        },
+      },
     },
     ropsten: {
       url: 'https://ropsten.infura.io/v3/7ef77c7be8e64f2f9272d68d4ce8deeb',
     },
-  } as Networks,
+  },
   // 合约配置
   contracts: {
     dao: {
       // 合约名，勿随意改动
       name: 'ERC20',
+      // 使用已有地址，配置改项会忽略 DAO 合约构建
+      address: '0x74d6A01b882A03dAe08E36d3aD0BF779dAffc4BC',
       // 1. 部署任务
       deploy: { name: 'DAO Token', symbol: 'DAO' },
 
@@ -126,9 +130,7 @@ const config = {
       name: 'idoCoinContract',
 
       // 1. 部署任务
-      deploy: {
-        router: '0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D',
-      },
+      deploy: {},
 
       setPlan: {
         enabled: true,
@@ -154,4 +156,4 @@ if (config.accounts.length === 0 || !config.accounts[0]) {
   console.log(`请配置部署账号，可使用环境变量 DEPLOY_ACCOUNT_PRIVATE_KEY`);
 }
 
-export default config;
+module.exports = config;

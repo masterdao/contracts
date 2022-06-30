@@ -11,7 +11,7 @@ import fs from 'fs';
 import '@nomiclabs/hardhat-solhint';
 import yaml from 'yaml';
 
-import cfg from './deployment.config';
+const cfg = require('./deployment.config');
 
 // skip paths
 const excludes = [/\/INO\//, /idovote\scopy/];

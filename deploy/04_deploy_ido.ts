@@ -1,7 +1,6 @@
 import { HardhatRuntimeEnvironment } from 'hardhat/types';
 import { DeployFunction } from 'hardhat-deploy/types';
 
-import cfg from '../deployment.config';
 import {
   createCliTable,
   createContractWithSigner,
@@ -9,10 +8,10 @@ import {
   run,
 } from '../utils';
 import { DAOMintingPool } from '../types/src/DAOMintingPoolV2';
-import * as hre from 'hardhat';
-import { ethers } from 'ethers';
 import { IdoCoinContract, IdovoteContract } from '../types';
 import { formatEther, parseEther } from 'ethers/lib/utils';
+
+const cfg = require('../deployment.config');
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deployments, getNamedAccounts, ethers } = hre;
@@ -20,12 +19,16 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deployer } = await getNamedAccounts();
   const { contracts } = cfg;
 
-  const depDAO = await deployments.get(contracts.dao.name);
+  let daoAddress = contracts.dao.address;
+  if (!daoAddress) {
+    const depDAO = await deployments.get(contracts.dao.name);
+    daoAddress = depDAO.address;
+  }
   const depVeDAO = await deployments.get(contracts.vedao.name);
   const depVoting = await deployments.get(contracts.voting.name);
-  const swap = await deployments.get(contracts.swap.name);
+  const depSwap = await deployments.get(contracts.swap.name);
 
-  const { ido } = contracts;
+  const { ido, swap } = contracts;
 
   if ((ido as any).skip) {
     return;
@@ -34,11 +37,11 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const artifact = await deploy(ido.name, {
     from: deployer,
     args: [
-      depDAO.address,
+      daoAddress,
       depVeDAO.address,
       depVoting.address,
-      ido.deploy.router,
-      swap.address,
+      swap.deploy.router,
+      depSwap.address,
     ],
   });
 

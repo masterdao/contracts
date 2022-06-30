@@ -1,9 +1,10 @@
 import { HardhatRuntimeEnvironment } from 'hardhat/types';
 import { DeployFunction } from 'hardhat-deploy/types';
 
-import cfg from '../deployment.config';
 import { createCliTable, createContractWithSigner, run } from '../utils';
 import { DAOMintingPool } from '../types/src/DAOMintingPoolV2';
+
+const cfg = require('../deployment.config');
 
 const func: DeployFunction = async function ({
   deployments,
@@ -15,7 +16,11 @@ const func: DeployFunction = async function ({
   const { contracts } = cfg;
   const { vedao } = contracts;
 
-  const depDAO = await deployments.get(contracts.dao.name);
+  let daoAddress = contracts.dao.address;
+  if (!daoAddress) {
+    const depDAO = await deployments.get(contracts.dao.name);
+    daoAddress = depDAO.address;
+  }
 
   // taks1: deploy
   const artifact = await deploy(contracts.vedao.name, {
@@ -38,7 +43,9 @@ const func: DeployFunction = async function ({
   // task2: addPoolTypes
   if (addPoolTypes.enabled && addPoolTypes.items?.length) {
     for (const { length, weight } of addPoolTypes.items) {
-      await run(contract.addmintingPoolType, length, weight);
+      await run(contract.addmintingPoolType, length, weight, {
+        gasLimit: 1200000,
+      });
     }
     await printPoolTypes(contract);
 
@@ -53,9 +60,11 @@ const func: DeployFunction = async function ({
         } = item;
 
         if (lpToken === 'ERC20') {
-          lpToken = depDAO.address;
+          lpToken = daoAddress;
         }
-        await run(contract.addmintingPool, lpToken, multiple, poolTypeId);
+        await run(contract.addmintingPool, lpToken, multiple, poolTypeId, {
+          gasLimit: 1200000,
+        });
       }
 
       await printPools(contract);

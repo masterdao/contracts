@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const config = require('../deployment.config')
 
 function main() {
   const dirs = {
@@ -15,9 +16,23 @@ function main() {
 }
 
 function buildArtifactForNetwork(dir) {
-  const sols = ['ERC20', 'DAOMintingPool', 'idovoteContract', 'idoCoinContract'];
+  const daoAddress = config.contracts.dao.address
+  let sols = [daoAddress? null :'ERC20', 'DAOMintingPool', 'idovoteContract', 'idoCoinContract', 'swapContract'].filter(i => i);
 
-  const out = {}
+  const out = {
+    router: {
+      address: config.contracts.swap.deploy.router
+    },
+  }
+
+  if(daoAddress) {
+    Object.assign(out, {
+      dao: {
+        address: daoAddress
+      }
+    })
+  }
+
   for (const sol of sols) {
     try {
       const json = require(path.join(dir, sol + '.json'));

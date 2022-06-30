@@ -1,12 +1,13 @@
 import { HardhatRuntimeEnvironment } from 'hardhat/types';
 import { DeployFunction } from 'hardhat-deploy/types';
 
-import cfg from '../deployment.config';
 import { createCliTable, createContractWithSigner, run } from '../utils';
 import { DAOMintingPool } from '../types/src/DAOMintingPoolV2';
 import * as hre from 'hardhat';
 // import { ethers } from 'ethers';
 import { IdovoteContract } from '../types';
+
+const cfg = require('../deployment.config');
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deployments, getNamedAccounts, ethers } = hre;
@@ -14,7 +15,11 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deployer } = await getNamedAccounts();
   const { contracts } = cfg;
 
-  const depDAO = await deployments.get(contracts.dao.name);
+  let daoAddress = contracts.dao.address;
+  if (!daoAddress) {
+    const depDAO = await deployments.get(contracts.dao.name);
+    daoAddress = depDAO.address;
+  }
   const depVeDAO = await deployments.get(contracts.vedao.name);
 
   const { voting } = contracts;
@@ -23,7 +28,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   // 部署
   const artifact = await deploy(voting.name, {
     from: deployer,
-    args: [depDAO.address, depVeDAO.address],
+    args: [daoAddress, depVeDAO.address],
   });
 
   console.log('address: voting\t', artifact.address);

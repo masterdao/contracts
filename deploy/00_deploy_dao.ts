@@ -1,7 +1,6 @@
 import { HardhatRuntimeEnvironment } from 'hardhat/types';
 import { DeployFunction } from 'hardhat-deploy/types';
 
-import cfg from '../deployment.config';
 import { ERC20 } from '../types/src/token/ERC20';
 import {
   createCliTable,
@@ -10,6 +9,7 @@ import {
   run,
 } from '../utils';
 import { formatEther, parseEther } from 'ethers/lib/utils';
+const cfg = require('../deployment.config');
 
 const func: DeployFunction = async function ({
   deployments,
@@ -22,6 +22,8 @@ const func: DeployFunction = async function ({
   const {
     contracts: { dao },
   } = cfg;
+
+  if (dao.address) return;
 
   // 部署任务
   const artifact = await deploy(dao.name, {
@@ -39,8 +41,8 @@ const func: DeployFunction = async function ({
   if (dao.multsign.enabled) {
     const accounts = (dao.multsign.accounts || '')
       .split(',')
-      .map((i) => i.trim())
-      .filter((i) => i);
+      .map((i: string) => i.trim())
+      .filter((i: any) => i);
     const addresses = new Set([...accounts, deployer]);
     for (const account of [...addresses]) {
       await run(contract.setMultiAddress, account);

@@ -1,11 +1,9 @@
 import { HardhatRuntimeEnvironment } from 'hardhat/types';
 import { DeployFunction } from 'hardhat-deploy/types';
 
-import cfg from '../deployment.config';
 import { createContractWithSigner, run } from '../utils';
-import { DAOMintingPool } from '../types/src/DAOMintingPoolV2';
-import * as hre from 'hardhat';
-import { IdovoteContract } from '../types';
+
+const cfg = require('../deployment.config');
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deployments, getNamedAccounts, ethers } = hre;
