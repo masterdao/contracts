@@ -79,7 +79,7 @@ contract idoCoinContract is Ownable {
     uint256 public treasuryAddrAmount; //金库地址  30%
     uint256 public businessAddrAmount; //业务经理 10%
     uint256 public statAddrAmount; //星探  10%
-    uint256 private ipoTime;
+    uint256 public ipoTime;
 
     constructor(
         IERC20 _DAOToken,
