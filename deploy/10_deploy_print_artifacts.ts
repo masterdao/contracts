@@ -39,6 +39,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     ['Swap', depSwap.address],
     ['IDO', depIdo.address],
     ['Owner', deployer],
+    ['Router', contracts.swap.deploy.router],
   );
 
   console.log('\nArtifacts:');

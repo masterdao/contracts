@@ -85,6 +85,11 @@ const config = {
             multiple: 2,
             poolTypeId: 0,
           },
+          {
+            lpToken: 'ERC20',
+            multiple: 1,
+            poolTypeId: 1,
+          },
         ],
       },
 
@@ -116,6 +121,14 @@ const config = {
         enabled: true,
         // 百分比
         value: 1,
+      },
+
+      addBonusToken: {
+        enable: false,
+        items: [
+          // 注入奖金, 第2个参数为 bsToken 地址，"ERC20" 为关键字，特质 DAO 币，参数参考 DAOMiningPool.addBonusToken 合约方法
+          ['DAO', 'ERC20', 1000, Date.now() + 30 * 24 * 3600 * 1000],
+        ],
       },
     },
 

@@ -116,7 +116,7 @@ async function printMint(dao: ERC20, deployer: string) {
     ['totalSupply', formatEther(totalSupply)],
     ['allTotalSupply', formatEther(allTotal)],
   );
-  console.log('\nMminting by', deployer);
+  console.log('\nMinting by', deployer);
   console.log(table.toString(), '\n');
 }
 
