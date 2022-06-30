@@ -22,3 +22,21 @@ export async function createContractWithSigner<T extends Contract>(
   const [signer] = await ethers.getSigners();
   return c.connect(signer) as T;
 }
+
+export function createCliTable(options: {
+  head: string[];
+  colWidths: number[];
+}) {
+  const Table = require('cli-table');
+  return new Table(options);
+}
+
+export async function getContractList(
+  getLengthMethod: any,
+  getItemMethod: any,
+) {
+  const length = await getLengthMethod();
+  return Promise.all(
+    Array.from({ length: length.toNumber() }).map((_, i) => getItemMethod(i)),
+  );
+}

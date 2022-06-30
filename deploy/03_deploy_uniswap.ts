@@ -2,7 +2,7 @@ import { HardhatRuntimeEnvironment } from 'hardhat/types';
 import { DeployFunction } from 'hardhat-deploy/types';
 
 import cfg from '../deployment.config';
-import { run } from '../utils';
+import { createContractWithSigner, run } from '../utils';
 import { DAOMintingPool } from '../types/src/DAOMintingPoolV2';
 import * as hre from 'hardhat';
 import { IdovoteContract } from '../types';
@@ -13,10 +13,19 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deployer } = await getNamedAccounts();
   const { contracts } = cfg;
 
-  // TODO: 部署 UniswapV2Factory
-  // TODO: 部署 WETH, 如果没有地址的话
-  // TODO: 部署 UniswapV2Router02
-  // console.log('uniswap do nothing');
+  const { swap } = contracts;
+
+  if ((swap as any).skip) return;
+
+  const artifact = await deploy(swap.name, {
+    from: deployer,
+    args: [swap.deploy.router],
+  });
+
+  console.log('address: swap\t', artifact.address);
+  if (!artifact.newlyDeployed) return;
+
+  const contract = await createContractWithSigner(artifact, ethers);
 };
 
 func.tags = ['local'];
