@@ -3,6 +3,7 @@ import { DeployFunction } from 'hardhat-deploy/types';
 
 import { createCliTable, createContractWithSigner, run } from '../utils';
 import { DAOMintingPool } from '../types/src/DAOMintingPoolV2';
+import { parseEther } from 'ethers/lib/utils';
 
 const cfg = require('../deployment.config');
 
@@ -71,6 +72,26 @@ const func: DeployFunction = async function ({
     }
   }
 
+  // task3: addBonusToken
+  if (vedao.addBonusToken?.enabled) {
+    for (const item of vedao.addBonusToken.items || []) {
+      let [name, bsToken, amount, timeinms] = item;
+      const timeinsec = Math.floor(timeinms / 1000);
+      if (bsToken === 'ERC20') {
+        bsToken = daoAddress;
+      }
+
+      await run(
+        contract.addBonusToken,
+        name,
+        bsToken,
+        parseEther(String(amount)),
+        timeinsec,
+      );
+    }
+
+    // TODO: printBonusList
+  }
   // 所有权转移
   // if(vedao.owner && vedao.owner !== deployer) {
   //   await run(contract.transferOwnership, vedao.owner)
