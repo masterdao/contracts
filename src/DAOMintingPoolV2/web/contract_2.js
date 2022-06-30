@@ -5,7 +5,7 @@ var DAOPOOLCONTRACT ="0x3fb8584e960167C63f2a9633daCD3b21dA189aDe"
 
 fetch('https://app.vedao.pro/v1/dao/public/contract-address')
     .then(resp => resp.json())
-    .then(data => {
+    .then(({data}) => {
         DAO = data.tokenAddress;
         DAOPOOLCONTRACT = data.poolAddress;
     })
