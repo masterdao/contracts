@@ -93,6 +93,14 @@ const config = {
         ],
       },
 
+      addBonusToken: {
+        enable: true,
+        items: [
+          // 注入奖金, 第2个参数为 bsToken 地址，"ERC20" 为关键字，特质 DAO 币，参数参考 DAOMiningPool.addBonusToken 合约方法
+          ['DAO', 'ERC20', 1000, Date.now() + 30 * 24 * 3600 * 1000],
+        ],
+      },
+
       // 4: 所有权转移 (可选)
       owner: undefined,
     },
@@ -121,14 +129,6 @@ const config = {
         enabled: true,
         // 百分比
         value: 1,
-      },
-
-      addBonusToken: {
-        enable: false,
-        items: [
-          // 注入奖金, 第2个参数为 bsToken 地址，"ERC20" 为关键字，特质 DAO 币，参数参考 DAOMiningPool.addBonusToken 合约方法
-          ['DAO', 'ERC20', 1000, Date.now() + 30 * 24 * 3600 * 1000],
-        ],
       },
     },
 
