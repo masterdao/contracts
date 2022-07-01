@@ -596,11 +596,19 @@ contract idoCoinContract is Ownable {
         return true;
     }
 
-    function getCoinInfo(address coinAddress) public view returns (uint256, bool,uint256) {
+    function getCoinInfo(address coinAddress)
+        public
+        view
+        returns (
+            uint256,
+            bool,
+            uint256
+        )
+    {
         if (idoCoin[coinAddress].idoCoinHead.expireTime > block.timestamp) {
-            return (0, false,idoCoin[coinAddress].timestamp);
+            return (0, false, idoCoin[coinAddress].timestamp);
         } else {
-            return (idoCoin[coinAddress].ipoRate, true,idoCoin[coinAddress].timestamp);
+            return (idoCoin[coinAddress].ipoRate, true, idoCoin[coinAddress].timestamp);
         }
     }
 
