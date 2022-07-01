@@ -340,12 +340,10 @@ contract idoCoinContract is Ownable {
         require(coinAddress != address(0));
         return idoCoin[coinAddress];
     }
-
     function getIdoSettle(address coinAddress) public view returns (bool) {
         require(coinAddress != address(0));
         return idoCoin[coinAddress].settle;
     }
-
     //获取注册费
     function getregisterAmount() public view returns (uint256) {
         return registerAmount;
@@ -402,7 +400,7 @@ contract idoCoinContract is Ownable {
 
         idoCoin[coinAddress] = newidoCoinInfo;
 
-        idoCoin[coinAddress].idoCoinHead.expireTime = idoCoin[coinAddress].idoCoinHead.startTime.add(ipoTime); //更新IPO结束时间
+        idoCoin[coinAddress].idoCoinHead.expireTime = idoCoin[coinAddress].idoCoinHead.startTime.add(ipoTime);  
 
         uint256 amount = idoCoinHead.idoAmount;
         COIN = IERC20(idoCoinHead.coinAddress);
@@ -454,7 +452,7 @@ contract idoCoinContract is Ownable {
 
         require(
             amount <= idoCoin[coinAddress].idoCoinHead.bundle.mul(idoCoin[coinAddress].idoCoinHead.maxbundle),
-            "cannot exceed the purchase scope"
+            "132"
         );
         address applyAddress = applyCoinAddress[idoCoin[coinAddress].idoCoinHead.collectType];
         address APPLYCOIN = applyCoin[applyAddress].contractAddress;
@@ -758,8 +756,8 @@ contract idoCoinContract is Ownable {
     }
 
     function takeOut(address coinAddress) public returns (bool) {
-        require(block.timestamp >= idoCoin[coinAddress].idoCoinHead.expireTime, "ipo not end"); //到期了
-        require(idoCoin[coinAddress].createUserAddress == msg.sender, "unauthenticated user");
+        require(block.timestamp >= idoCoin[coinAddress].idoCoinHead.expireTime, "700"); //到期了
+        require(idoCoin[coinAddress].createUserAddress == msg.sender, "710");
         if (idovoteContract.getVoteStatus(coinAddress) == false) {
             if (registerAmount.sub(deductAmount) > 0 || idoCoin[coinAddress].bUnpass) {
                 DAOToken.safeTransfer(idoCoin[coinAddress].createUserAddress, registerAmount.sub(deductAmount));
@@ -774,8 +772,8 @@ contract idoCoinContract is Ownable {
                 emit TakeOut(msg.sender, idoAmount, idoCoin[coinAddress].idoCoinHead.coinAddress);
             }
         } else {
-            require(idoCoin[coinAddress].withdrawAmount > 0, "zero withdraw balance");
-            require(idoCoin[coinAddress].bTakeOut, "no settled");
+            require(idoCoin[coinAddress].withdrawAmount > 0, "720");
+            require(idoCoin[coinAddress].bTakeOut, "730");
             idoCoin[coinAddress].bTakeOut = false;
             uint256 withdrawAmount = idoCoin[coinAddress].withdrawAmount;
 
