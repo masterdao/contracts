@@ -555,11 +555,12 @@ contract DAOMintingPool is Ownable {
         emit Deposit(msg.sender, lpToken, amount);
         return true;
     }
+
     //提取奖金
-     function withdrawBonus(address lpToken, uint256 poolTypeId) public returns (bool){
+    function withdrawBonus(address lpToken, uint256 poolTypeId) public returns (bool) {
         require(lpToken != address(0), "lptoken address cannot be zero address");
         require(mintingPool[lpToken][poolTypeId].lpToken != address(0), "mintingpool's lptoken cannot be zero address"); //抵押的矿池存在
-        require(miner[msg.sender][lpToken][poolTypeId].veDao >= 0,"veDao must be greate than zero.");
+        require(miner[msg.sender][lpToken][poolTypeId].veDao >= 0, "veDao must be greate than zero.");
         uint256 accBonusPerShare;
         //开始计算各种奖励资产
         for (uint256 i = 0; i < bonusList.length; i++) {
@@ -594,13 +595,18 @@ contract DAOMintingPool is Ownable {
             emit WithdrawBonus(msg.sender, lpToken, address(bonusList[i]), bonus);
         }
         return true;
-     }
+    }
+
     //提取奖金和本金
     function withdraw(address lpToken, uint256 poolTypeId) public returns (bool) {
         require(lpToken != address(0), "lptoken address cannot be zero address");
         require(mintingPool[lpToken][poolTypeId].lpToken != address(0), "mintingpool's lptoken cannot be zero address"); //抵押的矿池存在
-        require(miner[msg.sender][lpToken][poolTypeId].veDao >= 0,"veDao must be greate than zero.");
-        require( miner[msg.sender][lpToken][poolTypeId].timestamps.add(mintingPoolTypeList[poolTypeId].poolLength) <=block.timestamp,"not expired.");
+        require(miner[msg.sender][lpToken][poolTypeId].veDao >= 0, "veDao must be greate than zero.");
+        require(
+            miner[msg.sender][lpToken][poolTypeId].timestamps.add(mintingPoolTypeList[poolTypeId].poolLength) <=
+                block.timestamp,
+            "not expired."
+        );
         uint256 amount = miner[msg.sender][lpToken][poolTypeId].amount;
 
         uint256 accBonusPerShare;
