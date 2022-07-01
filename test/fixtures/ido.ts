@@ -35,6 +35,7 @@ export async function idoFixture() {
   // pair DAO/ETH
   await run(factory.createPair, dao.address, weth.address);
 
+  const swap = await deploy(contracts.swap, router.address);
   // const pair = await factory.getPair(dao.address, weth.address);
   //                        pair.address or router.address ?
   // await run(dao.approve, router.address, parseEther('10000'));
@@ -59,9 +60,12 @@ export async function idoFixture() {
     pool.address,
     vote.address,
     router.address,
+    swap.address
   );
 
   await run(vote.setidoCoinContract, ido.address);
+
+  await run(pool.setIdoAddress, ido.address);
 
   return {
     dao,
@@ -146,8 +150,8 @@ export function createIdoFixture(opt: Options) {
       partnerNumber: 0,
       bDAO: false,
       uDAONumber: 0,
-      // 单位秒, 质押结束即开启
-      startTime: Math.floor(Date.now() / 1000),
+      // 单位秒, 当前时间60s, 合约有限制，不能小于 block.time(now)
+      startTime: Math.floor(Date.now() / 1000+60),
       bundle: parseEther('0.001'),
       maxbundle: 100,
       planId: 1,

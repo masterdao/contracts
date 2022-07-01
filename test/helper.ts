@@ -24,6 +24,7 @@ export const contracts = {
     router: 'UniswapV2Router02',
   },
   weth: 'WETH9',
+  swap: 'swapContract',
 };
 
 /** 部署合约 */

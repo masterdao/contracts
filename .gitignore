@@ -12,3 +12,4 @@ cmd.sh
 deployments
 *.log
 .idea
+opp.json
