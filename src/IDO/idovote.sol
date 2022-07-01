@@ -217,7 +217,7 @@ contract idovoteContract is Ownable {
     }
 
     //获取IPO接受后，销售比率 0：未结束，1：超过70,2：小于70
-    function setIopSuccOrFail(address coinAddress) public view  returns (uint256) {
+    function setIopSuccOrFail(address coinAddress) public view returns (uint256) {
         // uint256 ipoRate;
         // bool bend;
         // uint256 timestamp;
