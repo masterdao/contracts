@@ -318,7 +318,6 @@ contract idovoteContract is Ownable {
         require(votecoin[coinAddress].bCLose == false, "vote have not end.");
         votecoin[coinAddress].bCLose = true;
         votecoin[coinAddress].bEnd = true;
-        votecoin[coinAddress].timestamp = block.timestamp;
         if (votecoin[coinAddress].cpassingRate >= passingRate && votecoin[coinAddress].cvotingRatio >= votingRatio) {
             votecoin[coinAddress].bSuccessOrFail = true;
         } else {
