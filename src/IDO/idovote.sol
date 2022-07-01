@@ -217,7 +217,7 @@ contract idovoteContract is Ownable {
     }
 
     //获取IPO接受后，销售比率 0：未结束，1：超过70,2：小于70
-    function setIopSuccOrFail(address coinAddress) public view returns (uint256) {
+    function getIopSuccOrFail(address coinAddress) public view returns (uint256) {
         // uint256 ipoRate;
         // bool bend;
         // uint256 timestamp;
@@ -262,7 +262,7 @@ contract idovoteContract is Ownable {
             if (votecoin[vote_p_list[msg.sender][i]].bEnd) {
                 //如果没有统计过权重的，开始统计用户权重
                 if (votePeople[msg.sender][vote_p_list[msg.sender][i]].weightSettled == false) {
-                    if (setIopSuccOrFail(coinAddress) == 1) {
+                    if (getIopSuccOrFail(coinAddress) == 1) {
                         if (votecoin[vote_p_list[msg.sender][i]].bSuccessOrFail) {
                             voet_p_weight[msg.sender].weight = voet_p_weight[msg.sender].weight.add(1);
                         } else {
@@ -271,7 +271,7 @@ contract idovoteContract is Ownable {
                             }
                         }
                         votePeople[msg.sender][vote_p_list[msg.sender][i]].weightSettled = true;
-                    } else if (setIopSuccOrFail(coinAddress) == 2) {
+                    } else if (getIopSuccOrFail(coinAddress) == 2) {
                         if (votecoin[vote_p_list[msg.sender][i]].bSuccessOrFail) {
                             voet_p_weight[msg.sender].weight = voet_p_weight[msg.sender].weight.sub(1);
                         } else {
@@ -381,7 +381,7 @@ contract idovoteContract is Ownable {
             if (votecoin[vote_p_list[msg.sender][i]].bEnd) {
                 //如果没有统计过权重的，开始统计用户权重
                 if (votePeople[msg.sender][vote_p_list[msg.sender][i]].weightSettled == false) {
-                    if (setIopSuccOrFail(coinAddress) == 1) {
+                    if (getIopSuccOrFail(coinAddress) == 1) {
                         if (votecoin[vote_p_list[msg.sender][i]].bSuccessOrFail) {
                             weight = weight.add(1);
                         } else {
@@ -389,7 +389,7 @@ contract idovoteContract is Ownable {
                                 weight = weight.sub(1);
                             }
                         }
-                    } else if (setIopSuccOrFail(coinAddress) == 2) {
+                    } else if (getIopSuccOrFail(coinAddress) == 2) {
                         if (votecoin[vote_p_list[msg.sender][i]].bSuccessOrFail) {
                             weight = weight.sub(1);
                         } else {
@@ -425,14 +425,14 @@ contract idovoteContract is Ownable {
             if (votecoin[vote_p_list[msg.sender][i]].bEnd) {
                 //如果没有统计过权重的，开始统计用户权重
                 if (votePeople[msg.sender][vote_p_list[msg.sender][i]].weightSettled == false) {
-                    if (setIopSuccOrFail(coinAddress) == 1) {
+                    if (getIopSuccOrFail(coinAddress) == 1) {
                         if (votecoin[vote_p_list[msg.sender][i]].bSuccessOrFail) {
                             voet_p_weight[msg.sender].weight = voet_p_weight[msg.sender].weight.add(1);
                         } else {
                             voet_p_weight[msg.sender].weight = voet_p_weight[msg.sender].weight.sub(1);
                         }
                         votePeople[msg.sender][vote_p_list[msg.sender][i]].weightSettled = true;
-                    } else if (setIopSuccOrFail(coinAddress) == 2) {
+                    } else if (getIopSuccOrFail(coinAddress) == 2) {
                         if (votecoin[vote_p_list[msg.sender][i]].bSuccessOrFail) {
                             voet_p_weight[msg.sender].weight = voet_p_weight[msg.sender].weight.sub(1);
                         } else {
