@@ -52,6 +52,8 @@ describe('ido contract', () => {
     });
 
     it(`IPOsubscription`, async () => {
+      // evm 时间增加 60, 达到 ipoStartTime
+      await helper.time.increase(60)
       const buyerBalance = await user.getBalance();
 
       // 让 user 去打新 1 ETH
@@ -74,16 +76,19 @@ describe('ido contract', () => {
 
       const coin = await ido.getidoCoin(ipoId);
       expect(coin.ipoCollectAmount).equals(amount);
+
       // idoAmountTotal 是可用项目币总数
     });
 
     it('withdraw', async () => {
-      // 等待 ipo 结束
-      await helper.time.increase(25 * 3600) // 时间增加25小时
+      const ipoTime = await ido.ipoTime()
+      // evm 时间推 ipoTime 秒, 让 ipo 结束
+      await helper.time.increase(ipoTime) 
       // 管理员先对项目进行结算
       await run(ido.connect(owner).settlement, ipoId);
 
       const oldBalance = await user.getBalance();
+      console.log('oldBalance', formatEther(oldBalance))
       // 10**10 是 100%
       // const winningRate = ethers.utils.parseUnits('10', 'gwei');
       const amount = parseEther('1');
@@ -94,14 +99,19 @@ describe('ido contract', () => {
         user.address,
       );
 
+      console.log('us', {winningRate: winningRate.toNumber(), makeCoinAmount: formatEther(makeCoinAmount)})
       // 用户对自己进行结算(首次提现前)
-      const rec1 = await run(ido.connect(user).settleaccounts, ipoId, winningRate, makeCoinAmount);
+      const rec1 = await run(ido.connect(user).settleaccounts, ipoId, makeCoinAmount);
+
+      console.log('user settled')
 
       // 用户提现 (planId: 1 只提现一次，提现全部)
       const rec2 = await run(
         ido.connect(user).withdraw,
         ipoId,
       );
+
+      console.log('user withdraw')
 
       const gas = rec1.gas.add(rec2.gas);
 
