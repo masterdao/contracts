@@ -275,8 +275,7 @@ contract idovoteContract is Ownable {
                 }
             }
         }
-        uint256 voteVeDao = votePeople[msg.sender][coinAddress].veDao.mul(voet_p_weight[msg.sender].weight).div(10);
-
+        uint256 voteVeDao = votePeople[msg.sender][coinAddress].veDao;
         uint256 timestamp = votecoin[coinAddress].timestamp == 0 ? block.timestamp : votecoin[coinAddress].timestamp;
         vcoinInfo memory newvcoinInfo = vcoinInfo({
             timestamp: timestamp,
