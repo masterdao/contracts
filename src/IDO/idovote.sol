@@ -292,7 +292,7 @@ contract idovoteContract is Ownable {
         });
         votecoin[coinAddress] = newvcoinInfo;
 
-        require(votecoin[coinAddress].timestamp.add(voteTime) >= block.timestamp,"expired."); //过期不允许投
+        require(votecoin[coinAddress].timestamp.add(voteTime) >= block.timestamp, "expired."); //过期不允许投
 
         uint256 weight = voet_p_weight[msg.sender].weight;
 

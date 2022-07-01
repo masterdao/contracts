@@ -367,15 +367,14 @@ contract idoCoinContract is Ownable {
         deductAmount = _deductAmount;
         return true;
     }
- 
- 
+
     function createIeoCoin(idoCoinInfoHead memory idoCoinHead) public payable returns (address) {
         require(idoCoinHead.coinAddress != address(0));
         require(idoCoinHead.startTime >= block.timestamp);
         require(idoCoinHead.idoAmount > 0);
         //新获取一个地址
         address coinAddress = getAddress(IERC20(idoCoinHead.coinAddress).symbol());
- 
+
         require(DAOToken.balanceOf(msg.sender) >= registerAmount); //收取一定数量DAO
 
         idoCoinInfo memory newidoCoinInfo = idoCoinInfo({
@@ -597,9 +596,9 @@ contract idoCoinContract is Ownable {
         return true;
     }
 
-    function getIpoRate(address coinAddress) public view returns (uint256,bool) {
+    function getIpoRate(address coinAddress) public view returns (uint256, bool) {
         if (idoCoin[coinAddress].idoCoinHead.expireTime > block.timestamp) {
-            return (0 , false);
+            return (0, false);
         } else {
             return (idoCoin[coinAddress].ipoRate, true);
         }
