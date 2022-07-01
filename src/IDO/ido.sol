@@ -340,10 +340,12 @@ contract idoCoinContract is Ownable {
         require(coinAddress != address(0));
         return idoCoin[coinAddress];
     }
+
     function getIdoSettle(address coinAddress) public view returns (bool) {
         require(coinAddress != address(0));
         return idoCoin[coinAddress].settle;
     }
+
     //获取注册费
     function getregisterAmount() public view returns (uint256) {
         return registerAmount;
@@ -365,16 +367,15 @@ contract idoCoinContract is Ownable {
         deductAmount = _deductAmount;
         return true;
     }
-
-    /**
-    新建IDO上币资料
-     */
+ 
+ 
     function createIeoCoin(idoCoinInfoHead memory idoCoinHead) public payable returns (address) {
         require(idoCoinHead.coinAddress != address(0));
         require(idoCoinHead.startTime >= block.timestamp);
         require(idoCoinHead.idoAmount > 0);
         //新获取一个地址
         address coinAddress = getAddress(IERC20(idoCoinHead.coinAddress).symbol());
+ 
         require(DAOToken.balanceOf(msg.sender) >= registerAmount); //收取一定数量DAO
 
         idoCoinInfo memory newidoCoinInfo = idoCoinInfo({
@@ -400,7 +401,7 @@ contract idoCoinContract is Ownable {
 
         idoCoin[coinAddress] = newidoCoinInfo;
 
-        idoCoin[coinAddress].idoCoinHead.expireTime = idoCoin[coinAddress].idoCoinHead.startTime.add(ipoTime);  
+        idoCoin[coinAddress].idoCoinHead.expireTime = idoCoin[coinAddress].idoCoinHead.startTime.add(ipoTime);
 
         uint256 amount = idoCoinHead.idoAmount;
         COIN = IERC20(idoCoinHead.coinAddress);
@@ -596,9 +597,9 @@ contract idoCoinContract is Ownable {
         return true;
     }
 
-    function getIpoRate(address coinAddress) public view returns (uint256, bool) {
+    function getIpoRate(address coinAddress) public view returns (uint256,bool) {
         if (idoCoin[coinAddress].idoCoinHead.expireTime > block.timestamp) {
-            return (0, false);
+            return (0 , false);
         } else {
             return (idoCoin[coinAddress].ipoRate, true);
         }
