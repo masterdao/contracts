@@ -555,11 +555,52 @@ contract DAOMintingPool is Ownable {
         emit Deposit(msg.sender, lpToken, amount);
         return true;
     }
+    //提取奖金
+     function withdrawBonus(address lpToken, uint256 poolTypeId) public returns (bool){
+        require(lpToken != address(0), "lptoken address cannot be zero address");
+        require(mintingPool[lpToken][poolTypeId].lpToken != address(0), "mintingpool's lptoken cannot be zero address"); //抵押的矿池存在
+        require(miner[msg.sender][lpToken][poolTypeId].veDao >= 0,"veDao must be greate than zero.");
+        uint256 accBonusPerShare;
+        //开始计算各种奖励资产
+        for (uint256 i = 0; i < bonusList.length; i++) {
+            updateBonusShare(bonusList[i]);
 
+            accBonusPerShare = BonusToken[bonusList[i]].accBonusPerShare;
+
+            if (miner[msg.sender][lpToken][poolTypeId].veDao > 0) {
+                userBonus[msg.sender][bonusList[i]] = userBonus[msg.sender][bonusList[i]].add(
+                    miner[msg.sender][lpToken][poolTypeId].veDao.mul(accBonusPerShare).div(1e18)
+                );
+                userBonus[msg.sender][bonusList[i]] = userBonus[msg.sender][bonusList[i]].sub(
+                    userRewardDebt[msg.sender][bonusList[i]]
+                );
+            }
+            userRewardDebt[msg.sender][bonusList[i]] = miner[msg.sender][lpToken][poolTypeId]
+                .veDao
+                .mul(accBonusPerShare)
+                .div(1e18);
+        }
+        uint256 bonus;
+        miner[msg.sender][lpToken][poolTypeId].timestamps = block.timestamp;
+        //开始分配各种奖励资产
+        for (uint256 i = 0; i < bonusList.length; i++) {
+            bonus = userBonus[msg.sender][bonusList[i]];
+            userBonus[msg.sender][bonusList[i]] = 0;
+            BonusToken[bonusList[i]].lastBonus = BonusToken[bonusList[i]].lastBonus.sub(bonus);
+
+            if (bonus > 0) {
+                IERC20(bonusList[i]).safeTransfer(msg.sender, bonus);
+            }
+            emit WithdrawBonus(msg.sender, lpToken, address(bonusList[i]), bonus);
+        }
+        return true;
+     }
+    //提取奖金和本金
     function withdraw(address lpToken, uint256 poolTypeId) public returns (bool) {
         require(lpToken != address(0), "lptoken address cannot be zero address");
         require(mintingPool[lpToken][poolTypeId].lpToken != address(0), "mintingpool's lptoken cannot be zero address"); //抵押的矿池存在
-        require(miner[msg.sender][lpToken][poolTypeId].veDao >= 0);
+        require(miner[msg.sender][lpToken][poolTypeId].veDao >= 0,"veDao must be greate than zero.");
+        require( miner[msg.sender][lpToken][poolTypeId].timestamps.add(mintingPoolTypeList[poolTypeId].poolLength) <=block.timestamp,"not expired.");
         uint256 amount = miner[msg.sender][lpToken][poolTypeId].amount;
 
         uint256 accBonusPerShare;
