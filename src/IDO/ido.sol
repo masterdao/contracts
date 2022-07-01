@@ -340,6 +340,7 @@ contract idoCoinContract is Ownable {
         require(coinAddress != address(0));
         return idoCoin[coinAddress];
     }
+
     function getIdoSettle(address coinAddress) public view returns (bool) {
         require(coinAddress != address(0));
         return idoCoin[coinAddress].settle;
