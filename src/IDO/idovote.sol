@@ -20,7 +20,7 @@ interface IDAOMintingPool {
 }
 
 interface IidoCoinContract {
-    function getIpoRate(address coinAddress) external view returns (uint256, bool);
+    function getCoinInfo(address coinAddress) external view returns (uint256, bool,uint256);
 }
 
 /*
@@ -211,9 +211,10 @@ contract idovoteContract is Ownable {
 
     //获取IPO接受后，销售比率 0：未结束，1：超过70,2：小于70
     function setIopSuccOrFail(address coinAddress) public view onlyISMPolicy returns (uint256) {
-        uint256 ipoRate;
-        bool bend;
-        (ipoRate, bend) = idoCoinContract.getIpoRate(coinAddress);
+        // uint256 ipoRate;
+        // bool bend;
+        // uint256 timestamp;
+        (uint256 ipoRate, bool bend, ) = idoCoinContract.getCoinInfo(coinAddress);
         if (bend == false) {
             return 0;
         } else {
@@ -230,7 +231,8 @@ contract idovoteContract is Ownable {
         require(coinAddress != address(0), "coinAddress can not be zero address.");
         require(daoMintingPool.getuserTotalVeDao(msg.sender) > 0, "veDao must be greater than 0.");
         require(votePeople[msg.sender][coinAddress].bVoted == false, "you have be voted."); //投过后，就不允许再次投票
-
+        (,,uint256 ts) = idoCoinContract.getCoinInfo(coinAddress);
+        require(ts != 0 ,"coin does not exist.");
         peopleInfo memory newpeopleInfo = peopleInfo({
             timestamp: block.timestamp,
             veDao: daoMintingPool.getuserTotalVeDao(msg.sender),
