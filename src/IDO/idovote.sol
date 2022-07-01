@@ -257,14 +257,18 @@ contract idovoteContract is Ownable {
                         if (votecoin[vote_p_list[msg.sender][i]].bSuccessOrFail) {
                             voet_p_weight[msg.sender].weight = voet_p_weight[msg.sender].weight.add(1);
                         } else {
-                            voet_p_weight[msg.sender].weight = voet_p_weight[msg.sender].weight.sub(1);
+                            if( voet_p_weight[msg.sender].weight > 1 ){
+                                voet_p_weight[msg.sender].weight = voet_p_weight[msg.sender].weight.sub(1);
+                            }
                         }
                         votePeople[msg.sender][vote_p_list[msg.sender][i]].weightSettled = true;
                     } else if (setIopSuccOrFail(coinAddress) == 2) {
                         if (votecoin[vote_p_list[msg.sender][i]].bSuccessOrFail) {
                             voet_p_weight[msg.sender].weight = voet_p_weight[msg.sender].weight.sub(1);
                         } else {
-                            voet_p_weight[msg.sender].weight = voet_p_weight[msg.sender].weight.add(1);
+                            if( voet_p_weight[msg.sender].weight > 1 ){
+                                voet_p_weight[msg.sender].weight = voet_p_weight[msg.sender].weight.sub(1);
+                            }
                         }
                         votePeople[msg.sender][vote_p_list[msg.sender][i]].weightSettled = true;
                     }
@@ -374,13 +378,17 @@ contract idovoteContract is Ownable {
                         if (votecoin[vote_p_list[msg.sender][i]].bSuccessOrFail) {
                             weight = weight.add(1);
                         } else {
-                            weight = weight.sub(1);
+                            if( weight >1 ){
+                                weight = weight.sub(1);    
+                            }
                         }
                     } else if (setIopSuccOrFail(coinAddress) == 2) {
                         if (votecoin[vote_p_list[msg.sender][i]].bSuccessOrFail) {
                             weight = weight.sub(1);
                         } else {
-                            weight = weight.add(1);
+                            if( weight >1 ){
+                                weight = weight.sub(1);    
+                            }
                         }
                     }
                 }
