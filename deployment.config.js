@@ -25,9 +25,9 @@ const config = {
       url: 'https://speedy-nodes-nyc.moralis.io/aa39bd678ed2a4cead5db9c3/bsc/testnet',
       overrides: {
         dao: {
-          address: '0x857B0Ee69fEca6A35Ec15F83bFbC837beBcbdcf8'
-        }
-      }
+          address: '0x857B0Ee69fEca6A35Ec15F83bFbC837beBcbdcf8',
+        },
+      },
     },
   },
   // 合约配置
