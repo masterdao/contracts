@@ -113,6 +113,16 @@ const config: HardhatUserConfig = {
       gasPrice: 8000000000,
       tags: ['staging'],
     },
+    bsctest: {
+      chainId: 97,
+      url: cfg.networks.bsctest.url,
+      accounts: cfg.networks.bsctest.accounts || cfg.accounts,
+      live: true,
+      saveDeployments: true,
+      gas: 12000000,
+      gasPrice: 8000000000,
+      tags: ['staging'],
+    },
   },
   // gasReporter: {
   //   enabled: true,
