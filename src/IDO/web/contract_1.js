@@ -363,6 +363,6 @@ async  function  getIdoSettle(){
     const coinAddress = document.getElementById("set-settle-coinAddress").value;
     const contract = await getErc20Contract(IDOABI, IDOCONTRACT);
     const coinbase = await getCurrentAccount()
-    const tx = await contract.methods.getIdoSettle(coinAddress).send({ from: coinbase })
+    const tx = await contract.methods.getIdoSettle(coinAddress).call()
     $('.show-settle').html(`${tx}`);
 }
