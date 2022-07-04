@@ -23,6 +23,11 @@ const config = {
     },
     bsctest: {
       url: 'https://speedy-nodes-nyc.moralis.io/aa39bd678ed2a4cead5db9c3/bsc/testnet',
+      overrides: {
+        dao: {
+          address: '0x857B0Ee69fEca6A35Ec15F83bFbC837beBcbdcf8'
+        }
+      }
     },
   },
   // 合约配置
@@ -31,7 +36,7 @@ const config = {
       // 合约名，勿随意改动
       name: 'ERC20',
       // 使用已有地址，配置改项会忽略 DAO 合约构建
-      // address: '0x74d6A01b882A03dAe08E36d3aD0BF779dAffc4BC',
+      address: '0x857B0Ee69fEca6A35Ec15F83bFbC837beBcbdcf8',
       // 1. 部署任务
       deploy: { name: 'DAO Token', symbol: 'DAO' },
 
