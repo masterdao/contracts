@@ -8,10 +8,11 @@ const config = {
   ],
   // 网络配置
   networks: {
+    localhost: {
+      url: 'http://localhost:8545',
+    },
     rinkeby: {
       url: 'https://rinkeby.infura.io/v3/7ef77c7be8e64f2f9272d68d4ce8deeb',
-      // accounts: []
-      // no use
       overrides: {
         dao: {
           address: '0x74d6A01b882A03dAe08E36d3aD0BF779dAffc4BC',
@@ -36,7 +37,7 @@ const config = {
       // 合约名，勿随意改动
       name: 'ERC20',
       // 使用已有地址，配置改项会忽略 DAO 合约构建
-      address: '0x857B0Ee69fEca6A35Ec15F83bFbC837beBcbdcf8',
+      // address: '0x857B0Ee69fEca6A35Ec15F83bFbC837beBcbdcf8',
       // 1. 部署任务
       deploy: { name: 'DAO Token', symbol: 'DAO' },
 
@@ -102,7 +103,7 @@ const config = {
       },
 
       addBonusToken: {
-        enable: true,
+        enabled: true,
         items: [
           // 注入奖金, 第2个参数为 bsToken 地址，"ERC20" 为关键字，特质 DAO 币，参数参考 DAOMiningPool.addBonusToken 合约方法
           ['DAO', 'ERC20', 1000, Date.now() + 30 * 24 * 3600 * 1000],

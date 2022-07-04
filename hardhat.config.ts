@@ -6,10 +6,9 @@ import 'hardhat-deploy';
 import 'hardhat-deploy-ethers';
 import { TASK_COMPILE_SOLIDITY_GET_SOURCE_PATHS } from 'hardhat/builtin-tasks/task-names';
 import { HardhatUserConfig, subtask } from 'hardhat/config';
-import fs from 'fs';
 // import 'hardhat-gas-reporter';
 import '@nomiclabs/hardhat-solhint';
-import yaml from 'yaml';
+import './hardhat/plugins/deployment-config-merge';
 
 const cfg = require('./deployment.config');
 

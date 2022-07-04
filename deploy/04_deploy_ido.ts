@@ -11,10 +11,8 @@ import { DAOMintingPool } from '../types/src/DAOMintingPoolV2';
 import { IdoCoinContract, IdovoteContract } from '../types';
 import { formatEther, parseEther } from 'ethers/lib/utils';
 
-const cfg = require('../deployment.config');
-
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
-  const { deployments, getNamedAccounts, ethers } = hre;
+  const { deployments, getNamedAccounts, ethers, deployConfig: cfg } = hre;
   const { deploy } = deployments;
   const { deployer } = await getNamedAccounts();
   const { contracts } = cfg;

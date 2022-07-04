@@ -9,11 +9,9 @@ import {
   SwapContract,
 } from '../types';
 import { createCliTable } from '../utils';
-const cfg = require('../deployment.config');
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
-  const { deployments, getNamedAccounts, ethers } = hre;
-  const { deploy } = deployments;
+  const { deployments, getNamedAccounts, deployConfig: cfg } = hre;
   const { deployer } = await getNamedAccounts();
   const { contracts } = cfg;
 

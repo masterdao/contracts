@@ -9,15 +9,14 @@ import {
   run,
 } from '../utils';
 import { formatEther, parseEther } from 'ethers/lib/utils';
-const cfg = require('../deployment.config');
 
 const func: DeployFunction = async function ({
   deployments,
   getNamedAccounts,
   ethers,
+  deployConfig: cfg,
 }: HardhatRuntimeEnvironment) {
   const { deploy } = deployments;
-
   const { deployer } = await getNamedAccounts();
   const {
     contracts: { dao },
@@ -53,7 +52,7 @@ const func: DeployFunction = async function ({
   }
 
   // 3. 发币
-  if (dao.mint?.enable) {
+  if (dao.mint?.enabled) {
     const { count } = dao.mint;
 
     if (count) {
@@ -65,7 +64,7 @@ const func: DeployFunction = async function ({
   }
 
   // 空投
-  if (dao.mint.enable && dao.airdrop.enabled && dao.airdrop.whiteList) {
+  if (dao.mint.enabled && dao.airdrop.enabled && dao.airdrop.whiteList) {
     const { whiteList, count } = dao.airdrop;
     const wei = parseEther(String(count));
     for (const account of whiteList) {

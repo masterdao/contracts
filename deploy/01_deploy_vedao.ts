@@ -5,12 +5,11 @@ import { createCliTable, createContractWithSigner, run } from '../utils';
 import { DAOMintingPool } from '../types/src/DAOMintingPoolV2';
 import { parseEther } from 'ethers/lib/utils';
 
-const cfg = require('../deployment.config');
-
 const func: DeployFunction = async function ({
   deployments,
   getNamedAccounts,
   ethers,
+  deployConfig: cfg,
 }: HardhatRuntimeEnvironment) {
   const { deploy } = deployments;
   const { deployer } = await getNamedAccounts();

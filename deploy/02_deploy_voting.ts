@@ -2,15 +2,11 @@ import { HardhatRuntimeEnvironment } from 'hardhat/types';
 import { DeployFunction } from 'hardhat-deploy/types';
 
 import { createCliTable, createContractWithSigner, run } from '../utils';
-import { DAOMintingPool } from '../types/src/DAOMintingPoolV2';
-import * as hre from 'hardhat';
 // import { ethers } from 'ethers';
 import { IdovoteContract } from '../types';
 
-const cfg = require('../deployment.config');
-
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
-  const { deployments, getNamedAccounts, ethers } = hre;
+  const { deployments, getNamedAccounts, ethers, deployConfig: cfg } = hre;
   const { deploy } = deployments;
   const { deployer } = await getNamedAccounts();
   const { contracts } = cfg;
