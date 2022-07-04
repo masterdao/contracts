@@ -358,3 +358,11 @@ async function getVoteEnd() {
     const vote = await contract.methods.getVoteEnd(coinAddress).call();
     $('.show-vote').html(`${vote}`);
 }
+
+async  function  getIdoSettle(){
+    const coinAddress = document.getElementById("set-settle-coinAddress").value;
+    const contract = await getErc20Contract(IDOABI, IDOCONTRACT);
+    const coinbase = await getCurrentAccount()
+    const tx = await contract.methods.getIdoSettle(coinAddress).send({ from: coinbase })
+    $('.show-settle').html(`${tx}`);
+}
