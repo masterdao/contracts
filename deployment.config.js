@@ -103,7 +103,7 @@ const config = {
       },
 
       addBonusToken: {
-        enabled: true,
+        enabled: false,
         items: [
           // 注入奖金, 第2个参数为 bsToken 地址，"ERC20" 为关键字，特质 DAO 币，参数参考 DAOMiningPool.addBonusToken 合约方法
           ['DAO', 'ERC20', 1000, Date.now() + 30 * 24 * 3600 * 1000],

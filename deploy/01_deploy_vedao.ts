@@ -71,11 +71,11 @@ const func: DeployFunction = async function ({
     }
   }
 
-  // task3: addBonusToken
-  if (vedao.addBonusToken?.enabled) {
+  // task4: addBonusToken
+  if (vedao.addBonusToken.enabled) {
     for (const item of vedao.addBonusToken.items || []) {
       let [name, bsToken, amount, timeinms] = item;
-      const timeinsec = Math.floor(timeinms / 1000);
+      const expiredAtSec = Math.floor(timeinms / 1000);
       if (bsToken === 'ERC20') {
         bsToken = daoAddress;
       }
@@ -85,11 +85,12 @@ const func: DeployFunction = async function ({
         name,
         bsToken,
         parseEther(String(amount)),
-        timeinsec,
+        expiredAtSec,
+        { gasLimit: 1200000 },
       );
     }
 
-    // TODO: printBonusList
+    printBonusList(contract);
   }
   // 所有权转移
   // if(vedao.owner && vedao.owner !== deployer) {
@@ -167,4 +168,8 @@ async function printPools(vedao: DAOMintingPool) {
 
   console.log('\n Pools');
   console.log(table.toString(), '\n');
+}
+
+async function printBonusList(vedao: DAOMintingPool) {
+  // TODO:
 }
