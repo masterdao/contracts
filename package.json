@@ -54,6 +54,7 @@
     "postdeploy": "node scripts/build-artifact.js",
     "deploy:localhost": "hardhat deploy --network localhost",
     "deploy:rinkeby": "npm run predeploy && hardhat deploy --network rinkeby && npm run postdeploy",
-    "deploy:bsctest": "npm run predeploy && hardhat deploy --network bsctest && npm run postdeploy"
+    "deploy:bsctest": "npm run predeploy && hardhat deploy --network bsctest && npm run postdeploy",
+    "cp:artifact": "node scripts/copy-artifact.js ../webapp/app/contract/contracts"
   }
 }
