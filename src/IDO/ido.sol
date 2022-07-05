@@ -153,7 +153,7 @@ contract idoCoinContract is Ownable {
         bool settle;
     }
     event CreateIeoCoin(address who, address coinAddress, uint256 time, uint256 amount, address newCoinAddress);
-    event IPOSUBscription(address who, uint256 amount, address applyAddress,address coinAddress);
+    event IPOSUBscription(address who, uint256 amount, address applyAddress, address coinAddress);
     event TakeOut(address who, uint256 amount, address tokenAddr);
     event Withdraw(address who, uint256 planCon, address coinAddress, uint256 amount);
     event Settleaccounts(address who, IERC20 COIN, uint256 amount, address coinAddress, uint256 takeBalance);
@@ -476,7 +476,7 @@ contract idoCoinContract is Ownable {
         usercoin[msg.sender][coinAddress] = newuserinfo;
         //计算打新总共进入多少钱
         idoCoin[coinAddress].ipoCollectAmount = idoCoin[coinAddress].ipoCollectAmount.add(amount);
-        emit IPOSUBscription(msg.sender, amount, APPLYCOIN,coinAddress);
+        emit IPOSUBscription(msg.sender, amount, APPLYCOIN, coinAddress);
         return true;
     }
 
