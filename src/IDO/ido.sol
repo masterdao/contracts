@@ -767,9 +767,10 @@ contract idoCoinContract is Ownable {
         require(block.timestamp >= idoCoin[coinAddress].idoCoinHead.expireTime, "700"); //到期了
         require(idoCoin[coinAddress].createUserAddress == msg.sender, "710");
         if (idovoteContract.getVoteStatus(coinAddress) == false) {
-            if (registerAmount.sub(deductAmount) > 0 || idoCoin[coinAddress].bUnpass) {
+            if (idoCoin[coinAddress].registerAmount.sub(deductAmount) > 0 || idoCoin[coinAddress].bUnpass) {
                 DAOToken.safeTransfer(idoCoin[coinAddress].createUserAddress, registerAmount.sub(deductAmount));
                 registeFee = registeFee.sub(registerAmount.sub(deductAmount));
+                idoCoin[coinAddress].registerAmount = 0;
                 emit TakeOut(msg.sender, registerAmount.sub(deductAmount), address(DAOToken));
             }
             uint256 idoAmount = idoCoin[coinAddress].idoCoinHead.idoAmount;

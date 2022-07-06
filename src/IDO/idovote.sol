@@ -403,7 +403,7 @@ contract idovoteContract is Ownable {
         }
         //开始计算收益
         uint256 peopleVoteIncome = votePeople[msg.sender][coinAddress].veDao.mul(weight);
-        peopleVoteIncome = peopleVoteIncome.div(10);
+        peopleVoteIncome = peopleVoteIncome.mul(votecoin[coinAddress].daoVoteIncome).div(10);
         if (votePeople[msg.sender][coinAddress].bStatus) {
             peopleVoteIncome = peopleVoteIncome.div(votecoin[coinAddress].pass);
         } else {
@@ -446,7 +446,7 @@ contract idovoteContract is Ownable {
 
         //开始计算收益
         uint256 peopleVoteIncome = votePeople[msg.sender][coinAddress].veDao.mul(voet_p_weight[msg.sender].weight);
-        peopleVoteIncome = peopleVoteIncome.div(10);
+        peopleVoteIncome = peopleVoteIncome.mul(votecoin[coinAddress].daoVoteIncome).div(10);
         if (votePeople[msg.sender][coinAddress].bStatus) {
             peopleVoteIncome = peopleVoteIncome.div(votecoin[coinAddress].pass);
         } else {
