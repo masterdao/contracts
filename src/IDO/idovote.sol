@@ -44,8 +44,6 @@ contract idovoteContract is Ownable {
     uint256 private passingRate; //通过率，默认80/100
     uint256 private votingRatio; //投票率，默认50/100
 
-    uint256 private minVoteVeDao;
-
     uint256 private totalStaking;
     uint256 private voteTime;
     uint256 private passRate; // IPO申购通过率
@@ -217,9 +215,6 @@ contract idovoteContract is Ownable {
 
     //获取IPO接受后，销售比率 0：未结束，1：超过70,2：小于70
     function getIopSuccOrFail(address coinAddress) public view returns (uint256) {
-        // uint256 ipoRate;
-        // bool bend;
-        // uint256 timestamp;
         (uint256 ipoRate, bool bend, ) = idoCoinContract.getCoinInfo(coinAddress);
         if (bend == false) {
             return 0;
