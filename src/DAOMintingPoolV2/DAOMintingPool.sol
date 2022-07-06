@@ -310,7 +310,7 @@ contract DAOMintingPool is Ownable {
     ) public payable onlyMonetaryPolicy returns (bool) {
         require(lpToken != address(0));
 
-        require(checklistmintingPool(poolTypeId) == false, "poolTypeId cannot be repeated.");
+        //require(checklistmintingPool(poolTypeId) == false, "poolTypeId cannot be repeated.");
 
         require(mintingPool[lpToken][poolTypeId].lpToken == address(0));
 
