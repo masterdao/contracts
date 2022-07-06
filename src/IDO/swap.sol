@@ -56,4 +56,26 @@ contract swapContract {
             block.timestamp.add(600)
         );
     }
+    function getamountOuts(uint256 collectType,uint256 amountIn, IERC20 DAOToken,address tokenB) public view returns(uint256) {
+        address pair_;
+        address[] memory path = new address[](2);
+        uint256[] memory amountOuts;
+        uint256 amountOut; 
+        address factory = IUniswapRouter02(router).factory();
+        if(collectType == 1){
+            pair_ = IUniswapFactory(factory).getPair(IUniswapRouter02(router).WETH(), address(DAOToken));
+            //计算本次购买数量
+            path[0] = IUniswapRouter02(router).WETH();
+            path[1] = address(DAOToken);
+            amountOuts = IUniswapRouter02(router).getAmountsOut(amountIn, path);
+        }
+        else{
+            pair_ = IUniswapFactory(factory).getPair(tokenB, address(DAOToken));
+            //计算本次购买数量
+            path[0] = tokenB;
+            path[1] = address(DAOToken);
+            amountOuts = IUniswapRouter02(router).getAmountsOut(amountIn, path);
+        }
+        amountOut = amountOuts[1];
+    }
 }

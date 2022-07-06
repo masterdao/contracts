@@ -6,12 +6,7 @@ import "./Ownable.sol";
 import "./IERC20.sol";
 import "./SafeMath.sol";
 import "./SafeERC20.sol";
-import "./Create2.sol";
-import "./InitializableAdminUpgradeabilityProxy.sol";
-import "./IUniswapFactory.sol";
-import "./IUniswapPair.sol";
-import "./IUniswapRouter02.sol";
-
+ 
 interface IDAOMintingPool {
     function getuserTotalVeDao(address who) external view returns (uint256);
 
@@ -31,6 +26,18 @@ interface IDAOMintingPool {
 interface IidovoteContract {
     function getVoteStatus(address coinAddress) external view returns (bool);
 }
+interface ItoolContract{
+    function getAddress(string memory name) external view returns (address);
+    function calculateTakeBalnce(uint256 makeCoinAmount,
+        uint256 decimals,
+        uint256 to_decimals,
+        uint256 takeCoinAmount,
+        uint256 price) external pure returns (uint256);
+    function calculateAllMakeCoinAmount(uint256 decimals,
+        uint256 to_decimals,
+        uint256 takeCoinAmount,
+        uint256 price)  external pure returns (uint256);
+}
 
 interface IswapContract {
     function autoSwapTokens(
@@ -45,6 +52,11 @@ interface IswapContract {
         uint256 amountIn,
         address to
     ) external;
+    function getamountOuts(uint256 collectType,
+        uint256 amountIn, 
+        IERC20 DAOToken,
+        address tokenB) external view returns(uint256);
+
 }
 
 /*
@@ -63,7 +75,7 @@ contract idoCoinContract is Ownable {
     IDAOMintingPool public daoMintingPool;
     IidovoteContract public idovoteContract;
     IswapContract public swapContract;
-
+    ItoolContract public toolContract;
     uint256 applyCoinId;
     address public daoAddress;
     uint256 public registeFee;
@@ -85,14 +97,15 @@ contract idoCoinContract is Ownable {
         IERC20 _DAOToken,
         IDAOMintingPool _IDAOMintingPool,
         IidovoteContract _IidovoteContract,
-        address router_,
-        IswapContract _IswapContract
+        IswapContract _IswapContract,
+        ItoolContract _toolContract
     ) {
         initializeOwner();
 
         daoMintingPool = _IDAOMintingPool;
         idovoteContract = _IidovoteContract;
         swapContract = _IswapContract;
+        toolContract = _toolContract;
         DAOToken = _DAOToken;
         priceDecimals = 4;
         TOKEN_DECIMALS = 18;
@@ -103,7 +116,6 @@ contract idoCoinContract is Ownable {
         addapplyCoin(msg.sender, "ETH", 18);
         registeFee = 0;
         _owner = msg.sender;
-        router = router_;
         zeorAddrAmount = 0;
         mintingAddrAmount = 0;
         treasuryAddrAmount = 0;
@@ -197,6 +209,7 @@ contract idoCoinContract is Ownable {
 
     //设定矿池地址
     function setdaoMintingPool(IDAOMintingPool _daoMintingPool) public onlyISMPolicy {
+        require(address(_daoMintingPool) != address(0));
         daoMintingPool = _daoMintingPool;
     }
 
@@ -205,23 +218,17 @@ contract idoCoinContract is Ownable {
     }
 
     function setswapContract(IswapContract _swapContract) public onlyISMPolicy {
+        require(address(_swapContract) != address(0));
         swapContract = _swapContract;
     }
-
+    function settoolContract(ItoolContract _toolContract) public onlyISMPolicy {
+        require(address(_toolContract) != address(0));
+        toolContract = _toolContract;
+    }
     //设定ipo时间
     function setipoTime(uint256 _ipoTime) public onlyISMPolicy {
         require(_ipoTime > 0);
         ipoTime = _ipoTime;
-    }
-
-    function computeAddress(bytes32 salt, address deployer) private pure returns (address) {
-        bytes memory bytecode = type(InitializableAdminUpgradeabilityProxy).creationCode;
-        return Create2.computeAddress(salt, keccak256(bytecode), deployer);
-    }
-
-    function getAddress(string memory name) public view returns (address) {
-        bytes32 salt = keccak256(abi.encodePacked(name, block.timestamp, block.number, block.difficulty));
-        return computeAddress(salt, address(this));
     }
 
     mapping(uint256 => uint256) planNumber; //方案1 ，分几次提
@@ -373,7 +380,7 @@ contract idoCoinContract is Ownable {
         require(idoCoinHead.startTime >= block.timestamp);
         require(idoCoinHead.idoAmount > 0);
         //新获取一个地址
-        address coinAddress = getAddress(IERC20(idoCoinHead.coinAddress).symbol());
+        address coinAddress = toolContract.getAddress(IERC20(idoCoinHead.coinAddress).symbol());
 
         require(DAOToken.balanceOf(msg.sender) >= registerAmount); //收取一定数量DAO
 
@@ -424,19 +431,6 @@ contract idoCoinContract is Ownable {
         return true;
     }
 
-    function calculateBuyCoin(address coinAddress, uint256 amount) private view returns (uint256) {
-        address applyAddress = applyCoinAddress[idoCoin[coinAddress].idoCoinHead.collectType];
-        uint256 decimals = applyCoin[applyAddress].decimals;
-        uint256 to_decimals = idoCoin[coinAddress].idoCoinHead.decimals;
-
-        uint256 buyCoinAmount; //计算用于可以购买多少币
-
-        buyCoinAmount = (amount.mul(10**to_decimals)).div(10**decimals);
-        buyCoinAmount = buyCoinAmount.div(idoCoin[coinAddress].idoCoinHead.price);
-        buyCoinAmount = buyCoinAmount.mul(10**uint256(PRICE_DECIMALS));
-        return buyCoinAmount;
-    }
-
     function getVoteStatus(address coinAddress) public view returns (bool) {
         return idovoteContract.getVoteStatus(idoCoin[coinAddress].idoCoinHead.coinAddress);
     }
@@ -479,35 +473,6 @@ contract idoCoinContract is Ownable {
         emit IPOSUBscription(msg.sender, amount, APPLYCOIN, coinAddress);
         return true;
     }
-
-    //上币返回的地址
-    function calculateAllMakeCoinAmount(address coinAddress) private view returns (uint256) {
-        address applyAddress = applyCoinAddress[idoCoin[coinAddress].idoCoinHead.collectType];
-        uint256 decimals = applyCoin[applyAddress].decimals;
-        uint256 to_decimals = idoCoin[coinAddress].idoCoinHead.decimals;
-
-        uint256 makeCoinAmount; //计算用于可以购买多少币
-
-        makeCoinAmount = (usercoin[msg.sender][coinAddress].takeCoinAmount.mul(10**to_decimals)).div(10**decimals);
-        makeCoinAmount = makeCoinAmount.mul(10**uint256(PRICE_DECIMALS));
-        makeCoinAmount = makeCoinAmount.div(idoCoin[coinAddress].idoCoinHead.price);
-        return makeCoinAmount;
-    }
-
-    //上币返回的地址
-    function calculateTakeBalnce(address coinAddress, uint256 makeCoinAmount) private view returns (uint256) {
-        address applyAddress = applyCoinAddress[idoCoin[coinAddress].idoCoinHead.collectType];
-        uint256 decimals = applyCoin[applyAddress].decimals;
-        uint256 to_decimals = idoCoin[coinAddress].idoCoinHead.decimals;
-
-        uint256 allmakeCoinAmount = calculateAllMakeCoinAmount(coinAddress);
-
-        uint256 takeBalance = allmakeCoinAmount.sub(makeCoinAmount).mul(10**decimals).div(10**to_decimals);
-        takeBalance = takeBalance.mul(idoCoin[coinAddress].idoCoinHead.price);
-        takeBalance = takeBalance.div(10**uint256(PRICE_DECIMALS));
-        return takeBalance;
-    }
-
     //用户提币
     function withdraw(address coinAddress) public returns (bool) {
         require(usercoin[msg.sender][coinAddress].settle, "160"); //已经结算
@@ -558,12 +523,19 @@ contract idoCoinContract is Ownable {
 
         address APPLYCOIN = applyCoinAddress[idoCoin[coinAddress].idoCoinHead.collectType];
 
-        uint256 allMakeCoinAmount = calculateAllMakeCoinAmount(coinAddress);
+        uint256 allMakeCoinAmount = toolContract.calculateAllMakeCoinAmount(applyCoin[APPLYCOIN].decimals,
+                idoCoin[coinAddress].idoCoinHead.decimals,
+                usercoin[msg.sender][coinAddress].takeCoinAmount,
+                idoCoin[coinAddress].idoCoinHead.price);
 
         require(allMakeCoinAmount >= makeCoinAmount, "290"); //提币数量必须大于或者登录能购买到的数量
 
         // uint256 takeBalance = allMakeCoinAmount.sub(makeCoinAmount);
-        uint256 takeBalance = calculateTakeBalnce(coinAddress, makeCoinAmount); //计算要退的钱
+        uint256 takeBalance = toolContract.calculateTakeBalnce(makeCoinAmount,
+            applyCoin[APPLYCOIN].decimals,
+            idoCoin[coinAddress].idoCoinHead.decimals,
+            usercoin[msg.sender][coinAddress].takeCoinAmount,
+            idoCoin[coinAddress].idoCoinHead.price); //计算要退的钱
 
         usercoin[msg.sender][coinAddress].makeCoinAmount = makeCoinAmount;
         usercoin[msg.sender][coinAddress].outAmount = makeCoinAmount;
@@ -660,29 +632,21 @@ contract idoCoinContract is Ownable {
     function toSwapBuyDAO(address coinAddress) public onlyISMPolicy returns (bool) {
         //ETH或者BNB
         require(coinAddress != address(0), "400");
-        address pair_;
         address tokenB = applyCoinAddress[idoCoin[coinAddress].idoCoinHead.collectType];
-        address[] memory path = new address[](2);
-        uint256[] memory amountOuts;
         uint256 amountOut;
-        factory = IUniswapRouter02(router).factory();
         //ETH
         if (idoCoin[coinAddress].idoCoinHead.collectType == 1) {
-            pair_ = IUniswapFactory(factory).getPair(IUniswapRouter02(router).WETH(), address(DAOToken));
-            //计算本次购买数量
-            path[0] = IUniswapRouter02(router).WETH();
-            path[1] = address(DAOToken);
-            amountOuts = IUniswapRouter02(router).getAmountsOut(swapBuyDao[coinAddress], path);
+ 
+            amountOut = swapContract.getamountOuts(idoCoin[coinAddress].idoCoinHead.collectType,
+                swapBuyDao[coinAddress],
+                DAOToken,tokenB);
             swapContract.autoSwapEthToTokens(address(DAOToken), swapBuyDao[coinAddress], address(this));
         } else {
-            pair_ = IUniswapFactory(factory).getPair(tokenB, address(DAOToken));
-            //计算本次购买数量
-            path[0] = tokenB;
-            path[1] = address(DAOToken);
-            amountOuts = IUniswapRouter02(router).getAmountsOut(swapBuyDao[coinAddress], path);
+            amountOut = swapContract.getamountOuts(idoCoin[coinAddress].idoCoinHead.collectType,
+                swapBuyDao[coinAddress],
+                DAOToken,tokenB);
             swapContract.autoSwapTokens(tokenB, address(DAOToken), swapBuyDao[coinAddress], address(this));
         }
-        amountOut = amountOuts[1];
         //开始记账：
         zeorAddrAmount = zeorAddrAmount.add(amountOut.mul(30).div(100));
         //开始销毁
