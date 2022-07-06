@@ -78,7 +78,6 @@ contract idovoteContract is Ownable {
         uint256 deny; //拒绝数量
         bool bEnd; //是否结束
         bool bSuccessOrFail; //通过还是失败
-        bool bIpoSuccOrFail;
         uint256 daoVoteIncome; //投票要分配的收益
     }
     mapping(address => vcoinInfo) votecoin;
@@ -296,7 +295,6 @@ contract idovoteContract is Ownable {
             voteVeDao: votecoin[coinAddress].voteVeDao.add(voteVeDao),
             bEnd: votecoin[coinAddress].bEnd,
             bSuccessOrFail: votecoin[coinAddress].bSuccessOrFail,
-            bIpoSuccOrFail: votecoin[coinAddress].bIpoSuccOrFail,
             daoVoteIncome: votecoin[coinAddress].daoVoteIncome
         });
         votecoin[coinAddress] = newvcoinInfo;
