@@ -23,6 +23,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const depVeDAO = await deployments.get(contracts.vedao.name);
   const depVoting = await deployments.get(contracts.voting.name);
   const depSwap = await deployments.get(contracts.swap.name);
+  const depTool = await deployments.get(contracts.tool.name);
   const depIdo = await deployments.get(contracts.ido.name);
 
   const table = createCliTable({
@@ -35,6 +36,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     ['POOL', depVeDAO.address],
     ['Vote', depVoting.address],
     ['Swap', depSwap.address],
+    ['TOOL', depTool.address],
     ['IDO', depIdo.address],
     ['Owner', deployer],
     ['Router', contracts.swap.deploy.router],

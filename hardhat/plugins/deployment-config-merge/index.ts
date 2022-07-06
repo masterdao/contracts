@@ -83,6 +83,9 @@ declare module 'hardhat/types' {
             router: string;
           };
         };
+        tool: {
+          name: string;
+        };
         ido: {
           name: string;
           deploy: any;

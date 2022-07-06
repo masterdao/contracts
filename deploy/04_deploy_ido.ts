@@ -25,8 +25,9 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const depVeDAO = await deployments.get(contracts.vedao.name);
   const depVoting = await deployments.get(contracts.voting.name);
   const depSwap = await deployments.get(contracts.swap.name);
+  const depTool = await deployments.get(contracts.tool.name);
 
-  const { ido, swap } = contracts;
+  const { ido } = contracts;
 
   if ((ido as any).skip) {
     return;
@@ -38,8 +39,8 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       daoAddress,
       depVeDAO.address,
       depVoting.address,
-      swap.deploy.router,
       depSwap.address,
+      depTool.address,
     ],
   });
 

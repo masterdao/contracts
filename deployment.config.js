@@ -148,6 +148,10 @@ const config = {
       },
     },
 
+    tool: {
+      name: 'toolContract',
+    },
+
     ido: {
       name: 'idoCoinContract',
 
