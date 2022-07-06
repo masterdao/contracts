@@ -141,12 +141,7 @@ contract idoCoinContract is Ownable {
         uint256 collectType; //1:ETH  2:USDT  3:DAOToken
         uint256 idoAmount; //本次募集数量
         uint256 price; //兑换比例
-        bool bBuyLimit; //购买限制（参与者）
-        uint256 uBuyLimitNumber; //地址购买限制数量
-        bool bPartner; //参与者是否限制持有DAOToken
-        uint256 partnerNumber; //参与者持有DAOToken数量
-        bool bDAO; //是否监管
-        uint256 uDAONumber; //监管比例，如30%,输入30
+ 
         uint256 startTime;
         uint256 expireTime; //到期时间，将天设置为秒 1天=86400
         uint256 bundle; //一手多少币
