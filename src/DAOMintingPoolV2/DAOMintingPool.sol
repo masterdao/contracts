@@ -567,12 +567,11 @@ contract DAOMintingPool is Ownable {
         for (uint256 i = 0; i < bonusList.length; i++) {
             updateBonusShare(bonusList[i]);
             accBonusPerShare = BonusToken[bonusList[i]].accBonusPerShare;
-            if (miner[msg.sender][lpToken][poolTypeId].veDao > 0){
+            if (miner[msg.sender][lpToken][poolTypeId].veDao > 0) {
                 bonus = miner[msg.sender][lpToken][poolTypeId].veDao.mul(accBonusPerShare).div(1e18);
-                if( bonus >= userRewardDebt[msg.sender][bonusList[i]] ){
+                if (bonus >= userRewardDebt[msg.sender][bonusList[i]]) {
                     bonus = bonus.sub(userRewardDebt[msg.sender][bonusList[i]]);
-                }
-                else{
+                } else {
                     bonus = 0;
                 }
             }
@@ -582,7 +581,7 @@ contract DAOMintingPool is Ownable {
                 .mul(accBonusPerShare)
                 .div(1e18);
         }
-        
+
         miner[msg.sender][lpToken][poolTypeId].timestamps = block.timestamp;
         //开始分配各种奖励资产
         for (uint256 i = 0; i < bonusList.length; i++) {
@@ -620,10 +619,9 @@ contract DAOMintingPool is Ownable {
 
             if (miner[msg.sender][lpToken][poolTypeId].veDao > 0) {
                 bonus = miner[msg.sender][lpToken][poolTypeId].veDao.mul(accBonusPerShare).div(1e18);
-                if( bonus >= userRewardDebt[msg.sender][bonusList[i]] ){
+                if (bonus >= userRewardDebt[msg.sender][bonusList[i]]) {
                     bonus = bonus.sub(userRewardDebt[msg.sender][bonusList[i]]);
-                }
-                else{
+                } else {
                     bonus = 0;
                 }
             }
@@ -690,10 +688,9 @@ contract DAOMintingPool is Ownable {
             accBonusPerShare = accBonusPerShare.add(DAOReward);
 
             bonus = miner[who][lpToken][poolTypeId].veDao.mul(accBonusPerShare).div(1e18);
-            if( bonus >= userRewardDebt[who][bsToken] ){
+            if (bonus >= userRewardDebt[who][bsToken]) {
                 bonus = bonus.sub(userRewardDebt[who][bsToken]);
-            }
-            else{
+            } else {
                 bonus = 0;
             }
         }
