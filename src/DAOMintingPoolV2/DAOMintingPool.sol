@@ -563,25 +563,26 @@ contract DAOMintingPool is Ownable {
         require(miner[msg.sender][lpToken][poolTypeId].veDao >= 0, "veDao must be greate than zero.");
         uint256 accBonusPerShare;
         //开始计算各种奖励资产
+        uint256 bonus;
         for (uint256 i = 0; i < bonusList.length; i++) {
             updateBonusShare(bonusList[i]);
-
             accBonusPerShare = BonusToken[bonusList[i]].accBonusPerShare;
-
-            if (miner[msg.sender][lpToken][poolTypeId].veDao > 0) {
-                userBonus[msg.sender][bonusList[i]] = userBonus[msg.sender][bonusList[i]].add(
-                    miner[msg.sender][lpToken][poolTypeId].veDao.mul(accBonusPerShare).div(1e18)
-                );
-                userBonus[msg.sender][bonusList[i]] = userBonus[msg.sender][bonusList[i]].sub(
-                    userRewardDebt[msg.sender][bonusList[i]]
-                );
+            if (miner[msg.sender][lpToken][poolTypeId].veDao > 0){
+                bonus = miner[msg.sender][lpToken][poolTypeId].veDao.mul(accBonusPerShare).div(1e18);
+                if( bonus >= userRewardDebt[msg.sender][bonusList[i]] ){
+                    bonus = bonus.sub(userRewardDebt[msg.sender][bonusList[i]]);
+                }
+                else{
+                    bonus = 0;
+                }
             }
+            userBonus[msg.sender][bonusList[i]] = bonus;
             userRewardDebt[msg.sender][bonusList[i]] = miner[msg.sender][lpToken][poolTypeId]
                 .veDao
                 .mul(accBonusPerShare)
                 .div(1e18);
         }
-        uint256 bonus;
+        
         miner[msg.sender][lpToken][poolTypeId].timestamps = block.timestamp;
         //开始分配各种奖励资产
         for (uint256 i = 0; i < bonusList.length; i++) {
@@ -611,19 +612,22 @@ contract DAOMintingPool is Ownable {
 
         uint256 accBonusPerShare;
         //开始计算各种奖励资产
+        uint256 bonus;
         for (uint256 i = 0; i < bonusList.length; i++) {
             updateBonusShare(bonusList[i]);
 
             accBonusPerShare = BonusToken[bonusList[i]].accBonusPerShare;
 
             if (miner[msg.sender][lpToken][poolTypeId].veDao > 0) {
-                userBonus[msg.sender][bonusList[i]] = userBonus[msg.sender][bonusList[i]].add(
-                    miner[msg.sender][lpToken][poolTypeId].veDao.mul(accBonusPerShare).div(1e18)
-                );
-                userBonus[msg.sender][bonusList[i]] = userBonus[msg.sender][bonusList[i]].sub(
-                    userRewardDebt[msg.sender][bonusList[i]]
-                );
+                bonus = miner[msg.sender][lpToken][poolTypeId].veDao.mul(accBonusPerShare).div(1e18);
+                if( bonus >= userRewardDebt[msg.sender][bonusList[i]] ){
+                    bonus = bonus.sub(userRewardDebt[msg.sender][bonusList[i]]);
+                }
+                else{
+                    bonus = 0;
+                }
             }
+            userBonus[msg.sender][bonusList[i]] = bonus;
             userRewardDebt[msg.sender][bonusList[i]] = miner[msg.sender][lpToken][poolTypeId]
                 .veDao
                 .mul(accBonusPerShare)
@@ -635,7 +639,7 @@ contract DAOMintingPool is Ownable {
             miner[msg.sender][lpToken][poolTypeId].timestamps.add(mintingPoolTypeList[poolTypeId].poolLength) <=
             block.timestamp
         ) {
-            miner[msg.sender][lpToken][poolTypeId].amount = (miner[msg.sender][lpToken][poolTypeId].amount).sub(amount);
+            miner[msg.sender][lpToken][poolTypeId].amount = 0;
             uint256 veDao = miner[msg.sender][lpToken][poolTypeId].veDao;
 
             miner[msg.sender][lpToken][poolTypeId].veDao = 0;
@@ -655,8 +659,6 @@ contract DAOMintingPool is Ownable {
                 emit Withdraw(msg.sender, lpToken, amount);
             }
         }
-
-        uint256 bonus;
         miner[msg.sender][lpToken][poolTypeId].timestamps = block.timestamp;
         //开始分配各种奖励资产
         for (uint256 i = 0; i < bonusList.length; i++) {
@@ -683,15 +685,17 @@ contract DAOMintingPool is Ownable {
         uint256 accBonusPerShare = BonusToken[bsToken].accBonusPerShare;
         if (miner[who][lpToken][poolTypeId].veDao > 0) {
             uint256 spacingTime = getspacingTime(bsToken);
-
             uint256 lpSupply = calculatestakingAmount;
-
             uint256 DAOReward = spacingTime.mul(BonusToken[bsToken].daoPerBlock).mul(1e18).div(lpSupply);
-
             accBonusPerShare = accBonusPerShare.add(DAOReward);
 
             bonus = miner[who][lpToken][poolTypeId].veDao.mul(accBonusPerShare).div(1e18);
-            bonus = bonus.sub(userRewardDebt[msg.sender][bsToken]);
+            if( bonus >= userRewardDebt[who][bsToken] ){
+                bonus = bonus.sub(userRewardDebt[who][bsToken]);
+            }
+            else{
+                bonus = 0;
+            }
         }
         bonus = bonus.add(userBonus[msg.sender][bsToken]);
         return bonus;
