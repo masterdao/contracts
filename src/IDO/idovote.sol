@@ -237,17 +237,15 @@ contract idovoteContract is Ownable {
             if (votecoin[coinAddress].bSuccessOrFail) {
                 successCount++;
             }
-            if( votecoin[coinAddress].bCLose ){
+            if (votecoin[coinAddress].bCLose) {
                 closeVote++;
             }
         }
-        if(closeVote >0){
+        if (closeVote > 0) {
             return successCount.mul(10000).div(closeVote);
-        }
-        else{
+        } else {
             return 0;
         }
-        
     }
 
     //投票
