@@ -231,13 +231,23 @@ contract idovoteContract is Ownable {
         require(who != address(0));
         require(vote_p_list[who].length > 0, "you must be voted.");
         uint256 successCount = 0;
+        uint256 closeVote = 0;
         for (uint256 i = 0; i < vote_p_list[who].length; i++) {
             address coinAddress = vote_p_list[who][i];
             if (votecoin[coinAddress].bSuccessOrFail) {
                 successCount++;
             }
+            if( votecoin[coinAddress].bCLose ){
+                closeVote++;
+            }
         }
-        return successCount.mul(10000).div(vote_p_list[who].length);
+        if(closeVote >0){
+            return successCount.mul(10000).div(closeVote);
+        }
+        else{
+            return 0;
+        }
+        
     }
 
     //投票
