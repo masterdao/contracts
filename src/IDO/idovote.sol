@@ -226,18 +226,20 @@ contract idovoteContract is Ownable {
             }
         }
     }
-    function getPeopleVoteRate(address who) public view returns(uint256){
+
+    function getPeopleVoteRate(address who) public view returns (uint256) {
         require(who != address(0));
-        require(vote_p_list[who].length>0,"you must be voted.");
+        require(vote_p_list[who].length > 0, "you must be voted.");
         uint256 successCount = 0;
-        for(uint256 i =0;i<vote_p_list[who].length;i++){
+        for (uint256 i = 0; i < vote_p_list[who].length; i++) {
             address coinAddress = vote_p_list[who][i];
-            if(votecoin[  coinAddress ].bSuccessOrFail){
-                successCount ++;
+            if (votecoin[coinAddress].bSuccessOrFail) {
+                successCount++;
             }
         }
-        return successCount.mul(10000).div(vote_p_list[who].length); 
+        return successCount.mul(10000).div(vote_p_list[who].length);
     }
+
     //投票
     function vote(address coinAddress, bool bStatus) public returns (bool) {
         require(coinAddress != address(0), "coinAddress can not be zero address.");
