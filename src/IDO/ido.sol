@@ -79,7 +79,6 @@ contract idoCoinContract is Ownable {
     uint256 private deductAmount; //扣取注册费用
     uint8 private TOKEN_DECIMALS;
     uint8 private PRICE_DECIMALS;
-    IERC20 public COIN;
     IERC20 public DAOToken;
     IDAOMintingPool public daoMintingPool;
     IidovoteContract public idovoteContract;
@@ -415,8 +414,8 @@ contract idoCoinContract is Ownable {
         idoCoin[coinAddress].idoCoinHead.expireTime = idoCoin[coinAddress].idoCoinHead.startTime.add(ipoTime);
 
         uint256 amount = idoCoinHead.idoAmount;
-        COIN = IERC20(idoCoinHead.coinAddress);
-        COIN.safeTransferFrom(msg.sender, address(this), amount);
+        IERC20 coinAddr = IERC20(idoCoinHead.coinAddress);
+        coinAddr.safeTransferFrom(msg.sender, address(this), amount);
 
         DAOToken.safeTransferFrom(msg.sender, address(this), registerAmount);
 
@@ -506,8 +505,8 @@ contract idoCoinContract is Ownable {
 
         usercoin[msg.sender][coinAddress].takeOutNumber++;
         if (amount > 0) {
-            COIN = IERC20(idoCoin[coinAddress].idoCoinHead.coinAddress);
-            COIN.safeTransfer(msg.sender, amount);
+            IERC20 coinAddr = IERC20(idoCoin[coinAddress].idoCoinHead.coinAddress);
+            coinAddr.safeTransfer(msg.sender, amount);
         }
         emit Withdraw(msg.sender, planCon, coinAddress, amount);
         return true;
@@ -555,6 +554,7 @@ contract idoCoinContract is Ownable {
         idoCoin[coinAddress].idoAmountComplete = makeCoinAmount.add(idoCoin[coinAddress].idoAmountComplete);
 
         //退款支付币
+        IERC20 coinAddr;
         if (allMakeCoinAmount != makeCoinAmount) {
             // 要减去已募资金部分
             idoCoin[coinAddress].ipoCollectAmount = idoCoin[coinAddress].ipoCollectAmount.sub(takeBalance);
@@ -562,8 +562,10 @@ contract idoCoinContract is Ownable {
             if (idoCoin[coinAddress].idoCoinHead.collectType == 1) {
                 address payable myaddr = address(uint160(msg.sender));
                 myaddr.transfer(takeBalance);
+                coinAddr = IERC20(address(0));
             } else {
                 IERC20(APPLYCOIN).safeTransfer(msg.sender, takeBalance);
+                coinAddr = IERC20(APPLYCOIN);
             }
             usercoin[msg.sender][coinAddress].takeCoinAmount = usercoin[msg.sender][coinAddress].takeCoinAmount.sub(
                 takeBalance
@@ -573,8 +575,8 @@ contract idoCoinContract is Ownable {
         idoCoin[coinAddress].collectAmount = usercoin[msg.sender][coinAddress].takeCoinAmount.add(
             idoCoin[coinAddress].collectAmount
         );
-
-        emit Settleaccounts(msg.sender, COIN, makeCoinAmount, coinAddress, takeBalance);
+        
+        emit Settleaccounts(msg.sender, coinAddr, makeCoinAmount, coinAddress, takeBalance);
         return true;
     }
 
@@ -754,8 +756,8 @@ contract idoCoinContract is Ownable {
             }
             uint256 idoAmount = idoCoin[coinAddress].idoCoinHead.idoAmount;
             if (idoAmount > 0) {
-                COIN = IERC20(idoCoin[coinAddress].idoCoinHead.coinAddress);
-                COIN.safeTransfer(msg.sender, idoAmount);
+                IERC20 coinAddr = IERC20(idoCoin[coinAddress].idoCoinHead.coinAddress);
+                coinAddr.safeTransfer(msg.sender, idoAmount);
                 idoCoin[coinAddress].idoCoinHead.idoAmount = 0;
                 emit TakeOut(msg.sender, idoAmount, idoCoin[coinAddress].idoCoinHead.coinAddress);
             }
@@ -777,8 +779,8 @@ contract idoCoinContract is Ownable {
             uint256 amountBalance = idoCoin[coinAddress].idoCoinHead.idoAmount.sub(idoCoin[coinAddress].ipoAmount);
             idoCoin[coinAddress].idoCoinHead.idoAmount = idoCoin[coinAddress].ipoAmount;
             if (amountBalance > 0) {
-                COIN = IERC20(idoCoin[coinAddress].idoCoinHead.coinAddress);
-                COIN.safeTransfer(msg.sender, amountBalance);
+                IERC20 coinAddr = IERC20(idoCoin[coinAddress].idoCoinHead.coinAddress);
+                coinAddr.safeTransfer(msg.sender, amountBalance);
             }
             if (idoCoin[coinAddress].registerAmount > 0) {
                 DAOToken.safeTransfer(msg.sender, idoCoin[coinAddress].registerAmount); //返还注册费
