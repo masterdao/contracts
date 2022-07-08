@@ -575,7 +575,7 @@ contract idoCoinContract is Ownable {
         idoCoin[coinAddress].collectAmount = usercoin[msg.sender][coinAddress].takeCoinAmount.add(
             idoCoin[coinAddress].collectAmount
         );
-        
+
         emit Settleaccounts(msg.sender, coinAddr, makeCoinAmount, coinAddress, takeBalance);
         return true;
     }
@@ -752,7 +752,7 @@ contract idoCoinContract is Ownable {
                 DAOToken.safeTransfer(idoCoin[coinAddress].createUserAddress, registerAmount.sub(deductAmount));
                 registeFee = registeFee.sub(registerAmount.sub(deductAmount));
                 idoCoin[coinAddress].registerAmount = 0;
-                emit TakeOut(msg.sender, registerAmount.sub(deductAmount), address(DAOToken));
+                emit TakeOut(msg.sender, idoCoin[coinAddress].registerAmount.sub(deductAmount), address(DAOToken));
             }
             uint256 idoAmount = idoCoin[coinAddress].idoCoinHead.idoAmount;
             if (idoAmount > 0) {
