@@ -425,17 +425,19 @@ contract idovoteContract is Ownable {
         }
         return peopleVoteIncome;
     }
+
     //统计用户治理收益
-    function countVoteIncome() public view returns(uint256){
+    function countVoteIncome() public view returns (uint256) {
         uint256 userIncome = 0;
         for (uint256 i = 0; i < vote_p_list[msg.sender].length; i++) {
             address coinAddress = vote_p_list[msg.sender][i];
-            if(votePeople[msg.sender][coinAddress].withdrawIncome == false){
+            if (votePeople[msg.sender][coinAddress].withdrawIncome == false) {
                 userIncome = userIncome.add(viewDaoVoteIncome(coinAddress));
             }
         }
         return userIncome;
     }
+
     //提取用户投票收益
     function tokeoutVoteIncome(address coinAddress) public returns (uint256) {
         require(coinAddress != address(0), "coinAddress can not be zero address. ");
