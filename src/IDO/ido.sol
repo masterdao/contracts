@@ -751,8 +751,8 @@ contract idoCoinContract is Ownable {
             if (idoCoin[coinAddress].registerAmount.sub(deductAmount) > 0 || idoCoin[coinAddress].bUnpass) {
                 DAOToken.safeTransfer(idoCoin[coinAddress].createUserAddress, registerAmount.sub(deductAmount));
                 registeFee = registeFee.sub(registerAmount.sub(deductAmount));
-                idoCoin[coinAddress].registerAmount = 0;
                 emit TakeOut(msg.sender, idoCoin[coinAddress].registerAmount.sub(deductAmount), address(DAOToken));
+                idoCoin[coinAddress].registerAmount = 0;
             }
             uint256 idoAmount = idoCoin[coinAddress].idoCoinHead.idoAmount;
             if (idoAmount > 0) {
