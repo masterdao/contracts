@@ -278,11 +278,10 @@ contract idovoteContract is Ownable {
                 //如果没有统计过权重的，开始统计用户权重
                 address addrCoin = vote_p_list[msg.sender][i];
                 if (votePeople[msg.sender][addrCoin].weightSettled == false) {
-                    if( getPeopleVoteStatus(addrCoin) ){
+                    if (getPeopleVoteStatus(addrCoin)) {
                         voet_p_weight[msg.sender].weight = voet_p_weight[msg.sender].weight.add(1);
-                    }
-                    else{
-                        if( voet_p_weight[msg.sender].weight > 1 ){
+                    } else {
+                        if (voet_p_weight[msg.sender].weight > 1) {
                             voet_p_weight[msg.sender].weight = voet_p_weight[msg.sender].weight.sub(1);
                         }
                     }
@@ -387,10 +386,9 @@ contract idovoteContract is Ownable {
                 //如果没有统计过权重的，开始统计用户权重
                 address addrCoin = vote_p_list[msg.sender][i];
                 if (votePeople[msg.sender][addrCoin].weightSettled == false) {
-                    if( getPeopleVoteStatus(addrCoin ) ){
+                    if (getPeopleVoteStatus(addrCoin)) {
                         weight = weight.add(1);
-                    }
-                    else{
+                    } else {
                         if (weight > 1) {
                             weight = weight.sub(1);
                         }
@@ -401,7 +399,7 @@ contract idovoteContract is Ownable {
         //开始计算收益
         uint256 peopleVoteIncome = votePeople[msg.sender][coinAddress].veDao.mul(weight);
         peopleVoteIncome = peopleVoteIncome.mul(votecoin[coinAddress].daoVoteIncome).div(10);
-      
+
         if (votePeople[msg.sender][coinAddress].bStatus) {
             peopleVoteIncome = peopleVoteIncome.div(votecoin[coinAddress].pass);
         } else {
@@ -436,11 +434,10 @@ contract idovoteContract is Ownable {
                 //如果没有统计过权重的，开始统计用户权重
                 address addrCoin = vote_p_list[msg.sender][i];
                 if (votePeople[msg.sender][addrCoin].weightSettled == false) {
-                    if( getPeopleVoteStatus(addrCoin) ){
+                    if (getPeopleVoteStatus(addrCoin)) {
                         voet_p_weight[msg.sender].weight = voet_p_weight[msg.sender].weight.add(1);
-                    }
-                    else{
-                        if( voet_p_weight[msg.sender].weight > 1 ){
+                    } else {
+                        if (voet_p_weight[msg.sender].weight > 1) {
                             voet_p_weight[msg.sender].weight = voet_p_weight[msg.sender].weight.sub(1);
                         }
                     }
@@ -453,17 +450,15 @@ contract idovoteContract is Ownable {
         uint256 peopleVoteIncome = votePeople[msg.sender][coinAddress].veDao.mul(voet_p_weight[msg.sender].weight);
         peopleVoteIncome = peopleVoteIncome.mul(votecoin[coinAddress].daoVoteIncome).div(10);
         if (votePeople[msg.sender][coinAddress].bStatus) {
-            if( getPeopleVoteStatus(coinAddress) ){
+            if (getPeopleVoteStatus(coinAddress)) {
                 peopleVoteIncome = peopleVoteIncome.div(votecoin[coinAddress].pass);
-            }
-            else{
+            } else {
                 peopleVoteIncome = 0;
             }
         } else {
-            if( getPeopleVoteStatus(coinAddress) ){
+            if (getPeopleVoteStatus(coinAddress)) {
                 peopleVoteIncome = peopleVoteIncome.div(votecoin[coinAddress].deny);
-            }
-            else{
+            } else {
                 peopleVoteIncome = 0;
             }
         }
@@ -473,23 +468,23 @@ contract idovoteContract is Ownable {
         emit TokeoutVoteIncome(msg.sender, peopleVoteIncome);
         return peopleVoteIncome;
     }
-    function getPeopleVoteStatus(address coinAddress) private view returns(bool){
+
+    function getPeopleVoteStatus(address coinAddress) private view returns (bool) {
         //大于70% ，赞成的获得
-        if (getIopSuccOrFail(coinAddress) == 1){
-                if (votecoin[coinAddress].bSuccessOrFail && votePeople[msg.sender][coinAddress].bStatus ){
-                    return true ;
-                }
-                else{
-                    return false;
-                }
-            }// 小于70% ，反对的获得
-            else if(getIopSuccOrFail(coinAddress) == 1){
-                if( votecoin[coinAddress].bSuccessOrFail == false && votePeople[msg.sender][coinAddress].bStatus == false ){
-                    return true;
-                }
-                else{
-                    return false;
-                }
+        if (getIopSuccOrFail(coinAddress) == 1) {
+            if (votecoin[coinAddress].bSuccessOrFail && votePeople[msg.sender][coinAddress].bStatus) {
+                return true;
+            } else {
+                return false;
             }
+        }
+        // 小于70% ，反对的获得
+        else if (getIopSuccOrFail(coinAddress) == 1) {
+            if (votecoin[coinAddress].bSuccessOrFail == false && votePeople[msg.sender][coinAddress].bStatus == false) {
+                return true;
+            } else {
+                return false;
+            }
+        }
     }
 }
