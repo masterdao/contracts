@@ -198,9 +198,10 @@ contract idovoteContract is Ownable {
         uint256 count = vote_p_list[who].length;
         return count;
     }
+
     function getVotePeoperInfo(address who, uint256 index) public view returns (address) {
         require(who != address(0));
-        require(index < vote_p_list[who].length );
+        require(index < vote_p_list[who].length);
         return vote_p_list[who][index];
     }
 
