@@ -85,7 +85,7 @@ contract idovoteContract is Ownable {
     event Vote(address who, address coinAddress, bool bStatus);
     event SetVoteCoinEnd(address who, address coinAddress);
     event SetDaoVoteIncome(address who, address coinAddress, uint256 amount);
-    event TokeoutVoteIncome(address who, address coinAddress,uint256 peopleVoteIncome);
+    event TokeoutVoteIncome(address who, address coinAddress, uint256 peopleVoteIncome);
     event LogISMPolicyUpdated(address ISMPolicy);
 
     constructor(IERC20 _DAOToken, IDAOMintingPool _IDAOMintingPool) {
@@ -419,16 +419,18 @@ contract idovoteContract is Ownable {
         }
         return userIncome;
     }
+
     //批量结算
-    function batchtokeoutVoteIncome(address [] memory coinAddress ) public returns(bool){
-        require(coinAddress.length <= 20,"coin can not be greater 20.");
-        for(uint256 i = 0;i<coinAddress.length;i++){
-            if( votePeople[msg.sender][coinAddress[i]].withdrawIncome == false &&  votecoin[coinAddress[i]].bEnd ){
+    function batchtokeoutVoteIncome(address[] memory coinAddress) public returns (bool) {
+        require(coinAddress.length <= 20, "coin can not be greater 20.");
+        for (uint256 i = 0; i < coinAddress.length; i++) {
+            if (votePeople[msg.sender][coinAddress[i]].withdrawIncome == false && votecoin[coinAddress[i]].bEnd) {
                 tokeoutVoteIncome(coinAddress[i]);
             }
         }
         return true;
     }
+
     //提取用户投票收益
     function tokeoutVoteIncome(address coinAddress) public returns (uint256) {
         require(coinAddress != address(0), "coinAddress can not be zero address. ");
@@ -473,10 +475,10 @@ contract idovoteContract is Ownable {
         }
         votePeople[msg.sender][coinAddress].withdrawIncome = true;
         //提取用户投票收益
-        if(peopleVoteIncome>0){
+        if (peopleVoteIncome > 0) {
             IERC20(DAOToken).safeTransfer(msg.sender, peopleVoteIncome);
         }
-        emit TokeoutVoteIncome(msg.sender, coinAddress,peopleVoteIncome);
+        emit TokeoutVoteIncome(msg.sender, coinAddress, peopleVoteIncome);
         return peopleVoteIncome;
     }
 
