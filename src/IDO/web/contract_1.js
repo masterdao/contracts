@@ -366,3 +366,11 @@ async  function  getIdoSettle(){
     const tx = await contract.methods.getIdoSettle(coinAddress).call()
     $('.show-settle').html(`${tx}`);
 }
+async  function  getUserInfo(){
+    const coinAddress = document.getElementById("set-user-coinAddress").value;
+    const userAddress = document.getElementById("set-user-userAddress").value;
+    const contract = await getErc20Contract(IDOABI, IDOCONTRACT);
+    const coinbase = await getCurrentAccount()
+    const tx = await contract.methods.getUserInfo(userAddress,coinAddress).call()
+    $('.show-user-info').html(`${tx}`);
+}

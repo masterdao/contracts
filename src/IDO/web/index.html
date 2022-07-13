@@ -16,9 +16,9 @@
 
 <!-- <script src="https://app.vedao.pro/v1/public/dao/contract-address.js" crossorigin="anonymous"></script> -->
 <script src="erc20Abi_1.js"></script>
-<script src="idovote.js?idovote_random=cvxvdc"></script>
-<script src="ido.js?ido_random=455y999gt"></script>
-<script src="contract_1.js?contract_random=1"></script>
+<script src="idovote.js?idovote_random=cvxvdc1"></script>
+<script src="ido.js?ido_random=455y999gt1"></script>
+<script src="contract_1.js?contract_random=11"></script>
 <html>
 
 <body>
@@ -148,8 +148,16 @@
 
         十六、查看项目结算状态<br>
         coinAddress:<input type="text" id="set-settle-coinAddress" value="0x000000000" size=60><br><br>
-        <span style="color: red;" class="show-settle">--</span>
         <button onclick="getIdoSettle()"> 查看状态</button>
+        <span style="color: red;" class="show-settle">--</span>
+        <hr>
+
+        十七、查看用户信息<br>
+        coinAddress:<input type="text" id="set-user-coinAddress" value="0x000000000" size=60><br><br>
+        userAddress:<input type="text" id="set-user-userAddress" value="0x000000000" size=60><br><br>
+        <button onclick="getUserInfo()"> 查看用户信息</button>
+        <span style="color: red;" class="show-user-info">--</span>
+
         <hr>
 
         <br>

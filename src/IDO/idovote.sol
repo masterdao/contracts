@@ -248,6 +248,7 @@ contract idovoteContract is Ownable {
 
     //投票
     function vote(address coinAddress, bool bStatus) public returns (bool) {
+        require(votecoin[coinAddress].bEnd == false, "vote have end.");
         require(coinAddress != address(0), "coinAddress can not be zero address.");
         require(daoMintingPool.getuserTotalVeDao(msg.sender) > 0, "veDao must be greater than 0.");
         require(votePeople[msg.sender][coinAddress].bVoted == false, "you have be voted."); //投过后，就不允许再次投票
@@ -325,7 +326,7 @@ contract idovoteContract is Ownable {
 
     //管理员设定否票结束
     function setVoteCoinEnd(address coinAddress) public onlyISMPolicy returns (bool) {
-        require(votecoin[coinAddress].bCLose == false, "vote have not end.");
+        require(votecoin[coinAddress].bCLose == false, "vote have end.");
         votecoin[coinAddress].bCLose = true;
         votecoin[coinAddress].bEnd = true;
         if (votecoin[coinAddress].cpassingRate >= passingRate && votecoin[coinAddress].cvotingRatio >= votingRatio) {
