@@ -165,9 +165,9 @@ contract idoCoinContract is Ownable {
         uint256 ipoRate; //IPO成功的比率。80% = 80
         bool bUnpass; //不通过
         bool settle;
-        address statAddr;   //星探地址
+        address statAddr; //星探地址
         uint256 statAddrAmount;
-        address businessAddr;   //商务地址
+        address businessAddr; //商务地址
         uint256 businessAddrAmount;
     }
     event CreateIeoCoin(address who, address coinAddress, uint256 time, uint256 amount, address newCoinAddress);
@@ -414,7 +414,7 @@ contract idoCoinContract is Ownable {
             statAddr: address(0),
             statAddrAmount: 0,
             businessAddr: address(0),
-            businessAddrAmount:0
+            businessAddrAmount: 0
         });
 
         idoCoin[coinAddress] = newidoCoinInfo;
@@ -705,31 +705,40 @@ contract idoCoinContract is Ownable {
     //管理员获取业务资金
     function sendbusinessAddrAmount(address coinAddress) public onlyOwner {
         require(coinAddress != address(0));
-        if( idoCoin[coinAddress].businessAddr == address(0) ){
+        if (idoCoin[coinAddress].businessAddr == address(0)) {
             IERC20(DAOToken).safeTransferFrom(address(this), msg.sender, idoCoin[coinAddress].businessAddrAmount);
-        }
-        else{
-            IERC20(DAOToken).safeTransferFrom(address(this), idoCoin[coinAddress].businessAddr, idoCoin[coinAddress].businessAddrAmount);
+        } else {
+            IERC20(DAOToken).safeTransferFrom(
+                address(this),
+                idoCoin[coinAddress].businessAddr,
+                idoCoin[coinAddress].businessAddrAmount
+            );
         }
     }
-    function setbusinessAddr(address businessAddr,address coinAddress) public onlyOwner{
+
+    function setbusinessAddr(address businessAddr, address coinAddress) public onlyOwner {
         require(businessAddr != address(0));
         require(coinAddress != address(0));
         idoCoin[coinAddress].businessAddr = businessAddr;
     }
-    function setstatAddr(address statAddr,address coinAddress) public onlyOwner{
+
+    function setstatAddr(address statAddr, address coinAddress) public onlyOwner {
         require(statAddr != address(0));
         require(coinAddress != address(0));
         idoCoin[coinAddress].statAddr = statAddr;
     }
+
     //管理员获取星探资金
     function sendstatAddrAmount(address coinAddress) public onlyOwner {
         require(coinAddress != address(0));
-        if( idoCoin[coinAddress].statAddr == address(0) ){
+        if (idoCoin[coinAddress].statAddr == address(0)) {
             IERC20(DAOToken).safeTransferFrom(address(this), msg.sender, idoCoin[coinAddress].statAddrAmount);
-        }
-        else{
-            IERC20(DAOToken).safeTransferFrom(address(this),idoCoin[coinAddress].statAddr, idoCoin[coinAddress].statAddrAmount);
+        } else {
+            IERC20(DAOToken).safeTransferFrom(
+                address(this),
+                idoCoin[coinAddress].statAddr,
+                idoCoin[coinAddress].statAddrAmount
+            );
         }
     }
 
