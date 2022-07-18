@@ -167,7 +167,7 @@ contract idoCoinContract is Ownable {
         bool settle;
         address statAddr; //星探地址
         uint256 statAddrAmount;
-        bool    bstat;
+        bool bstat;
         address businessAddr; //商务地址
         uint256 businessAddrAmount;
     }
@@ -414,7 +414,7 @@ contract idoCoinContract is Ownable {
             settle: false,
             statAddr: address(0),
             statAddrAmount: 0,
-            bstat:  false,
+            bstat: false,
             businessAddr: address(0),
             businessAddrAmount: 0
         });
