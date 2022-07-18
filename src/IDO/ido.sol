@@ -165,6 +165,10 @@ contract idoCoinContract is Ownable {
         uint256 ipoRate; //IPO成功的比率。80% = 80
         bool bUnpass; //不通过
         bool settle;
+        address statAddr;   //星探地址
+        uint256 statAddrAmount;
+        address businessAddr;   //商务地址
+        uint256 businessAddrAmount;
     }
     event CreateIeoCoin(address who, address coinAddress, uint256 time, uint256 amount, address newCoinAddress);
     event IPOSUBscription(address who, uint256 amount, address applyAddress, address coinAddress);
@@ -406,7 +410,11 @@ contract idoCoinContract is Ownable {
             createUserAddress: msg.sender,
             ipoRate: 0,
             bUnpass: false,
-            settle: false
+            settle: false,
+            statAddr: address(0),
+            statAddrAmount: 0,
+            businessAddr: address(0),
+            businessAddrAmount:0
         });
 
         idoCoin[coinAddress] = newidoCoinInfo;
@@ -677,9 +685,11 @@ contract idoCoinContract is Ownable {
         //送入金库
         treasuryAddrAmount = treasuryAddrAmount.add(amountOut.mul(30).div(100));
         //送入业务
-        businessAddrAmount = businessAddrAmount.add(amountOut.mul(10).div(100));
+
+        idoCoin[coinAddress].businessAddrAmount = amountOut.mul(10).div(100);
         //送入星探
-        statAddrAmount = statAddrAmount.add(amountOut.mul(10).div(100));
+        idoCoin[coinAddress].statAddrAmount = amountOut.mul(10).div(100);
+
         return true;
     }
 
@@ -693,21 +703,34 @@ contract idoCoinContract is Ownable {
     }
 
     //管理员获取业务资金
-    function sendbusinessAddrAmount(uint256 _businessAddrAmount) public onlyOwner {
-        require(_businessAddrAmount > 0);
-        require(businessAddrAmount > 0);
-        require(businessAddrAmount.sub(_businessAddrAmount) > 0);
-        IERC20(DAOToken).safeTransferFrom(address(this), msg.sender, businessAddrAmount);
-        businessAddrAmount = businessAddrAmount.sub(_businessAddrAmount);
+    function sendbusinessAddrAmount(address coinAddress) public onlyOwner {
+        require(coinAddress != address(0));
+        if( idoCoin[coinAddress].businessAddr == address(0) ){
+            IERC20(DAOToken).safeTransferFrom(address(this), msg.sender, idoCoin[coinAddress].businessAddrAmount);
+        }
+        else{
+            IERC20(DAOToken).safeTransferFrom(address(this), idoCoin[coinAddress].businessAddr, idoCoin[coinAddress].businessAddrAmount);
+        }
     }
-
+    function setbusinessAddr(address businessAddr,address coinAddress) public onlyOwner{
+        require(businessAddr != address(0));
+        require(coinAddress != address(0));
+        idoCoin[coinAddress].businessAddr = businessAddr;
+    }
+    function setstatAddr(address statAddr,address coinAddress) public onlyOwner{
+        require(statAddr != address(0));
+        require(coinAddress != address(0));
+        idoCoin[coinAddress].statAddr = statAddr;
+    }
     //管理员获取星探资金
-    function sendstatAddrAmount(uint256 _statAddrAmount) public onlyOwner {
-        require(_statAddrAmount > 0);
-        require(statAddrAmount > 0);
-        require(statAddrAmount.sub(_statAddrAmount) > 0);
-        IERC20(DAOToken).safeTransferFrom(address(this), msg.sender, statAddrAmount);
-        statAddrAmount = statAddrAmount.sub(_statAddrAmount);
+    function sendstatAddrAmount(address coinAddress) public onlyOwner {
+        require(coinAddress != address(0));
+        if( idoCoin[coinAddress].statAddr == address(0) ){
+            IERC20(DAOToken).safeTransferFrom(address(this), msg.sender, idoCoin[coinAddress].statAddrAmount);
+        }
+        else{
+            IERC20(DAOToken).safeTransferFrom(address(this),idoCoin[coinAddress].statAddr, idoCoin[coinAddress].statAddrAmount);
+        }
     }
 
     function _setTakeOut(address coinAddress) private returns (bool) {
