@@ -378,16 +378,15 @@ contract idoCoinContract is Ownable {
         deductAmount = _deductAmount;
         return true;
     }
-
-    function createIeoCoin(idoCoinInfoHead memory idoCoinHead) public payable returns (address) {
+    //bStat:默认false,不是星探，true，是星探
+    function createIeoCoin(idoCoinInfoHead memory idoCoinHead,bool bStat) public payable returns (address) {
         require(idoCoinHead.coinAddress != address(0));
         require(idoCoinHead.startTime >= block.timestamp);
         require(idoCoinHead.idoAmount > 0);
+
         //新获取一个地址
         address coinAddress = toolContract.getAddress(IERC20(idoCoinHead.coinAddress).symbol());
-
-        require(DAOToken.balanceOf(msg.sender) >= registerAmount); //收取一定数量DAO
-
+        
         idoCoinInfo memory newidoCoinInfo = idoCoinInfo({
             idoCoinHead: idoCoinHead,
             timestamp: block.timestamp,
@@ -412,15 +411,17 @@ contract idoCoinContract is Ownable {
         idoCoin[coinAddress] = newidoCoinInfo;
 
         idoCoin[coinAddress].idoCoinHead.expireTime = idoCoin[coinAddress].idoCoinHead.startTime.add(ipoTime);
-
+        if(bStat ==  false){
+            require(DAOToken.balanceOf(msg.sender) >= registerAmount); //收取一定数量DAO
+            DAOToken.safeTransferFrom(msg.sender, address(this), registerAmount);
+            registeFee = registeFee.add(registerAmount);
+        }
+        else{
+            idoCoin[coinAddress].registerAmount = 0;
+        }
         uint256 amount = idoCoinHead.idoAmount;
         IERC20 coinAddr = IERC20(idoCoinHead.coinAddress);
         coinAddr.safeTransferFrom(msg.sender, address(this), amount);
-
-        DAOToken.safeTransferFrom(msg.sender, address(this), registerAmount);
-
-        registeFee = registeFee.add(registerAmount);
-
         emit CreateIeoCoin(msg.sender, idoCoinHead.coinAddress, block.timestamp, amount, coinAddress);
         return coinAddress;
     }
@@ -748,12 +749,15 @@ contract idoCoinContract is Ownable {
         require(block.timestamp >= idoCoin[coinAddress].idoCoinHead.expireTime, "700"); //到期了
         require(idoCoin[coinAddress].createUserAddress == msg.sender, "710");
         if (idovoteContract.getVoteStatus(coinAddress) == false) {
-            if (idoCoin[coinAddress].registerAmount.sub(deductAmount) > 0 || idoCoin[coinAddress].bUnpass) {
-                DAOToken.safeTransfer(idoCoin[coinAddress].createUserAddress, registerAmount.sub(deductAmount));
-                registeFee = registeFee.sub(registerAmount.sub(deductAmount));
-                emit TakeOut(msg.sender, idoCoin[coinAddress].registerAmount.sub(deductAmount), address(DAOToken));
-                idoCoin[coinAddress].registerAmount = 0;
+            if( idoCoin[coinAddress].registerAmount > deductAmount ){
+                 if (idoCoin[coinAddress].registerAmount.sub(deductAmount) > 0 || idoCoin[coinAddress].bUnpass) {
+                    DAOToken.safeTransfer(idoCoin[coinAddress].createUserAddress, registerAmount.sub(deductAmount));
+                    registeFee = registeFee.sub(registerAmount.sub(deductAmount));
+                    emit TakeOut(msg.sender, idoCoin[coinAddress].registerAmount.sub(deductAmount), address(DAOToken));
+                    idoCoin[coinAddress].registerAmount = 0;
+                }
             }
+           
             uint256 idoAmount = idoCoin[coinAddress].idoCoinHead.idoAmount;
             if (idoAmount > 0) {
                 IERC20 coinAddr = IERC20(idoCoin[coinAddress].idoCoinHead.coinAddress);
