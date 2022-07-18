@@ -167,6 +167,7 @@ contract idoCoinContract is Ownable {
         bool settle;
         address statAddr; //星探地址
         uint256 statAddrAmount;
+        bool    bstat;
         address businessAddr; //商务地址
         uint256 businessAddrAmount;
     }
@@ -413,6 +414,7 @@ contract idoCoinContract is Ownable {
             settle: false,
             statAddr: address(0),
             statAddrAmount: 0,
+            bstat:  false,
             businessAddr: address(0),
             businessAddrAmount: 0
         });
@@ -426,6 +428,7 @@ contract idoCoinContract is Ownable {
             registeFee = registeFee.add(registerAmount);
         } else {
             idoCoin[coinAddress].registerAmount = 0;
+            idoCoin[coinAddress].bstat = true;
         }
         uint256 amount = idoCoinHead.idoAmount;
         IERC20 coinAddr = IERC20(idoCoinHead.coinAddress);
