@@ -145,6 +145,7 @@ contract idoCoinContract is Ownable {
         uint256 bundle; //一手多少币
         uint256 maxbundle; //最多买几手
         uint256 planId;
+        bool    pending;
     }
     struct idoCoinInfo {
         idoCoinInfoHead idoCoinHead;
@@ -444,6 +445,7 @@ contract idoCoinContract is Ownable {
         require(startTime > 0);
         idoCoin[coinAddress].idoCoinHead.startTime = startTime;
         idoCoin[coinAddress].idoCoinHead.expireTime = idoCoin[coinAddress].idoCoinHead.startTime.add(ipoTime);
+        idoCoin[coinAddress].idoCoinHead.pending = false;
         return true;
     }
 
@@ -453,6 +455,7 @@ contract idoCoinContract is Ownable {
 
     function IPOsubscription(address coinAddress, uint256 amount) public payable returns (bool) {
         require(amount > 0, "100");
+        require(idoCoin[coinAddress].idoCoinHead.pending == false,"110");
         require(idoCoin[coinAddress].idoCoinHead.coinAddress != address(0), "120");
         require(idoCoin[coinAddress].idoCoinHead.startTime <= block.timestamp, "130");
 
