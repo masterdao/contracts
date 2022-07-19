@@ -694,7 +694,7 @@ contract DAOMintingPool is Ownable {
                 bonus = 0;
             }
         }
-        bonus = bonus.add(userBonus[msg.sender][bsToken]);
+            bonus = bonus.add(userBonus[msg.sender][bsToken]);
         return bonus;
     }
 }

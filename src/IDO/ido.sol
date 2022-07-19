@@ -595,6 +595,10 @@ contract idoCoinContract is Ownable {
             return (idoCoin[coinAddress].ipoRate, true, idoCoin[coinAddress].timestamp);
         }
     }
+    function getCoinInfoTime(address coinAddress) public view returns (uint256, uint256, bool){
+        require(msg.sender != address(0), "800");
+        return (idoCoin[coinAddress].idoCoinHead.startTime, idoCoin[coinAddress].idoCoinHead.expireTime,idoCoin[coinAddress].settle);
+    }
 
     //管理员结算项目方资金
     function settlement(address coinAddress) public onlyISMPolicy returns (bool) {
