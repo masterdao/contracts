@@ -329,7 +329,11 @@ contract DAOMintingPool is Ownable {
         emit AddmintingPool(msg.sender, lpToken, poolTypeId);
         return true;
     }
-
+    //获取矿池抵押信息
+    function getmintingPool(address lpToken,uint256 poolTypeId) public view returns(mintingPoolInfo memory ){
+        require(lpToken != address(0));
+        return mintingPool[lpToken][poolTypeId];
+    }
     //设定投票合约地址
     function setIdoAddress(address _idoAddress) public onlyOwner returns (bool) {
         idoAddress = _idoAddress;
